@@ -1,0 +1,78 @@
+function initial_solution
+global leda2
+
+if ~leda2.file.open
+    add2log(0,'Please open data file!',0,0,0,0,0,1);
+    return;
+end
+add2log(1,'Get initial solution',1,1,1);
+
+delete_fit(0);
+
+timeData = leda2.data.time.data;
+condData = leda2.data.conductance.data;
+tau1_tmp = leda2.set.parset.tmp.tau(1);
+tau2_tmp = leda2.set.parset.tmp.tau(2);
+
+%Identify peaks (initial values)
+cond_smooth = smooth(condData, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);  %smooth data
+[onset_iv, peaktime_iv, amp_iv] = get_peaks(timeData, cond_smooth, leda2.set.initVal.signHeight);
+leda2.analyze.initialvalues.onset = onset_iv;
+leda2.analyze.initialvalues.peaktime = peaktime_iv;
+leda2.analyze.initialvalues.amp = amp_iv;
+leda2.data.conductance.smoothData = cond_smooth;
+
+%Generating initial solution
+%for the first fit parameters are already corrected
+[onset, peaktime, amp, phasicData, phasicComponent, phasicRemainder] = fit_iv(timeData, tau1_tmp, tau2_tmp, onset_iv, peaktime_iv, amp_iv);
+leda2.analyze.initialsolution.phasiccoef.onset = onset;
+leda2.analyze.initialsolution.phasiccoef.peaktime = peaktime;
+leda2.analyze.initialsolution.phasiccoef.amp = amp;
+
+%Tonic
+tonicRawData = condData - phasicData;
+groundtimes = [timeData(1),(leda2.set.epoch.size/2) : leda2.set.tonicGridSize : timeData(end), timeData(end)];
+for i = 1:length(groundtimes)
+    ground(i) = median(tonicRawData(subrange_idx(groundtimes(i)-leda2.set.epoch.size/2, groundtimes(i)+leda2.set.epoch.size/2)));
+end
+
+tonicData = interp1(groundtimes, ground, timeData, leda2.set.initVal.groundInterp);
+leda2.analyze.initialsolution.toniccoef.polycoef = interp1(groundtimes, ground,leda2.set.initVal.groundInterp, 'pp');
+leda2.analyze.initialsolution.toniccoef.groundtimes = groundtimes;
+leda2.analyze.initialsolution.toniccoef.ground = ground;
+
+%Set initial Fit-Values from convolution-estimates
+leda2.analyze.fit.phasiccoef.onset = onset;
+leda2.analyze.fit.phasiccoef.amp = amp;
+leda2.analyze.fit.phasiccoef.tau = [tau1_tmp; tau2_tmp] * ones(1,length(onset));
+
+leda2.analyze.fit.toniccoef.ground = ground;
+leda2.analyze.fit.toniccoef.time = groundtimes;
+leda2.analyze.fit.toniccoef.polycoef = leda2.analyze.initialsolution.toniccoef.polycoef;
+leda2.analyze.fit.data.tonic = tonicData;
+leda2.analyze.fit.data.phasic = phasicData;
+leda2.analyze.fit.data.residual =  leda2.data.conductance.data - (leda2.analyze.fit.data.tonic + leda2.analyze.fit.data.phasic);
+leda2.analyze.fit.data.phasicComponent = phasicComponent;
+leda2.analyze.fit.data.phasicRemainder = phasicRemainder;
+
+leda2.analyze.fit.info.iterations = 0;
+
+refresh_fitoverview;
+refresh_fitinfo;
+%refresh_progressinfo;
+
+axes(leda2.gui.rangeview.ax);
+hold on;
+ch = get(leda2.gui.rangeview.ax,'Children');
+delete(ch(strcmp(get(ch,'Tag'),'InitialSolutionInfo')));
+leda2.gui.rangeview.cond_smooth = plot(timeData, cond_smooth,'m','Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showSmoothData));
+leda2.gui.rangeview.groundpoints = plot(groundtimes, ground,'ws','MarkerFaceColor',[.8 .8 .8],'Tag','InitialSolutionInfo');
+leda2.gui.rangeview.estim_ground = plot(timeData, tonicRawData,'Color',[.8 .8 .8],'Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showTonicRawData));
+
+ni = 1 + leda2.pref.showSmoothData + leda2.pref.showTonicRawData;
+kids = get(leda2.gui.rangeview.ax, 'Children');
+set(leda2.gui.rangeview.ax, 'Children',[kids((ni+1):end); kids(ni:-1:1)]);
+
+drawnow;
+showfit;
+change_range;
