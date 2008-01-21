@@ -69,6 +69,17 @@ leda2.gui.rangeview.cond_smooth = plot(timeData, cond_smooth,'m','Tag','InitialS
 leda2.gui.rangeview.groundpoints = plot(groundtimes, ground,'ws','MarkerFaceColor',[.8 .8 .8],'Tag','InitialSolutionInfo');
 leda2.gui.rangeview.estim_ground = plot(timeData, tonicRawData,'Color',[.8 .8 .8],'Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showTonicRawData));
 
+%  for i=1:length(leda2.analyze.initialvalues.onset)
+%     onset_idx(i) = time_idx(leda2.data.time.data, leda2.analyze.initialvalues.onset(i));
+% %    sc_idx(i) = any(find((leda2.analyze.initialvalues.onset(i) - [leda2.data.events.event.time]) > -4 & (leda2.analyze.initialvalues.onset(i) - [leda2.data.events.event.time]) < 0.3));
+%  end
+%  plot(leda2.analyze.initialvalues.onset, leda2.data.conductance.data(onset_idx),'s','Color',[.2 .9 .2],'MarkerFaceColor',[.2 .9 .2],'Tag','InitialSolutionInfo','MarkerSize',5);
+% % plot(leda2.analyze.initialvalues.onset(find(sc_idx)), leda2.data.conductance.data(onset_idx(find(sc_idx))),'s','Color',[.9 .2 .2],'MarkerEdgeColor','k','MarkerFaceColor',[.9 .2 .2],'Tag','InitialSolutionInfo','MarkerSize',10);
+%  for i=1:length(leda2.analyze.initialvalues.peaktime)
+%     peaktime_idx(i) = time_idx(leda2.data.time.data, leda2.analyze.initialvalues.peaktime(i));
+%  end
+% plot(leda2.analyze.initialvalues.peaktime, leda2.data.conductance.data(peaktime_idx),'s','Color',[.9 .2 .2],'MarkerFaceColor',[.9 .2 .2],'Tag','InitialSolutionInfo','MarkerSize',5); 
+
 ni = 1 + leda2.pref.showSmoothData + leda2.pref.showTonicRawData;
 kids = get(leda2.gui.rangeview.ax, 'Children');
 set(leda2.gui.rangeview.ax, 'Children',[kids((ni+1):end); kids(ni:-1:1)]);

@@ -2,7 +2,7 @@ function [idx, time0_adj] = time_idx(time, time0)
 
 idx = find(time >= time0);
 if ~isempty(idx)
-    idx = idx(1);
+    idx = min(idx);
     time0_adj = time(idx);
     
     %check if there is a closer idex before
@@ -15,6 +15,7 @@ if ~isempty(idx)
     end
     
 else
-    idx = [];
-    time0 = [];
+    idx = find(time <= time0);
+    idx = max(idx);
+    time0_adj = time(idx);
 end

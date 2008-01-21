@@ -1,7 +1,7 @@
 function ledapref
 global leda2
 
-leda2.gui.set.fig = figure('Units','normalized','Position',[.05 .5 .4 .4],'Menubar','None','Name','Preference Settings','Numbertitle','Off','Resize','Off');
+leda2.gui.set.fig = figure('Units','normalized','Position',[.05 .5 .4 .4],'Menubar','None','Name','Visual Settings','Numbertitle','Off','Resize','Off');
 
 dx = .12; %Breite der UIs
 dy = .05; %Höhe der UIs

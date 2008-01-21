@@ -1,12 +1,17 @@
 function cut_ledafile %keep rangeview
 global leda2
 
+cmd = questdlg('Do you really want to cut the data?','Warning','Continue','Cancel','Continue');
+if isempty(cmd) || strcmp(cmd, 'Cancel')
+    return;
+end
+
 start = leda2.gui.rangeview.start;
 ende = start + leda2.gui.rangeview.range;
 
 [ts, cs, idx] = subrange(start, ende + 1/leda2.data.samplingrate);
-leda2.data.conductance.error = sqrt(mean(diff(cs).^2)/2);
 leda2.data.conductance.data = cs;
+leda2.data.conductance.error = sqrt(mean(diff(cs).^2)/2);
 leda2.data.time.data = ts - start;
 leda2.data.time.timeoff = leda2.data.time.timeoff + start;
 

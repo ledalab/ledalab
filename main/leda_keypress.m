@@ -3,6 +3,10 @@ global leda2
 
 ch = double(get(leda2.gui.fig_main,'CurrentCharacter'));
 
+if isempty(ch) %Strg / Cntrl
+    return;
+end
+
 switch ch
     case 27,  %Esc
         leda2.analyze.current.optimizing_epoch = 0;

@@ -10,9 +10,6 @@ end
 leda2.intern.install_dir = fileparts(file);
 addpath(genpath(leda2.intern.install_dir));  %add all subdirectories to Matlab path
 
-leda2.intern.name = 'Ledalab';
-leda2.intern.version = 2.00;
-leda2.intern.version_datestr = '2007-10-02';
 leda2.intern.sessionlog = {};
 
 try
@@ -53,7 +50,7 @@ leda2.gui.overview.phasic = [];
 %general
 leda2.set.tonicGridSize = 20;
 % get peaks
-leda2.set.initVal.hannWinWidth = 2;
+leda2.set.initVal.hannWinWidth = .5;
 leda2.set.initVal.signHeight = .01;
 leda2.set.initVal.groundInterp = 'spline'; %'pchip' keeps only S(x)' continuous
 % get initial solution
@@ -105,7 +102,7 @@ leda2.pref.showTonicRawData = 0;
 leda2.pref.showEpochFringe = 0;
 leda2.pref.eventWindow = [5, 15];
 leda2.pref.updateFit = 3;
-%not settable
+%not settable inside of Ledalab
 leda2.pref.oldfile_maxn = 5;
 leda2.pref.scalewidth_min = .6; %muS
 leda2.gui.col.fig = [.8 .8 .8];

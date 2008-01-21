@@ -1,11 +1,6 @@
 function plot_data
 global leda2
 
-leda2.data.N = length(leda2.data.conductance.data);
-leda2.data.samplingrate = (leda2.data.N - 1) / (leda2.data.time.data(end) - leda2.data.time.data(1));
-leda2.data.conductance.min = min(leda2.data.conductance.data);
-leda2.data.conductance.max = max(leda2.data.conductance.data);
-
 leda2.gui.rangeview.start = 0;
 
 cond = leda2.data.conductance;
@@ -59,9 +54,10 @@ axes(rgview.ax);
 cla;
 hold on
 leda2.gui.rangeview.conductance = plot(time.data, cond.data, 'Color',[0 0 0], 'LineWidth',1);
-leda2.data.conductance.smoothData = smooth(cond.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
 
+leda2.data.conductance.smoothData = smooth(cond.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
 leda2.gui.rangeview.cond_smooth = plot(time.data, leda2.data.conductance.smoothData ,'m','Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showSmoothData));
+
 if ~isempty(leda2.analyze.fit)
     leda2.gui.rangeview.groundpoints = plot(leda2.analyze.fit.toniccoef.time, leda2.analyze.fit.toniccoef.ground,'ws','MarkerFaceColor',[.8 .8 .8],'MarkerEdgeColor',[1 1 1],'Tag','InitialSolutionInfo');
     tonicRawData = cond.data - leda2.analyze.fit.data.phasic;
@@ -80,7 +76,7 @@ leda2.gui.rangeview.eventtxt = [];
 for ev = 1:events.N
     ev_x = events.event(ev).time;
     leda2.gui.rangeview.markerL(ev) = plot([ev_x ev_x], [0,100], '-','Color',[1 0 .3]);
-    leda2.gui.rangeview.eventtxt(ev) = text(ev_x, cond.max, sprintf('%.1f:  %s %s',ev_x ,num2str(events.event(ev).nid), events.event(ev).name),'rotation',90,'verticalalignment','baseline','Color',[1 0 .3]);
+    leda2.gui.rangeview.eventtxt(ev) = text(ev_x, cond.max, sprintf('%.1f:  %s (%s)', ev_x, events.event(ev).name, num2str(events.event(ev).nid)),'rotation',90,'verticalalignment','baseline','Color',[1 0 .3]);
 end
 
 set(leda2.gui.rangeview.ax, 'XLim', [rg_start, rg_end], 'Color',[.95 .95 1]); %, 'Ylim', [0,cond.max+.25]

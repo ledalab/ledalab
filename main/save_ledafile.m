@@ -45,18 +45,18 @@ end
 
 try
     save(fullfile(pathname,filename), savevars{:}, '-v6');
-    add2log(0,[datestr(now,31), ' Save ',pathname, filename,' in V',num2str(leda2.intern.version,'%1.2f')],1,1,1);   
+    add2log(1,[' Save ',pathname, filename,' in V',num2str(leda2.intern.version,'%1.2f')],1,1,1);   
     fileinfo.log = leda2.file.log; %if it there is no error, save again with updated filelog
     save(fullfile(pathname,filename), savevars{:}, '-v6');  
     
     file_changed(0);
 catch
-    add2log(0,['Saving ',fullfile(pathname, filename),' failed!!!'],1,1,0,1,0,1);
+    add2log(1,['Saving ',fullfile(pathname, filename),' failed!!!'],1,1,0,1,0,1);
 end
 
 
 leda2.file.date = fileinfo.date;
 leda2.file.version = fileinfo.version;
-if save_as
-    update_prevfilelist(pathname, filename);
-end
+%if save_as
+update_prevfilelist(pathname, filename);
+%end

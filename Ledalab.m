@@ -5,6 +5,11 @@ close all;
 clear global leda2
 
 global leda2
+
+leda2.intern.name = 'Ledalab';
+leda2.intern.version = 2.10;
+leda2.intern.version_datestr = '2008-01-22';
+
 ledapreset;
 
 if 1
