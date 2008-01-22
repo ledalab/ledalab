@@ -53,16 +53,21 @@ leda2.gui.menu.menu_4d = uimenu(leda2.gui.menu.menu_4,'Label','Optimize selectio
 leda2.gui.menu.menu_4e = uimenu(leda2.gui.menu.menu_4,'Label','Edit fit','Callback','manual_edit','Separator','on'); 
 leda2.gui.menu.menu_4f = uimenu(leda2.gui.menu.menu_4,'Label','Delete fit','Callback','delete_fit(1)'); 
 
+%-Tools
+%leda2.gui.menu.menu_5  = uimenu(leda2.gui.fig_main,'Label','Tools');  %,'Enable','off'
+%leda2.gui.menu.menu_5a = uimenu(leda2.gui.menu.menu_5,'Label','FFT','Callback','leda_fft'); 
+
 %-Results
-leda2.gui.menu.menu_5  = uimenu(leda2.gui.fig_main,'Label','Results');  %,'Enable','off'
-leda2.gui.menu.menu_5a = uimenu(leda2.gui.menu.menu_5,'Label','Export SCR-List','Callback','export_scrlist'); 
-leda2.gui.menu.menu_5b = uimenu(leda2.gui.menu.menu_5,'Label','Export Event-Related Activation','Callback','export_era','Accelerator','e'); 
+leda2.gui.menu.menu_6  = uimenu(leda2.gui.fig_main,'Label','Results');  %,'Enable','off'
+leda2.gui.menu.menu_6a = uimenu(leda2.gui.menu.menu_6,'Label','Export SCR-List','Callback','export_scrlist'); 
+leda2.gui.menu.menu_6b = uimenu(leda2.gui.menu.menu_6,'Label','Export Event-Related Activation','Callback','export_era','Accelerator','e'); 
 
 %-Info
-leda2.gui.menu.menu_6 =  uimenu(leda2.gui.fig_main,'Label','Info');  
-leda2.gui.menu.menu_6a = uimenu(leda2.gui.menu.menu_6,'Label','About Ledalab','Callback','ledalogo');
-%leda2.gui.menu.menu_6b = uimenu(leda2.gui.menu.menu_6,'Label','Documentation','Enable','off');   
-
+leda2.gui.menu.menu_7 =  uimenu(leda2.gui.fig_main,'Label','Info');  
+leda2.gui.menu.menu_7a = uimenu(leda2.gui.menu.menu_7,'Label','Ledalab Website','Callback','web(''www.ledalab.de'',''-browser'')');   
+leda2.gui.menu.menu_7b = uimenu(leda2.gui.menu.menu_7,'Label','Documentation','Callback','web(''www.ledalab.de/download/Ledalab_Documentation.pdf'',''-browser'')');
+leda2.gui.menu.menu_7c = uimenu(leda2.gui.menu.menu_7,'Label','Version check','Callback','version_check');
+leda2.gui.menu.menu_7d = uimenu(leda2.gui.menu.menu_7,'Label','About Ledalab','Callback','ledalogo','Separator','on');
 
 %Overview (= Data Display)
 dy = .79;

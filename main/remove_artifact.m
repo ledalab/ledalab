@@ -11,7 +11,7 @@ leda2.gui.remartf.edit_preperiod = uicontrol('Style','edit','Units','normalized'
 leda2.gui.remartf.edit_postperiod = uicontrol('Style','edit','Units','normalized','Position',[.41 .05 .05 .04],'String',1);
 interp_txtL = {'linear','spline','cubic'};
 leda2.gui.remartf.text_interptype = uicontrol('Style','text','Units','normalized','Position',[.55 .05 .13 .04],'String','Interpolation-Type');
-leda2.gui.remartf.popm_interptype = uicontrol('Style','popupmenu','Units','normalized','Position',[.7 .05 .08 .04],'String',interp_txtL,'Value',3);
+leda2.gui.remartf.popm_interptype = uicontrol('Style','popupmenu','Units','normalized','Position',[.7 .05 .08 .04],'String',interp_txtL,'Value',2);
 
 rv = leda2.gui.rangeview;
 [ts, cs, idx] = subrange(rv.start, rv.start + rv.range);
