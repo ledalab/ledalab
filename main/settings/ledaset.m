@@ -6,7 +6,7 @@ leda2.gui.set.fig = figure('Units','normalized','Position',[.05 .1 .4 .8],'Menub
 dx = .12; %Breite der UIs
 dy = .025; %Höhe der UIs
 dy2 = .003; %Abstand zwischen Zeilen
-dw = [.1 .6 .75]; %Abstand Felder von links (west) 
+dw = [.1 .6 .75]; %Abstand Felder von links (west)
 ds = .93; %Abstand des ersten Felds von unten (south)
 fs = [.6 .60];
 
@@ -66,15 +66,17 @@ leda2.gui.set.edit_tauMinDiff = uicontrol('Style','edit','Units','normalized','P
 %leda2.gui.set.chbx_tauBinding = uicontrol('Style','checkbox','Units','normalized','Position',[dw(2) ds-(dy+dy2)*28 .04 dy],'String', '','Value',leda2.set.tauBinding ,'FontUnits','normalized','FontSize',fs(1),'Enable','off');
 
 
-leda2.gui.set.butt_apply = uicontrol('Style','pushbutton','Units','normalized','Position',[.75 .05 .15 .05],'String', 'Apply','Callback',@apply,'FontUnits','normalized');
+leda2.gui.set.butt_apply = uicontrol('Style','pushbutton','Units','normalized','Position',[.75 .05 .15 .04],'String', 'Apply','Callback',@apply,'FontUnits','normalized');
 
 
-function apply(scr, event)
+
+
+function apply(scr, event) %#ok<INUSD>
 global leda2
 
 %general
 leda2.set.tonicGridSize = str2double(get(leda2.gui.set.edit_tonicGridSize,'String'));
-%leda2.set.initval.groundinterp = 'spline'; 
+%leda2.set.initval.groundinterp = 'spline';
 %get initial values
 leda2.set.initVal.hannWinWidth = str2double(get(leda2.gui.set.edit_hannWinWidth,'String'));
 leda2.set.initVal.signHeight = str2double(get(leda2.gui.set.edit_signHeight,'String'));
@@ -83,8 +85,8 @@ leda2.set.initSol.compensateUnderestimOnset = get(leda2.gui.set.chbx_considerUnd
 leda2.set.initSol.compensateUnderestimAmp = get(leda2.gui.set.chbx_considerUnderestimAmp,'Value');
 %setup epochs
 leda2.set.epoch.size = str2double(get(leda2.gui.set.edit_epochSize,'String')); %sec
-leda2.set.epoch.leftFringe = str2double(get(leda2.gui.set.edit_leftFringe,'String')); 
-leda2.set.epoch.rightFringe = str2double(get(leda2.gui.set.edit_rightFringe,'String')); 
+leda2.set.epoch.leftFringe = str2double(get(leda2.gui.set.edit_leftFringe,'String'));
+leda2.set.epoch.rightFringe = str2double(get(leda2.gui.set.edit_rightFringe,'String'));
 leda2.set.epoch.overlap = str2double(get(leda2.gui.set.edit_overlap,'String'));
 leda2.set.epoch.core = leda2.set.epoch.size - leda2.set.epoch.overlap;
 %initialize parsets

@@ -24,12 +24,6 @@ function export_era(action, file)
 %      relative amplitude sum (sum of amplitudes divided by initialvalue of the first deflection)
 %      area under Bateman functions related to SCRs within SCR window
 
-global leda_exp
-
-leda_exp.SCRstart = 1.00; %sec
-leda_exp.SCRend   = 4.00; %sec
-leda_exp.SCRmin   = .03; %muS
-leda_exp.savetype = 1;
 
 if nargin < 1,
     action = 'start';
@@ -41,10 +35,9 @@ switch action,
     case 'take_settings',take_settings;
     case 'savePeaks', savePeaks;
 end
-disp('OK')
 
 function start
-global leda_exp leda2
+global leda2
 
 dy = .13;
 
@@ -69,38 +62,38 @@ if isempty(leda2.analyze.fit)
 end
 
 
-leda_exp.fig_pl = figure('Units','normalized','Position',[.2 .5 .6 .2],'Name','Export Fit','MenuBar','none','NumberTitle','off');
+leda2.gui.export.fig_pl = figure('Units','normalized','Position',[.2 .5 .6 .2],'Name','Export Fit','MenuBar','none','NumberTitle','off');
 
-leda_exp.text_scrWindowLimits = uicontrol('Style','text','Units','normalized','Position',[.1 .75 .35 dy],'BackgroundColor',[.8 .8 .8],'String','SCR window relative to event (start - end) [sec]:','HorizontalAlignment','left');
-leda_exp.edit_scrWindowStart = uicontrol('Style','edit','Units','normalized','Position',[.5 .75 .1 dy],'BackgroundColor',[1 1 1],'String',num2str(leda_exp.SCRstart,'%1.2f'));
-leda_exp.edit_scrWindowEnd   = uicontrol('Style','edit','Units','normalized','Position',[.65 .75 .1 dy],'BackgroundColor',[1 1 1],'String',num2str(leda_exp.SCRend,'%1.2f'));
+leda2.gui.export.text_scrWindowLimits = uicontrol('Style','text','Units','normalized','Position',[.1 .75 .35 dy],'BackgroundColor',[.8 .8 .8],'String','SCR window relative to event (start - end) [sec]:','HorizontalAlignment','left');
+leda2.gui.export.edit_scrWindowStart = uicontrol('Style','edit','Units','normalized','Position',[.5 .75 .1 dy],'BackgroundColor',[1 1 1],'String',num2str(leda2.set.export.SCRstart,'%1.2f'));
+leda2.gui.export.edit_scrWindowEnd   = uicontrol('Style','edit','Units','normalized','Position',[.65 .75 .1 dy],'BackgroundColor',[1 1 1],'String',num2str(leda2.set.export.SCRend,'%1.2f'));
 
-leda_exp.text_scrAmplitudeMin = uicontrol('Style','text','Units','normalized','Position',[.1 .5 .35 .08],'BackgroundColor',[.8 .8 .8],'String','SCR amplitude minimum [muS]:','HorizontalAlignment','left');
-leda_exp.edit_scrAmplitudeMin = uicontrol('Style','edit','Units','normalized','Position',[.5 .5 .1 dy],'BackgroundColor',[1 1 1],'String',num2str(leda_exp.SCRmin,'%1.2f'));
+leda2.gui.export.text_scrAmplitudeMin = uicontrol('Style','text','Units','normalized','Position',[.1 .5 .35 .08],'BackgroundColor',[.8 .8 .8],'String','SCR amplitude minimum [muS]:','HorizontalAlignment','left');
+leda2.gui.export.edit_scrAmplitudeMin = uicontrol('Style','edit','Units','normalized','Position',[.5 .5 .1 dy],'BackgroundColor',[1 1 1],'String',num2str(leda2.set.export.SCRmin,'%1.2f'));
 
-leda_exp.butt_savePeaks = uicontrol('Units','normalized','Position',[.1 .2 .3 dy],'String','Export','Callback','export_era(''take_settings'')');
-leda_exp.popm_type = uicontrol('Style','popupmenu','Units','normalized','Position',[.5 .2 .3 dy],'String',{'Matlab-File';'Text-File';'Matlab & Text-File'});
+leda2.gui.export.butt_savePeaks = uicontrol('Units','normalized','Position',[.1 .2 .3 dy],'String','Export','Callback','export_era(''take_settings'')');
+leda2.gui.export.popm_type = uicontrol('Style','popupmenu','Units','normalized','Position',[.5 .2 .3 dy],'String',{'Matlab-File';'Text-File';'Matlab & Text-File'},'Value',leda2.set.export.savetype);
 
 
 
 function take_settings
-global leda_exp
+global leda2
 
-leda_exp.SCRstart = str2double(get(leda_exp.edit_scrWindowStart,'String'));
-leda_exp.SCRend = str2double(get(leda_exp.edit_scrWindowEnd,'String'));
-leda_exp.SCRmin = str2double(get(leda_exp.edit_scrAmplitudeMin,'String'));
-leda_exp.savetype = get(leda_exp.popm_type,'Value');
+leda2.set.export.SCRstart = str2double(get(leda2.gui.export.edit_scrWindowStart,'String'));
+leda2.set.export.SCRend = str2double(get(leda2.gui.export.edit_scrWindowEnd,'String'));
+leda2.set.export.SCRmin = str2double(get(leda2.gui.export.edit_scrAmplitudeMin,'String'));
+leda2.set.export.savetype = get(leda2.gui.export.popm_type,'Value');
 
 savePeaks;
 
 
 
 function savePeaks
-global leda_exp leda2
+global leda2
 
-scrWindow_t1 = leda_exp.SCRstart;
-scrWindow_t2 = leda_exp.SCRend;
-scrAmplitudeMin = leda_exp.SCRmin;
+scrWindow_t1 = leda2.set.export.SCRstart;
+scrWindow_t2 = leda2.set.export.SCRend;
+scrAmplitudeMin = leda2.set.export.SCRmin;
 
 for iEvent = 1:leda2.data.events.N
 
@@ -201,7 +194,7 @@ end %iEvent
 %%%%%%%%%
 savefname = [leda2.file.filename(1:end-4), '_era'];
 %-Text Export
-if any(leda_exp.savetype == [2,3])
+if any(leda2.set.export.savetype == [2,3])
     fid = fopen([savefname,'.txt'],'wt');
 
     for i = 1:leda2.data.events.N
@@ -215,11 +208,11 @@ if any(leda_exp.savetype == [2,3])
     fclose(fid);
 end
 %-Matlab Export
-if any(leda_exp.savetype == [1,3])
+if any(leda2.set.export.savetype == [1,3])
     results = era;
     save(savefname,'results');
 end
 
-add2log(1,[num2str(leda2.data.events.N),' events written to ',fullfile(cd, savefname)],1,1,1,1,0,1)
+add2log(1,[num2str(leda2.data.events.N),' events written to ',fullfile(cd, savefname)],1,1,1,0,0,1)
 
-close(leda_exp.fig_pl)
+close(leda2.gui.export.fig_pl)

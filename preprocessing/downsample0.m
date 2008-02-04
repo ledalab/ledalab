@@ -30,9 +30,9 @@ if ~isempty(leda2.analyze.fit)
 end
     
 
-factor = factorL(sel);
+fac = factorL(sel);
 
-[td, scd] = downsamp(t, sc, factor);
+[td, scd] = downsamp(t, sc, fac);
 %downsampling results in an additional offset = time(1), which will not be substracted (tim = time - offset) in order not to affect event times
 leda2.data.time.data = td(:)';
 leda2.data.conductance.data = scd(:)';
@@ -50,10 +50,16 @@ file_changed(1);
 add2log(1,['Data downsampled to ',FsL_txt{sel},'.'],1,1,1);
 
 
-function [t, data] = downsamp(t, data, factor)
+function [t, data] = downsamp(t, data, fac, type)
 
 N = length(data); %#samples
-data = data(1:end-mod(N, factor)); %reduce samples to match a multiple of <factor>
-data = mean(reshape(data, factor, []))'; %Mean of <factor> succeeding samples
-t = t(1:end-mod(N, factor));
-t = mean(reshape(t, factor, []))';
+if strcmp(type,'step')
+    t = t(1:fac:end);
+    data = data(1:fac:end);
+
+elseif strcmp(type,'mean')
+    t = t(1:end-mod(N, fac));
+    t = mean(reshape(t, fac, []))';
+    data = data(1:end-mod(N, fac)); %reduce samples to match a multiple of <fac>
+    data = mean(reshape(data, fac, []))'; %Mean of <fac> succeeding samples
+end

@@ -1,29 +1,13 @@
 function ledapreset
 global leda2
 
-file = which('Ledalab.m');
-if isempty(file)
-    errormessage('Can''t find Ledalab installation. Change to Ledalab install directory');
-    return;
-end
-
-leda2.intern.install_dir = fileparts(file);
-addpath(genpath(leda2.intern.install_dir));  %add all subdirectories to Matlab path
 
 leda2.intern.sessionlog = {};
-
-try
-    mem = load(fullfile(leda2.intern.install_dir,'leda2_mem.mat'));
-    leda2.intern.prevfile = mem.prevfile;
-    clear mem
-catch
-    add2log(0,'Failed to load leda2_mem',1,0,0,1)
-end
-
+leda2.intern.prevfile = [];
 leda2.intern.prompt = 1;
+
 leda2.gui.rangeview.start = 0;
 leda2.gui.rangeview.range = 60;
-
 leda2.gui.rangeview.fit_component = 0;
 leda2.gui.eventinfo.showEvent = 0;
 leda2.gui.rangeview.fitcomps = [];
@@ -46,9 +30,11 @@ leda2.gui.overview.residual = [];
 leda2.gui.overview.tonic_component = [];
 leda2.gui.overview.phasic = [];
 
+%Default Setting:
+
 %LEDASET
 %general
-leda2.set.tonicGridSize = 20;
+leda2.set.tonicGridSize = 16;
 % get peaks
 leda2.set.initVal.hannWinWidth = .5;
 leda2.set.initVal.signHeight = .01;
@@ -94,7 +80,12 @@ leda2.set.tauMin = .1;
 leda2.set.tauMax = 20;
 leda2.set.tauMinDiff = .001;
 leda2.set.tauBinding = 0;
-
+%leda2.set.downsampleType
+%Export (ERA)
+leda2.set.export.SCRstart = 1.00; %sec
+leda2.set.export.SCRend   = 4.00; %sec
+leda2.set.export.SCRmin   = .03; %muS
+leda2.set.export.savetype = 1;
 
 %Ledapref
 leda2.pref.showSmoothData = 0;
@@ -107,3 +98,30 @@ leda2.pref.oldfile_maxn = 5;
 leda2.pref.scalewidth_min = .6; %muS
 leda2.gui.col.fig = [.8 .8 .8];
 leda2.gui.col.frame1 = [.85 .85 .85];
+
+
+%Save defaults
+% load ledamem to workspace
+try
+    load(fullfile(leda2.intern.install_dir,'main\settings\ledamem.mat'));
+    leda2.intern.prevfile = ledamem.prevfile; %#ok<NODEF>
+catch
+    add2log(0,'No ledamem available',1)
+end
+
+%saving the default settings may replace an unavailble ledamem, if necessary
+ledamem.prevfile = leda2.intern.prevfile;
+ledamem.set.default = leda2.set;
+ledamem.pref.default = leda2.pref;
+save(fullfile(leda2.intern.install_dir,'main\settings\ledamem'), 'ledamem','-v6') 
+
+
+%Apply custom settings if available
+if any(strcmp(fieldnames(ledamem.set),'custom')) && ~isempty(ledamem.set.custom)
+    leda2.set = ledamem.set.custom;
+    %disp('Custom settings loaded.')
+end
+if any(strcmp(fieldnames(ledamem.pref),'custom')) && ~isempty(ledamem.pref.custom)
+    leda2.pref = ledamem.pref.custom;
+    %disp('Custom preferences loaded.')
+end

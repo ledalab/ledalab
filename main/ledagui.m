@@ -19,7 +19,7 @@ leda2.gui.menu.menu_1b6 = uimenu(leda2.gui.menu.menu_1b,'Label','User-defined Da
 leda2.gui.menu.menu_1c = uimenu(leda2.gui.menu.menu_1,'Label','Import Event-Info...'); %,'Accelerator','i'
 leda2.gui.menu.menu_1c1 = uimenu(leda2.gui.menu.menu_1c,'Label','User-defined Event-Info','Callback','import_eventinfo(''userdef'')');
 leda2.gui.menu.menu_1d = uimenu(leda2.gui.menu.menu_1,'Label','Save','Callback','save_ledafile','Accelerator','s','Separator','on');
-leda2.gui.menu.menu_1e = uimenu(leda2.gui.menu.menu_1,'Label','Save as...','Callback','save_ledafile(1)','Accelerator','a');
+leda2.gui.menu.menu_1e = uimenu(leda2.gui.menu.menu_1,'Label','Save as...','Callback','save_ledafile(1)');
 leda2.gui.menu.menu_1f = uimenu(leda2.gui.menu.menu_1,'Label','Exit','Callback','exit_leda','Accelerator','x','Separator','on');
 
 %--Oldfile-list
@@ -37,12 +37,13 @@ end
 leda2.gui.menu.menu_2  = uimenu(leda2.gui.fig_main,'Label','Preprocessing');
 leda2.gui.menu.menu_2a  = uimenu(leda2.gui.menu.menu_2,'Label','Cut data (keep selection)','Callback','cut_ledafile'); %,'Enable','off'
 leda2.gui.menu.menu_2b  = uimenu(leda2.gui.menu.menu_2,'Label','Downsampling','Callback','downsample');
-leda2.gui.menu.menu_2c  = uimenu(leda2.gui.menu.menu_2,'Label','Artifact correction','Callback','remove_artifact','Accelerator','r');
+leda2.gui.menu.menu_2c  = uimenu(leda2.gui.menu.menu_2,'Label','Artifact correction','Callback','artifact_interp','Accelerator','a');
 
 %-Settings
 leda2.gui.menu.menu_3  = uimenu(leda2.gui.fig_main,'Label','Settings');
 leda2.gui.menu.menu_3a  = uimenu(leda2.gui.menu.menu_3,'Label','Analysis settings','Callback','ledaset');
 leda2.gui.menu.menu_3b  = uimenu(leda2.gui.menu.menu_3,'Label','Visual settings','Callback','ledapref');
+leda2.gui.menu.menu_3c  = uimenu(leda2.gui.menu.menu_3,'Label','Resore default settings','Callback','restore_settings','Separator','on');
 
 %-Analyze
 leda2.gui.menu.menu_4  = uimenu(leda2.gui.fig_main,'Label','Analyze');
@@ -54,11 +55,11 @@ leda2.gui.menu.menu_4e = uimenu(leda2.gui.menu.menu_4,'Label','Edit fit','Callba
 leda2.gui.menu.menu_4f = uimenu(leda2.gui.menu.menu_4,'Label','Delete fit','Callback','delete_fit(1)'); 
 
 %-Tools
-%leda2.gui.menu.menu_5  = uimenu(leda2.gui.fig_main,'Label','Tools');  %,'Enable','off'
-%leda2.gui.menu.menu_5a = uimenu(leda2.gui.menu.menu_5,'Label','FFT','Callback','leda_fft'); 
+leda2.gui.menu.menu_5  = uimenu(leda2.gui.fig_main,'Label','Tools'); 
+leda2.gui.menu.menu_5a = uimenu(leda2.gui.menu.menu_5,'Label','FFT','Callback','leda_fft'); 
 
 %-Results
-leda2.gui.menu.menu_6  = uimenu(leda2.gui.fig_main,'Label','Results');  %,'Enable','off'
+leda2.gui.menu.menu_6  = uimenu(leda2.gui.fig_main,'Label','Results');
 leda2.gui.menu.menu_6a = uimenu(leda2.gui.menu.menu_6,'Label','Export SCR-List','Callback','export_scrlist'); 
 leda2.gui.menu.menu_6b = uimenu(leda2.gui.menu.menu_6,'Label','Export Event-Related Activation','Callback','export_era','Accelerator','e'); 
 
@@ -66,7 +67,7 @@ leda2.gui.menu.menu_6b = uimenu(leda2.gui.menu.menu_6,'Label','Export Event-Rela
 leda2.gui.menu.menu_7 =  uimenu(leda2.gui.fig_main,'Label','Info');  
 leda2.gui.menu.menu_7a = uimenu(leda2.gui.menu.menu_7,'Label','Ledalab Website','Callback','web(''www.ledalab.de'',''-browser'')');   
 leda2.gui.menu.menu_7b = uimenu(leda2.gui.menu.menu_7,'Label','Documentation','Callback','web(''www.ledalab.de/download/Ledalab_Documentation.pdf'',''-browser'')');
-leda2.gui.menu.menu_7c = uimenu(leda2.gui.menu.menu_7,'Label','Version check','Callback','version_check');
+leda2.gui.menu.menu_7c = uimenu(leda2.gui.menu.menu_7,'Label','Check for updates','Callback','version_check');
 leda2.gui.menu.menu_7d = uimenu(leda2.gui.menu.menu_7,'Label','About Ledalab','Callback','ledalogo','Separator','on');
 
 %Overview (= Data Display)

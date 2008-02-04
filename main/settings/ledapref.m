@@ -26,10 +26,12 @@ leda2.gui.set.chbx_showEpochfringe = uicontrol('Style','checkbox','Units','norma
 leda2.gui.set.text_updateFit = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*7 .5 dy],'String','Refresh fit:','FontUnits','normalized','FontSize',fs(1),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
 leda2.gui.set.popm_updateFit = uicontrol('Style','popupmenu','Units','normalized','Position',[dw(2) ds-(dy+dy2)*7 dx*2+.03 dy],'String', {'Never';'Every Epoch';'Every improvement'},'Value',leda2.pref.updateFit,'FontUnits','normalized','FontSize',fs(1));
 
-leda2.gui.set.butt_apply = uicontrol('Style','pushbutton','Units','normalized','Position',[.75 .05 .15 .05],'String', 'Apply','Callback',@apply,'FontUnits','normalized');
+leda2.gui.set.butt_apply = uicontrol('Style','pushbutton','Units','normalized','Position',[.75 .05 .15 .06],'String', 'Apply','Callback',@apply,'FontUnits','normalized');
 
 
-function apply(scr, event)
+
+
+function apply(scr, event) %#ok<INUSL>
 global leda2
 
 %get initial values

@@ -1,6 +1,10 @@
 function change_range
 global leda2
 
+if ~any(strcmp(fieldnames(leda2.data),'time')) %no data loaded yet
+    return;
+end
+
 rgview = leda2.gui.rangeview;
 time = leda2.data.time;
 

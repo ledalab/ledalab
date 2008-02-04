@@ -1,6 +1,11 @@
 function leda_click
 global leda2
 
+if ~any(strcmp(fieldnames(leda2.data),'time')) %no data loaded yet
+    return;
+end
+
+
 point1 = get(leda2.gui.overview.ax,'currentpoint');
 finalRect = rbbox;
 point2 = get(leda2.gui.overview.ax,'currentpoint');
