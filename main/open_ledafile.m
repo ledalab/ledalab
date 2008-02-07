@@ -130,6 +130,12 @@ if leda2.file.version >= 2
     end
 end
 
+%Data statistics
+leda2.data.N = length(leda2.data.conductance.data);
+leda2.data.samplingrate = (leda2.data.N - 1) / (leda2.data.time.data(end) - leda2.data.time.data(1));
+leda2.data.conductance.min = min(leda2.data.conductance.data);
+leda2.data.conductance.max = max(leda2.data.conductance.data);
+
 plot_data;
 
 update_prevfilelist(pathname, filename);

@@ -72,7 +72,7 @@ leda2.gui.menu.menu_7d = uimenu(leda2.gui.menu.menu_7,'Label','About Ledalab','C
 
 %Overview (= Data Display)
 dy = .79;
-leda2.gui.overview.ax = axes('Units','normalized','Position',[.05 dy .87 .18],'ButtonDownFcn','leda_click');
+leda2.gui.overview.ax = axes('Units','normalized','Position',[.05 dy .87 .18],'ButtonDownFcn','leda_click(1)');
 set(leda2.gui.overview.ax,'XLim',[0,60],'YLim',[0,20],'Color',[.9 .9 .9]);
 set(get(leda2.gui.overview.ax,'YLabel'),'String','SC [\muS]')
 set(get(leda2.gui.overview.ax,'XLabel'),'String','Time [sec]')
@@ -106,7 +106,7 @@ y2 = .67;
 y3 = .27;
 y5 = .22;
 y6 = .19;
-leda2.gui.rangeview.ax = axes('Units','normalized','Position',[.05 y3 .6 y2-y3],'XLim',[leda2.gui.rangeview.start, leda2.gui.rangeview.start + leda2.gui.rangeview.range],'YLim',[0,20],'Color',[1 1 1],'DrawMode','fast');
+leda2.gui.rangeview.ax = axes('Units','normalized','Position',[.05 y3 .6 y2-y3],'XLim',[leda2.gui.rangeview.start, leda2.gui.rangeview.start + leda2.gui.rangeview.range],'YLim',[0,20],'Color',[1 1 1],'DrawMode','fast','ButtonDownFcn','leda_click(2)');
 set(get(leda2.gui.rangeview.ax,'YLabel'),'String','Skin Conductance [\muS]')
 set(get(leda2.gui.rangeview.ax,'XLabel'),'String','Time [sec]')
 

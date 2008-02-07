@@ -14,18 +14,18 @@ leda2.gui.eventinfo.current_event = 0;
 axes(leda2.gui.overview.ax);
 cla;
 hold on
-leda2.gui.overview.conductance = plot(time.data, cond.data,'ButtonDownFcn','leda_click','Color',[0 0 0],'LineWidth',1);
+leda2.gui.overview.conductance = plot(time.data, cond.data,'ButtonDownFcn','leda_click(1)','Color',[0 0 0],'LineWidth',1);
 
 %range-indicator-field
 rg_start = rgview.start;
 rg_end = rgview.start + rgview.range;
-leda2.gui.overview.rangefld = fill([rg_start, rg_start, rg_end, rg_end],[.5, cond.max+.5, cond.max+.5, .5],[1 1 1], 'EdgeColor',[0 0 0], 'FaceAlpha',.4,'ButtonDownFcn','leda_click');
+leda2.gui.overview.rangefld = fill([rg_start, rg_start, rg_end, rg_end],[.5, cond.max+.5, cond.max+.5, .5],[1 1 1], 'EdgeColor',[0 0 0], 'FaceAlpha',.4,'ButtonDownFcn','leda_click(1)');
 
 %Events - overview
 if events.N > 0
     for ev = 1:events.N
         ev_x = events.event(ev).time;
-        leda2.gui.overview.markerL(ev) = plot([ev_x ev_x], [0, cond.max+20], '-','Color',[1 0 .3],'ButtonDownFcn','leda_click');
+        leda2.gui.overview.markerL(ev) = plot([ev_x ev_x], [0, cond.max+20], '-','Color',[1 0 .3],'ButtonDownFcn','leda_click(1)');
     end
 end
 
@@ -53,15 +53,15 @@ refresh_fitoverview;
 axes(rgview.ax);
 cla;
 hold on
-leda2.gui.rangeview.conductance = plot(time.data, cond.data, 'Color',[0 0 0], 'LineWidth',1);
+leda2.gui.rangeview.conductance = plot(time.data, cond.data, 'Color',[0 0 0], 'LineWidth',1,'ButtonDownFcn','leda_click(2)');
 
 leda2.data.conductance.smoothData = smooth(cond.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
-leda2.gui.rangeview.cond_smooth = plot(time.data, leda2.data.conductance.smoothData ,'m','Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showSmoothData));
+leda2.gui.rangeview.cond_smooth = plot(time.data, leda2.data.conductance.smoothData ,'m','Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showSmoothData),'ButtonDownFcn','leda_click(2)');
 
 if ~isempty(leda2.analyze.fit)
-    leda2.gui.rangeview.groundpoints = plot(leda2.analyze.fit.toniccoef.time, leda2.analyze.fit.toniccoef.ground,'ws','MarkerFaceColor',[.8 .8 .8],'MarkerEdgeColor',[1 1 1],'Tag','InitialSolutionInfo');
+    leda2.gui.rangeview.groundpoints = plot(leda2.analyze.fit.toniccoef.time, leda2.analyze.fit.toniccoef.ground,'ws','MarkerFaceColor',[.8 .8 .8],'MarkerEdgeColor',[1 1 1],'Tag','InitialSolutionInfo','ButtonDownFcn','leda_click(2)');
     tonicRawData = cond.data - leda2.analyze.fit.data.phasic;
-    leda2.gui.rangeview.estim_ground = plot(time.data, tonicRawData,'Color',[.8 .8 .8],'Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showTonicRawData));
+    leda2.gui.rangeview.estim_ground = plot(time.data, tonicRawData,'Color',[.8 .8 .8],'Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showTonicRawData),'ButtonDownFcn','leda_click(2)');
 end
 
 %ni = 1 + leda2.pref.showSmoothData + leda2.pref.showTonicRawData*(~isempty(leda2.analyze.fit));
@@ -75,8 +75,8 @@ leda2.gui.rangeview.eventtxt = [];
 
 for ev = 1:events.N
     ev_x = events.event(ev).time;
-    leda2.gui.rangeview.markerL(ev) = plot([ev_x ev_x], [0,100], '-','Color',[1 0 .3]);
-    leda2.gui.rangeview.eventtxt(ev) = text(ev_x, cond.max, sprintf('%.1f:  %s (%s)', ev_x, events.event(ev).name, num2str(events.event(ev).nid)),'rotation',90,'verticalalignment','baseline','Color',[1 0 .3]);
+    leda2.gui.rangeview.markerL(ev) = plot([ev_x ev_x], [0,100], '-','Color',[1 0 .3],'ButtonDownFcn','leda_click(2)');
+    leda2.gui.rangeview.eventtxt(ev) = text(ev_x, cond.max, sprintf('%.1f:  %s (%s)', ev_x, events.event(ev).name, num2str(events.event(ev).nid)),'rotation',90,'verticalalignment','baseline','Color',[1 0 .3],'ButtonDownFcn','leda_click(2)');
 end
 
 set(leda2.gui.rangeview.ax, 'XLim', [rg_start, rg_end], 'Color',[.95 .95 1]); %, 'Ylim', [0,cond.max+.25]

@@ -11,6 +11,8 @@ switch type,
         window = 0.5*(1 - cos(2*pi*(0:1/winwidth:1)));  % hanning window
     case 'mean'
         window = ones(1,winwidth+1); %moving average
+    case 'gauss'
+        window = normpdf(1:(winwidth+1), winwidth/2+1, winwidth/6);
     otherwise
         error('Unknown type')
 end
