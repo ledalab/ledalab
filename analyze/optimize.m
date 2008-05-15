@@ -37,8 +37,11 @@ epoch = [];
 
 timesize = ende - start;
 nEpochs = ceil(timesize / leda2.set.epoch.core);
-axes(leda2.gui.rangeview.ax);
-hold on
+if ~leda2.intern.batchmode
+    axes(leda2.gui.rangeview.ax);
+    hold on
+    return;
+end
 
 fit_iterations = leda2.analyze.fit.info.iterations;
 
@@ -100,16 +103,17 @@ for iEpoch = 1:nEpochs
     leda2.analyze.epoch(iEpoch).initial_error = leda2.analyze.epoch(iEpoch).error;
     %_setup epochs
 
-    refresh_progressinfo;
-    refresh_epochinfo;
+    if ~leda2.intern.batchmode
+        refresh_progressinfo;
+        refresh_epochinfo;
 
-    leda2.gui.rangeview.start = leda2.analyze.epoch(iEpoch).start - leda2.set.epoch.leftFringe * leda2.pref.showEpochFringe;
-    leda2.gui.rangeview.range = leda2.analyze.epoch(iEpoch).end - leda2.analyze.epoch(iEpoch).start + (leda2.set.epoch.leftFringe + leda2.set.epoch.rightFringe) * leda2.pref.showEpochFringe;
+        leda2.gui.rangeview.start = leda2.analyze.epoch(iEpoch).start - leda2.set.epoch.leftFringe * leda2.pref.showEpochFringe;
+        leda2.gui.rangeview.range = leda2.analyze.epoch(iEpoch).end - leda2.analyze.epoch(iEpoch).start + (leda2.set.epoch.leftFringe + leda2.set.epoch.rightFringe) * leda2.pref.showEpochFringe;
 
-    if leda2.pref.updateFit >= 2
-        change_range;
+        if leda2.pref.updateFit >= 2
+            change_range;
+        end
     end
-
 
     leda2.analyze.current.optimizing_epoch = 1;
 

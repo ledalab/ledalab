@@ -1,4 +1,7 @@
 function [time, conductance, event] = getBiotraceData(filename)
+%Import Biotrace data
+%
+%Mind: events must not be 0!
 
 event = [];
 headerLines = 14;
@@ -24,7 +27,9 @@ nSignals = length(labels) - 1;
 
 %read data
 M = dlmread(filename,'\t',[headerLines, 0, headerLines+nSamples-1, nSignals]);
-scCol = find(strcmp(labels,'Sensor-13:SC/GSR')); %column of SC data
+for i = 1:length(labels)
+    scCol(i) = any(strfind(labels{i}, 'SC/GSR'));
+end
 conductance = M(:,scCol);
 time = M(:,1) / freq;
 

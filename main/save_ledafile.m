@@ -20,6 +20,8 @@ else
     filename = leda2.file.filename;
     pathname = leda2.file.pathname;
 end
+file = fullfile(pathname, filename);
+
 
 %Prepare data for saving
 fileinfo.version = leda2.intern.version;
@@ -30,28 +32,30 @@ data.conductance = leda2.data.conductance.data;
 data.time = leda2.data.time.data;
 data.timeoff = leda2.data.time.timeoff;
 data.event = leda2.data.events.event;
+%data.artifact = leda2.data.artifact;
 
 savevars = {'fileinfo','data'};
 
 fit = [];
 if ~isempty(leda2.analyze.fit)
+    initvals = leda2.analyze.initialvalues;
     fit = leda2.analyze.fit;
     fit = rmfield(fit, 'data');
 end
-if ~isempty(fit)
-    savevars = [savevars, 'fit'];
+if ~isempty(fit) && ~isempty(initvals)
+    savevars = [savevars, {'initvals'}, {'fit'}];
 end
 
 
 try
-    save(fullfile(pathname,filename), savevars{:}, '-v6'); %
-    add2log(1,[' Save ',pathname, filename,' in V',num2str(leda2.intern.version,'%1.2f')],1,1,1);   
+    save(file, savevars{:}, '-v6'); %
+    add2log(1,[' Save ',file,' in V',num2str(leda2.intern.version,'%1.2f')],1,1,1);   
     fileinfo.log = leda2.file.log; %if it there is no error, save again with updated filelog
-    save(fullfile(pathname,filename), savevars{:}, '-v6');  %
+    save(file, savevars{:}, '-v6');  %
     
     file_changed(0);
 catch
-    add2log(1,['Saving ',fullfile(pathname, filename),' failed!!!'],1,1,0,1,0,1);
+    add2log(1,[' Saving ',file,' failed!!!'],1,1,0,1,0,1);
 end
 
 

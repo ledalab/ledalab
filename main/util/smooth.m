@@ -1,7 +1,7 @@
 function sdata = smooth(data, winwidth, type)
 
 if nargin < 3
-    type = 'hann';
+    type = 'gauss';
 end
 
 data = data(:)'; %ensure data as a row;
@@ -12,7 +12,7 @@ switch type,
     case 'mean'
         window = ones(1,winwidth+1); %moving average
     case 'gauss'
-        window = normpdf(1:(winwidth+1), winwidth/2+1, winwidth/6);
+        window = normpdf(1:(winwidth+1), winwidth/2+1, winwidth/8);
     otherwise
         error('Unknown type')
 end

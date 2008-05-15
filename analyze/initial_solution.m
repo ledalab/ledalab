@@ -57,6 +57,11 @@ leda2.analyze.fit.data.phasicRemainder = phasicRemainder;
 
 leda2.analyze.fit.info.iterations = 0;
 
+if leda2.intern.batchmode
+    return;
+end
+
+
 refresh_fitoverview;
 refresh_fitinfo;
 %refresh_progressinfo;

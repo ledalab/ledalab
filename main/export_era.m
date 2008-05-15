@@ -1,4 +1,4 @@
-function export_era(action, file)
+function export_era(action)
 % postleda: Saving results of ledafit-file into textfile (*_results.txt)
 %
 %  - Choose SCR-Window times relative to event
@@ -31,7 +31,6 @@ end
 
 switch action,
     case 'start', start;
-    case 'file', openFitFile;
     case 'take_settings',take_settings;
     case 'savePeaks', savePeaks;
 end

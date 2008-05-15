@@ -4,9 +4,9 @@ global leda2
 if ~leda2.file.open
     return;
 end
-    
+
 %Unsaved data can be saved now
-if leda2.file.changed
+if leda2.file.changed && ~leda2.intern.batchmode
     choice = questdlg('Do you want to save the file?','Save File','Yes','No','Cancel','Yes');
     if strcmp(choice,'Yes')
         save_ledafile;

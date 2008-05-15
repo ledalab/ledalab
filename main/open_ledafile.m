@@ -1,7 +1,7 @@
 function open_ledafile(flag, pathname, filename)
 global leda2
 
-%validfile = 0;
+leda2.current.fileopen_ok = 0;
 
 if nargin == 0
     [filename, pathname] = uigetfile(' *.mat','Choose a ledalab-file');
@@ -14,14 +14,15 @@ end
 if all(filename == 0) || all(pathname == 0) %Cancel
     return
 end
+file = fullfile(pathname, filename);
 
 
 %Try to open file
 try
-    ledafile = load([pathname, filename], '-mat');
+    ledafile = load(file, '-mat');
     cd(pathname);
 catch
-    add2log(0,['Unable to open ',pathname, filename],1,1,0,1,0,1);
+    add2log(0,['Unable to open ',file],1,1,0,1,0,1);
     return;
 end
 
@@ -30,7 +31,7 @@ end
 ledafile_vars = fieldnames(ledafile); %isstruct?
 
 if any(strcmp(ledafile_vars,'epocharray')) %V1.x
-    add2log(0,['Unable to open ',pathname, filename,': This is a ledafit-file. Please open corresponding ledadata-file instead..'],1,1,0,1,0,1);
+    add2log(0,['Unable to open ',file,': This is a ledafit-file. Please open corresponding ledadata-file instead..'],1,1,0,1,0,1);
     return;
 end
 
@@ -44,7 +45,7 @@ if any(strcmp(ledafile_vars,'data'))
         return
     end
 else
-    add2log(0,['Unable to open ',pathname, filename,': Could not load data.'],1,1,0,1,0,1);
+    add2log(0,['Unable to open ',file,': Could not load data.'],1,1,0,1,0,1);
     return;
 end
 %Valid ledadata available and ready to load!
@@ -64,7 +65,7 @@ conductanceerror = sqrt(mean(diff(ledafile.data.conductance).^2)/2);
 leda2.data.conductance.error = conductanceerror;
 
 leda2.file.filename = filename;
-leda2.file.pathname = fileparts(pathname);
+leda2.file.pathname = pathname;
 leda2.intern.current_dir = leda2.file.pathname;
 leda2.file.open = 1;
 file_changed(0);
@@ -105,7 +106,7 @@ elseif any(strcmp(ledafile_vars,'fileinfo')) %version 2.x
         disp('Could not load File-Info properly!');
     end
 end
-add2log(0,[datestr(now,31), ' Open ',fullfile(pathname,filename),' V',num2str(leda2.file.version,'%1.2f')],1,1,1);
+add2log(0,[datestr(now,31), ' Open ',file,' V',num2str(leda2.file.version,'%1.2f')],1,1,1);
 
 %Fit
 if leda2.file.version >= 2
@@ -127,6 +128,15 @@ if leda2.file.version >= 2
         catch
             add2log(0,'Could not load Fit-Info properly!',1,1,0,0,0,1)
         end
+
+        if any(strcmp(ledafile_vars,'initvals'))  %V2.14+
+            try
+                leda2.analyze.initialvalues = ledafile.initvals;
+            catch
+                add2log(0,'Could not load Initial Values Info properly!',1,1,0,0,0,1)
+            end
+        end
+
     end
 end
 
@@ -135,6 +145,12 @@ leda2.data.N = length(leda2.data.conductance.data);
 leda2.data.samplingrate = (leda2.data.N - 1) / (leda2.data.time.data(end) - leda2.data.time.data(1));
 leda2.data.conductance.min = min(leda2.data.conductance.data);
 leda2.data.conductance.max = max(leda2.data.conductance.data);
+leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
+
+leda2.current.fileopen_ok = 1;
+if leda2.intern.batchmode
+    return;
+end
 
 plot_data;
 

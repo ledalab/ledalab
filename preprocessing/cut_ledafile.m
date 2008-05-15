@@ -18,12 +18,15 @@ leda2.data.time.timeoff = leda2.data.time.timeoff + start;
 leda2.data.N = length(ts);
 
 %cut events
-eidx = find([leda2.data.events.event.time] >= start & [leda2.data.events.event.time] < ende);
-leda2.data.events.event = leda2.data.events.event(eidx);
-leda2.data.events.N = length(leda2.data.events.event);
-for i = 1:leda2.data.events.N
-    leda2.data.events.event(i).time = leda2.data.events.event(i).time - start;
+if ~isempty(leda2.data.events.event)
+    eidx = find([leda2.data.events.event.time] >= start & [leda2.data.events.event.time] < ende);
+    leda2.data.events.event = leda2.data.events.event(eidx);
+    leda2.data.events.N = length(leda2.data.events.event);
+    for i = 1:leda2.data.events.N
+        leda2.data.events.event(i).time = leda2.data.events.event(i).time - start;
+    end
 end
+leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
 
 delete_fit(0);
 

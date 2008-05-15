@@ -64,10 +64,8 @@ if ~isempty(leda2.analyze.fit)
     leda2.gui.rangeview.estim_ground = plot(time.data, tonicRawData,'Color',[.8 .8 .8],'Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showTonicRawData),'ButtonDownFcn','leda_click(2)');
 end
 
-%ni = 1 + leda2.pref.showSmoothData + leda2.pref.showTonicRawData*(~isempty(leda2.analyze.fit));
-%set(leda2.gui.rangeview.ax, 'Children',[kids((ni+1):end); kids(ni:-1:1)]);
-kids = get(leda2.gui.rangeview.ax, 'Children');
-set(leda2.gui.rangeview.ax, 'Children',kids(end:-1:1));
+% kids = get(leda2.gui.rangeview.ax, 'Children');
+% set(leda2.gui.rangeview.ax, 'Children',kids(end:-1:1));
 
 %Events - rangeview
 leda2.gui.rangeview.markerL = [];

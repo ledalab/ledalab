@@ -1,6 +1,10 @@
 function refresh_epochinfo
 global leda2
 
+if leda2.intern.batchmode
+    return;
+end
+
 if isempty(leda2.analyze.fit)
     set(leda2.gui.epochinfo.list_scr,'String', 'No Fit available');
     set(leda2.gui.epochinfo.list_tonic,'String', 'No Fit available');

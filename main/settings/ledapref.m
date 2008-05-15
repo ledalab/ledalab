@@ -6,13 +6,13 @@ leda2.gui.set.fig = figure('Units','normalized','Position',[.05 .5 .4 .4],'Menub
 dx = .12; %Breite der UIs
 dy = .05; %Höhe der UIs
 dy2 = .006; %Abstand zwischen Zeilen
-dw = [.1 .6 .75]; %Abstand Felder von links (west) 
+dw = [.1 .6 .75]; %Abstand Felder von links (west)
 ds = .82; %Abstand des ersten Felds von unten (south)
 fs = [.6 .60];
 
 %get initial values
 leda2.gui.set.text_getpeaks = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*0 .5 dy],'String','Selection Display','FontUnits','normalized','FontSize',fs(2),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'),'FontWeight','bold');
-leda2.gui.set.text_showSmoothData = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*1 .5 dy],'String','Show smoothed data (after initial solution):','FontUnits','normalized','FontSize',fs(1),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
+leda2.gui.set.text_showSmoothData = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*1 .5 dy],'String','Show smoothed data:','FontUnits','normalized','FontSize',fs(1),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
 leda2.gui.set.chbx_showSmoothData = uicontrol('Style','checkbox','Units','normalized','Position',[dw(2) ds-(dy+dy2)*1 .026 dy],'Value', leda2.pref.showSmoothData,'FontUnits','normalized','FontSize',fs(1));
 leda2.gui.set.text_tonicRawData = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*2 .5 dy],'String','Show raw tonic data (after initial solution):','FontUnits','normalized','FontSize',fs(1),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
 leda2.gui.set.chbx_tonicRawData = uicontrol('Style','checkbox','Units','normalized','Position',[dw(2) ds-(dy+dy2)*2 .026 dy],'Value', leda2.pref.showTonicRawData,'FontUnits','normalized','FontSize',fs(1));
@@ -45,7 +45,7 @@ leda2.pref.updateFit = get(leda2.gui.set.popm_updateFit,'Value');
 close(leda2.gui.set.fig)
 
 change_range;
+set(leda2.gui.rangeview.cond_smooth,'Visible',onoffstr(leda2.pref.showSmoothData));
 if ~isempty(leda2.analyze.fit)
-    set(leda2.gui.rangeview.cond_smooth,'Visible',onoffstr(leda2.pref.showSmoothData));
     set(leda2.gui.rangeview.estim_ground,'Visible',onoffstr(leda2.pref.showTonicRawData));
 end

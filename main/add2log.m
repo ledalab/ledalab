@@ -27,7 +27,7 @@ if ledalog
     fclose(fid_ll);
 end
 
-if sessionlog
+if sessionlog && ~leda2.intern.batchmode
     if replaceline
         leda2.intern.sessionlog = [{newinfo}; leda2.intern.sessionlog(2:end)];
     else
@@ -45,6 +45,6 @@ if display
     disp(newinfo)
 end
 
-if showmsgbox && leda2.intern.prompt
+if showmsgbox && leda2.intern.prompt && ~leda2.intern.batchmode
     msgbox(newinfo,'Info','warn')
 end

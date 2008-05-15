@@ -72,6 +72,10 @@ leda2.analyze.fit.toniccoef.polycoef = interp1(leda2.analyze.fit.toniccoef.time,
 tonicRawData = leda2.data.conductance.data - leda2.analyze.fit.data.phasic;
 leda2.analyze.fit.data.residual = tonicRawData - leda2.analyze.fit.data.tonic;
 
+if leda2.intern.batchmode
+    return;
+end
+
 set(leda2.gui.rangeview.estim_ground, 'YData', tonicRawData);
 set(leda2.gui.rangeview.groundpoints, 'YData', leda2.analyze.fit.toniccoef.ground);
 

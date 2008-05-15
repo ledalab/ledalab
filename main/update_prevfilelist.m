@@ -1,6 +1,10 @@
 function update_prevfilelist(pathname, filename)
 global leda2
 
+if leda2.intern.batchmode
+    return;
+end
+
 %Update previous files - list
 pf = leda2.intern.prevfile;
 n = length(pf);

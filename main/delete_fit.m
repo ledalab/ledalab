@@ -8,6 +8,10 @@ leda2.analyze.epoch = [];
 leda2.analyze.fit = [];
 leda2.analyze.history = [];
 
+if leda2.intern.batchmode
+    return;
+end
+
 %Delete fitoverview
 ch = get(leda2.gui.overview.ax,'Children');
 delete(ch(strcmp(get(ch,'Tag'),'FitComp')));
@@ -17,7 +21,7 @@ leda2.gui.overview.phasic = [];
 
 refresh_fitinfo;
 manual_edit('exit_medit');
-    
+
 if show_log
     plot_data;
     add2log(1,'Fit deleted',1,1,1)

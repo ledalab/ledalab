@@ -1,5 +1,6 @@
-function import_data(datatype)
+function import_data(datatype, pathname, filename)
 global leda2
+leda2.current.fileopen_ok = 0;
 
 switch datatype
     case 'mat', ext = {'*.mat'};
@@ -10,42 +11,47 @@ switch datatype
     case 'userdef', ext = {'*.txt'};
 
     otherwise
-        msgbox('Unknown filetype.','Info')
+        if leda2.intern.prompt
+            msgbox('Unknown filetype.','Info')
+        end
         return
 end
 
-[filename, pathname] = uigetfile(ext, ['Choose a ',datatype,' data-file']);
-if all(filename == 0) || all(pathname == 0) %Cancel
-    return
+if nargin < 3
+    [filename, pathname] = uigetfile(ext, ['Choose a ',datatype,' data-file']);
+    if all(filename == 0) || all(pathname == 0) %Cancel
+        return
+    end
 end
+file = fullfile(pathname, filename);
 
 %Try to import the selected data-file
 try
     switch datatype
         case 'mat',
-            load([pathname, filename]);
+            load(file);
             conductance = data.conductance;
             time = data.time;
             event = data.event;
 
         case 'text'
-            [time, conductance, event] = gettextdata([pathname, filename]);
+            [time, conductance, event] = gettextdata(file);
 
         case 'cassylab',
-            [time, conductance, event] = getcassydata([pathname, filename]);
+            [time, conductance, event] = getcassydata(file);
 
         case 'biotrace'
-            [time, conductance, event] = getBiotraceData([pathname, filename]);
-            
+            [time, conductance, event] = getBiotraceData(file);
+
         case 'visionanalyzer'
-            [time, conductance, event] = getVisionanalyzerData([pathname, filename]);            
+            [time, conductance, event] = getVisionanalyzerData(file);
 
         case 'userdef'
-            [time, conductance, event] = getuserdefdata([pathname, filename]);
+            [time, conductance, event] = getuserdefdata(file);
 
     end
 catch
-    add2log(0,['Unable to import ',pathname, filename,': No valid ',datatype,' data-file or corrupt file.'],1,1,0,1,0,1)
+    add2log(0,['Unable to import ',file,': No valid ',datatype,' data-file or corrupt file.'],1,1,0,1,0,1)
     return
 end
 
@@ -65,7 +71,6 @@ leda2.data.conductance.data = conductance;
 leda2.data.time.data = time;
 leda2.data.time.timeoff = timeoffset;
 conductanceerror = sqrt(mean(diff(conductance).^2)/2);
-leda2.data.conductance.error = conductanceerror;
 
 %Get events
 if ~isempty(event)
@@ -99,15 +104,18 @@ leda2.intern.current_dir = leda2.file.pathname;
 cd(pathname);
 leda2.file.open = 1;
 file_changed(1);
-add2log(1,[' Imported ',pathname, filename,' successfully.'],1,1,1);
+add2log(1,[' Imported ',file,' successfully.'],1,1,1);
 
 %Data statistics
 leda2.data.N = length(leda2.data.conductance.data);
 leda2.data.samplingrate = (leda2.data.N - 1) / (leda2.data.time.data(end) - leda2.data.time.data(1));
 leda2.data.conductance.min = min(leda2.data.conductance.data);
 leda2.data.conductance.max = max(leda2.data.conductance.data);
+leda2.data.conductance.error = conductanceerror;
+leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
+
 %Downsample?
-if leda2.data.samplingrate > 32 || leda2.data.N > 36000
+if (leda2.data.samplingrate > 32 || leda2.data.N > 36000) && ~leda2.intern.batchmode
     cmd = questdlg('Data is quite large. Do you wish to downsample your data in order to speed up the analysis?','Warning','Yes','No','Yes');
     if strcmp(cmd, 'Yes')
         downsample;
@@ -115,3 +123,5 @@ if leda2.data.samplingrate > 32 || leda2.data.N > 36000
 end
 
 plot_data;
+
+leda2.current.fileopen_ok = 1;

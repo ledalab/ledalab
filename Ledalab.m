@@ -1,4 +1,4 @@
-function Ledalab
+function Ledalab(varargin)
 
 clc;
 close all;
@@ -7,8 +7,8 @@ clear global leda2
 global leda2
 
 leda2.intern.name = 'Ledalab';
-leda2.intern.version = 2.13;
-leda2.intern.version_datestr = '2008-02-06';
+leda2.intern.version = 2.14;
+leda2.intern.version_datestr = '2008-05-16';
 
 %Add all subdirectories to Matlab path
 file = which('Ledalab.m');
@@ -17,16 +17,26 @@ if isempty(file)
     return;
 end
 leda2.intern.install_dir = fileparts(file);
-addpath(genpath(leda2.intern.install_dir));  
+addpath(genpath(leda2.intern.install_dir));
 
 ledapreset;
 
-if 1
+
+if nargin > 0
+    %Batch-Mode
+    leda2.intern.batchmode = 1;
+    leda2.intern.prompt = 0;
+    leda2.pref.updateFit = 0;
+    leda_batchanalysis(varargin{:});
+
+else
+    leda2.intern.batchmode = 0;
+    
     ledalogo;
     pause(1);
     delete(leda2.gui.fig_logo);
+
+    ledagui;
+
+    add2log(0,['>>>> ',datestr(now,31), ' Session started'],1,1);
 end
-
-ledagui;
-
-add2log(0,['>>>> ',datestr(now,31), ' Session started'],1,1);
