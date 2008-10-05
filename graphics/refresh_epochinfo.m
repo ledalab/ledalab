@@ -17,7 +17,7 @@ parset = epoch.parset(epoch.bestparset);
 
 scr_str = {};
 for i = 1:length(parset.onset)
-    scr_str(i) = {[sprintf('%6.2f',parset.onset(i)),' s:  amp =  ',num2str(parset.amp(i),'%4.3f'),' muS,  tau = ',sprintf('%3.1f',parset.tau(1,i)),', ',sprintf('%3.1f',parset.tau(2,i))]};
+    scr_str(i) = {[sprintf('%6.2f',parset.onset(i)),' s:  amp =  ',num2str(parset.amp(i),'%4.3f'),' muS,  tau = ',sprintf('%3.1f',parset.tau(1,i)),', ',sprintf('%3.1f',parset.tau(2,i)),',  s = ',sprintf('%1.3f',parset.sigma(i))]};
 end
 set(leda2.gui.epochinfo.list_scr,'String', scr_str);
 

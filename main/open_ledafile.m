@@ -147,11 +147,8 @@ leda2.data.conductance.min = min(leda2.data.conductance.data);
 leda2.data.conductance.max = max(leda2.data.conductance.data);
 leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
 
-leda2.current.fileopen_ok = 1;
-if leda2.intern.batchmode
-    return;
-end
-
 plot_data;
 
 update_prevfilelist(pathname, filename);
+
+leda2.current.fileopen_ok = 1;

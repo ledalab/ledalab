@@ -11,7 +11,7 @@ if ~leda2.file.open
 end
 
 if nargin < 1
-    add2log(1,'Fit data', 1,1,1);
+    add2log(1,' Fit data', 1,1,1);
 end
 
 if isempty(leda2.analyze.fit)
@@ -22,12 +22,12 @@ end
 if nargin < 1
     start = leda2.data.time.data(1);
     ende = leda2.data.time.data(end);
-    add2log(1,'Optimize all', 1,1,1);
+    add2log(1,' Optimize all', 1,1,1);
 
 elseif this == -1
     start = leda2.gui.rangeview.start;
     ende = start + leda2.gui.rangeview.range;
-    add2log(1,['Optimize selection ',sprintf('%5.2f', start),' : ',sprintf('%5.2f', ende)], 1,1,1);
+    add2log(1,[' Optimize selection ',sprintf('%5.2f', start),' : ',sprintf('%5.2f', ende)], 1,1,1);
 
 end
 
@@ -37,11 +37,8 @@ epoch = [];
 
 timesize = ende - start;
 nEpochs = ceil(timesize / leda2.set.epoch.core);
-if ~leda2.intern.batchmode
-    axes(leda2.gui.rangeview.ax);
-    hold on
-    return;
-end
+%axes(leda2.gui.rangeview.ax);
+%hold on
 
 fit_iterations = leda2.analyze.fit.info.iterations;
 
@@ -49,7 +46,7 @@ fit_iterations = leda2.analyze.fit.info.iterations;
 for iEpoch = 1:nEpochs
 
     if iEpoch < nEpochs
-        epoch(iEpoch).start = start + (iEpoch-1)*leda2.set.epoch.core;
+        epoch(iEpoch).start = start + (iEpoch-1)*leda2.set.epoch.core; %#ok<AGROW>
         epoch(iEpoch).end = start + (iEpoch-1)*leda2.set.epoch.core + leda2.set.epoch.size;
         epoch(iEpoch).end = withinlimits(epoch(iEpoch).end, leda2.data.time.data(1), leda2.data.time.data(end));
     else
@@ -103,17 +100,16 @@ for iEpoch = 1:nEpochs
     leda2.analyze.epoch(iEpoch).initial_error = leda2.analyze.epoch(iEpoch).error;
     %_setup epochs
 
-    if ~leda2.intern.batchmode
-        refresh_progressinfo;
-        refresh_epochinfo;
+    refresh_progressinfo;
+    refresh_epochinfo;
 
-        leda2.gui.rangeview.start = leda2.analyze.epoch(iEpoch).start - leda2.set.epoch.leftFringe * leda2.pref.showEpochFringe;
-        leda2.gui.rangeview.range = leda2.analyze.epoch(iEpoch).end - leda2.analyze.epoch(iEpoch).start + (leda2.set.epoch.leftFringe + leda2.set.epoch.rightFringe) * leda2.pref.showEpochFringe;
+    leda2.gui.rangeview.start = leda2.analyze.epoch(iEpoch).start - leda2.set.epoch.leftFringe * leda2.pref.showEpochFringe;
+    leda2.gui.rangeview.range = leda2.analyze.epoch(iEpoch).end - leda2.analyze.epoch(iEpoch).start + (leda2.set.epoch.leftFringe + leda2.set.epoch.rightFringe) * leda2.pref.showEpochFringe;
 
-        if leda2.pref.updateFit >= 2
-            change_range;
-        end
+    if leda2.pref.updateFit >= 2
+        change_range;
     end
+
 
     leda2.analyze.current.optimizing_epoch = 1;
 
@@ -185,9 +181,9 @@ update_fit(3); %fullupdate
 stopT = clock;
 file_changed(1);
 if leda2.analyze.current.optimizing
-    add2log(1,['Optimization finished successfully (elapsed time = ',sprintf('%5.1f',etime(stopT,startT)),'sec)'],1,1,1);
+    add2log(1,[' Optimization finished successfully (elapsed time = ',sprintf('%5.1f',etime(stopT,startT)),'sec)'],1,1,1);
 else
-    add2log(1,'Optimization aborted.',1,1,1);
+    add2log(1,' Optimization aborted.',1,1,1);
 end
 
 leda2.analyze.current.oldEpoch = leda2.analyze.epoch; %for software testing reasons

@@ -1,6 +1,9 @@
 function change_range
 global leda2
 
+if leda2.intern.batchmode
+    return;
+end
 if ~any(strcmp(fieldnames(leda2.data),'time')) %no data loaded yet
     return;
 end
@@ -79,6 +82,7 @@ if ~leda2.analyze.current.optimizing
         epoch.parset(1).onset = phasics.onset(epoch.phasic_idx);
         epoch.parset(1).amp = phasics.amp(epoch.phasic_idx);
         epoch.parset(1).tau = phasics.tau(:, epoch.phasic_idx);
+        epoch.parset(1).sigma = phasics.sigma(:, epoch.phasic_idx);
         epoch.parset(1).groundtime = tonics.time(epoch.tonic_idx);
         epoch.parset(1).groundlevel = tonics.ground(epoch.tonic_idx);
         epoch.parset(1).error = fiterror_parset(epoch, epoch.parset(1));

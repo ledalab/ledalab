@@ -87,6 +87,11 @@ if ~(isempty(onset) || isempty(amp) || isempty(tau1) || isempty(tau2)) && (isnum
         epoch.parset.onset(end+1) = onset; %will be sorted in update_fit
         epoch.parset.amp(end+1) = amp;
         epoch.parset.tau(1:2, end+1) = [tau1; tau2];
+        if leda2.set.template == 1
+            epoch.parset.sigma(end+1) = 0;
+        elseif leda2.set.template == 2 %Guass x Bateman
+            epoch.parset.sigma(end+1) = leda2.set.parset.tmp.sigma;
+        end
     elseif type == 3 %delete_scr
         epoch.parset.onset = [epoch.parset.onset(1:isel-1), epoch.parset.onset(isel+1:end)];
         epoch.parset.amp = [epoch.parset.amp(1:isel-1), epoch.parset.amp(isel+1:end)];

@@ -1,7 +1,7 @@
 function refresh_fitoverview
 global leda2
 
-if isempty(leda2.analyze.fit)
+if isempty(leda2.analyze.fit) || leda2.intern.batchmode
     return;
 end
 

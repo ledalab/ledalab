@@ -31,6 +31,15 @@ for iFile = 1:nFile
         downsample(downsample_factor, 'mean');
     end
 
+    %Artifact-Detection
+    if artifact_thresh > 0
+        artifact_detect(artifact_thresh);
+        nart = length(leda2.current.artifact_samples);
+        if nart > 0
+            disp([num2str(nart),' artifacts detected'])
+        end
+    end
+
     %Fit
     if do_fit
         optimize
@@ -54,9 +63,6 @@ end
 function [wdir, open_datatype, downsample_factor, artifact_thresh, do_fit, do_export_scr, do_export_era] = parse_arguments(varargin)
 
 wdir = varargin{1};
-if ~strcmp(wdir(end),'\') && ~strcmp(wdir(end),'/')
-    wdir = [wdir,'\'];
-end
 
 %default options
 open_datatype = 'leda'; %open

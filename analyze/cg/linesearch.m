@@ -31,7 +31,7 @@ for iStep = 2:maxSteps
                 wparset = mnparset;
                 wparset.error = error;
                 step = fxm;
-            else %finding Minimum did not work out
+            else %finding Minimum did not work
                 xc = x + direction_n * factor(iStep-1);%before last point
                 wparset = set_parset_position(wparset, xc, epoch); 
                 wparset.error = error_list(iStep - 1);

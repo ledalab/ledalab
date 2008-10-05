@@ -1,9 +1,10 @@
 function showfit(start, ende)
 global leda2
 
-if isempty(leda2.analyze.fit)
+if leda2.intern.batchmode || isempty(leda2.analyze.fit)
     return;
 end
+
 
 if nargin == 0
     start = leda2.gui.rangeview.start;
@@ -40,7 +41,7 @@ for iPhasic = idx
         fit.data.phasicRemainder{iPhasic+1} = y_phasic;
     end
     y_phasic = [y_phasic(t_idx) 0 0];
-    phasic = fill(x, [y_tonic + y_phasic], col, 'linestyle', 'none');
+    fill(x, y_tonic + y_phasic, col, 'linestyle', 'none');
     
 end
 

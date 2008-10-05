@@ -34,7 +34,9 @@ leda2.gui.overview.phasic = [];
 
 %LEDASET
 %general
-leda2.set.tonicGridSize = 16;
+leda2.set.templateL = {'Bateman'; 'Bateman x Gauss'};
+leda2.set.template = 1;
+leda2.set.tonicGridSize = 12;
 % get peaks
 leda2.set.initVal.hannWinWidth = .5;
 leda2.set.initVal.signHeight = .01;
@@ -43,8 +45,8 @@ leda2.set.initVal.groundInterp = 'spline'; %'pchip' keeps only S(x)' continuous
 leda2.set.initSol.compensateUnderestimOnset = 1;
 leda2.set.initSol.compensateUnderestimAmp = 1;
 %setup epochs
-leda2.set.epoch.size = 20; %sec
-leda2.set.epoch.leftFringe = 2; %additional area relative to epochsize where goodness of fit is calculated
+leda2.set.epoch.size = 12; %sec
+leda2.set.epoch.leftFringe = 4; %additional area relative to epochsize where goodness of fit is calculated
 leda2.set.epoch.rightFringe = 4; 
 leda2.set.epoch.overlap = 2;
 leda2.set.epoch.core = leda2.set.epoch.size - leda2.set.epoch.overlap;
@@ -56,7 +58,8 @@ parset_tmp = [];
 parset_tmp.id = 0;
 parset_tmp.onset = [];
 parset_tmp.amp = [];
-parset_tmp.tau = [.5; 10];
+parset_tmp.tau = [.5; 4];
+parset_tmp.sigma = 1/4;
 parset_tmp.groundtime = [];
 parset_tmp.groundlevel = [];
 parset_tmp.error = [];
@@ -71,8 +74,9 @@ parset_tmp.history.h = parset_tmp.h;
 parset_tmp.history.error = [];
 leda2.set.parset.tmp = parset_tmp;
 %optimize
-leda2.set.errorThresholdFac = 1.35;
+leda2.set.errorThresholdFac = 10;%1.35;
 leda2.set.hThreshold = .0005;
+leda2.set.optimizeSigma = 1;
 leda2.set.optimizeGround = 1;
 leda2.set.ampMin = .02;
 leda2.set.ampMax = 10;
@@ -80,12 +84,16 @@ leda2.set.tauMin = .1;
 leda2.set.tauMax = 20;
 leda2.set.tauMinDiff = .001;
 leda2.set.tauBinding = 0;
+leda2.set.sigmaMin = .001;
+leda2.set.sigmaMax = .5; % 1: 1SD = 1sec
 %leda2.set.downsampleType
 %Export (ERA)
 leda2.set.export.SCRstart = 1.00; %sec
 leda2.set.export.SCRend   = 4.00; %sec
 leda2.set.export.SCRmin   = .03; %muS
 leda2.set.export.savetype = 1;
+%Artifact
+leda2.set.artifact.ckk_thresh = .25;
 
 %Ledapref
 leda2.pref.showSmoothData = 0;

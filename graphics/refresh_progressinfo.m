@@ -5,6 +5,7 @@ if leda2.intern.batchmode
     return;
 end
 
+
 if isempty(leda2.analyze.fit)
     set(leda2.gui.progressinfo.text_fitIteration,'String','-');
     set(leda2.gui.progressinfo.text_fitError,'String','-');

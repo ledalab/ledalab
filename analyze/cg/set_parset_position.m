@@ -16,6 +16,11 @@ end
 if leda2.set.optimizeGround
     ng = length(wparset.groundlevel);
     cparset.groundlevel = x(end-ng+1:end);
+else
+    ng = 0;
+end
+if leda2.set.optimizeSigma
+    cparset.sigma = x(end-ng-n+1:end-ng);
 end
 
 %Check Limits %Settings!!
@@ -30,4 +35,6 @@ for i = 1:length(cparset.onset)
             cparset.tau(2,i) = cparset.tau(1,i) + leda2.set.tauMinDiff;
         end
     end
+    
+    cparset.sigma(i) = withinlimits(cparset.sigma(i), leda2.set.sigmaMin, leda2.set.sigmaMax);
 end

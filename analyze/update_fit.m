@@ -21,6 +21,7 @@ for p = 1:length(leda2.analyze.epoch(iEpoch).parset)
     leda2.analyze.epoch(iEpoch).parset(p).onset = leda2.analyze.epoch(iEpoch).parset(p).onset(idx);
     leda2.analyze.epoch(iEpoch).parset(p).amp = leda2.analyze.epoch(iEpoch).parset(p).amp(idx);
     leda2.analyze.epoch(iEpoch).parset(p).tau = leda2.analyze.epoch(iEpoch).parset(p).tau(:,idx);
+    leda2.analyze.epoch(iEpoch).parset(p).sigma = leda2.analyze.epoch(iEpoch).parset(p).sigma(idx);
 end
 
 bparset = leda2.analyze.epoch(iEpoch).parset(leda2.analyze.epoch(iEpoch).bestparset);
@@ -33,6 +34,7 @@ np = length(bparset.onset);
 leda2.analyze.fit.phasiccoef.onset = [leda2.analyze.fit.phasiccoef.onset(1:n1), bparset.onset, leda2.analyze.fit.phasiccoef.onset(end-n2+1:end)];
 leda2.analyze.fit.phasiccoef.amp   = [leda2.analyze.fit.phasiccoef.amp(1:n1), bparset.amp, leda2.analyze.fit.phasiccoef.amp(end-n2+1:end)];
 leda2.analyze.fit.phasiccoef.tau   = [leda2.analyze.fit.phasiccoef.tau(:,1:n1), bparset.tau, leda2.analyze.fit.phasiccoef.tau(:,end-n2+1:end)];
+leda2.analyze.fit.phasiccoef.sigma   = [leda2.analyze.fit.phasiccoef.sigma(1:n1), bparset.sigma, leda2.analyze.fit.phasiccoef.sigma(end-n2+1:end)];
 leda2.analyze.fit.toniccoef.time = [leda2.analyze.fit.toniccoef.time(1:leda2.analyze.epoch(iEpoch).n_tonicsbefore), bparset.groundtime, leda2.analyze.fit.toniccoef.time(end-leda2.analyze.epoch(iEpoch).n_tonicsafter+1:end)];
 leda2.analyze.fit.toniccoef.ground = [leda2.analyze.fit.toniccoef.ground(1:leda2.analyze.epoch(iEpoch).n_tonicsbefore), bparset.groundlevel, leda2.analyze.fit.toniccoef.ground(end-leda2.analyze.epoch(iEpoch).n_tonicsafter+1:end)];
 
@@ -44,7 +46,7 @@ end
 %Update phasicComponent
 new_phasicComponent = {};
 for i = 1:np
-    new_phasicComponent(i) = {bateman(leda2.data.time.data, bparset.onset(i), bparset.amp(i), bparset.tau(1,i), bparset.tau(2,i))};
+    new_phasicComponent(i) = {scr_template(leda2.data.time.data, bparset.onset(i), bparset.amp(i), bparset.tau(1,i), bparset.tau(2,i), bparset.sigma(i))};  
 end
 
 leda2.analyze.fit.data.phasicComponent = [leda2.analyze.fit.data.phasicComponent(1:n1), new_phasicComponent, leda2.analyze.fit.data.phasicComponent(end-n2+1:end)];
@@ -72,10 +74,12 @@ leda2.analyze.fit.toniccoef.polycoef = interp1(leda2.analyze.fit.toniccoef.time,
 tonicRawData = leda2.data.conductance.data - leda2.analyze.fit.data.phasic;
 leda2.analyze.fit.data.residual = tonicRawData - leda2.analyze.fit.data.tonic;
 
+
 if leda2.intern.batchmode
     return;
 end
 
+%Graphics
 set(leda2.gui.rangeview.estim_ground, 'YData', tonicRawData);
 set(leda2.gui.rangeview.groundpoints, 'YData', leda2.analyze.fit.toniccoef.ground);
 

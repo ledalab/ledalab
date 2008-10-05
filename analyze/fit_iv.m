@@ -1,4 +1,4 @@
-function [onset, peaktime, amp, phasicData, phasicComponents, phasicRemainder] = fit_iv(time, tau1, tau2, onset_iv, peaktime_iv, amp_iv)
+function [onset, peaktime, amp, phasicData, phasicComponents, phasicRemainder] = fit_iv(time, tau1, tau2, sigma, onset_iv, peaktime_iv, amp_iv)
 global leda2
 
 onset = [];
@@ -6,7 +6,7 @@ peaktime = [];
 amp = [];
 phasicData = zeros(size(time));
 phasicComponents = {};
-phasicRemainder = {};
+phasicRemainder = {phasicData};  %set, esp for case isempty(onset)
 
 delay = batemandelay(tau1, tau2);
 
@@ -41,7 +41,7 @@ for p = 1:length(peaktime_iv)
             peak_idx = time_idx(time, peaktime(p));
             onset_idx = time_idx(time, onset(p));
             drop = phasicData(onset_idx) - phasicData(peak_idx);
-            amp(p) = amp_iv(p) + drop;
+            amp(p) = amp_iv(p) + max(drop,0);
         else
             amp(p) = amp_iv(p);
         end
@@ -49,7 +49,7 @@ for p = 1:length(peaktime_iv)
         amp = amp_iv;
     end
 
-    phasicComponents(p) = {bateman(time, onset(p), amp(p), tau1, tau2)};
+    phasicComponents(p) = {scr_template(time, onset(p), amp(p), tau1, tau2, sigma)};
     phasicRemainder(p) = {phasicData};
     phasicData = phasicData + phasicComponents{p};
 

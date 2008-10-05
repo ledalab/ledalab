@@ -1,6 +1,11 @@
 function refresh_fitinfo
 global leda2
 
+if leda2.intern.batchmode
+    return;
+end
+
+
 if isempty(leda2.analyze.fit)
     set(leda2.gui.text_adjR2,'String','Adj. R2: ');
     set(leda2.gui.text_rmse,'String','RMSE: ');

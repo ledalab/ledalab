@@ -122,6 +122,8 @@ if (leda2.data.samplingrate > 32 || leda2.data.N > 36000) && ~leda2.intern.batch
     end
 end
 
-plot_data;
+if ~leda2.intern.batchmode
+    plot_data;
+end
 
 leda2.current.fileopen_ok = 1;

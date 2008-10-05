@@ -12,7 +12,7 @@ fs = [.6 .60];
 
 leda2.gui.set.text_general = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*0 .5 dy],'String','General','FontUnits','normalized','FontSize',fs(2),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'),'FontWeight','bold');
 leda2.gui.set.text_template = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*1 .5 dy],'String','Template:','FontUnits','normalized','FontSize',fs(1),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
-leda2.gui.set.popm_template = uicontrol('Style','popupmenu','Units','normalized','Position',[dw(2) ds-(dy+dy2)*1 dw(3)-dw(2)+dx dy],'String', {'Bateman Fcn'},'Value',leda2.set.tonicGridSize,'FontUnits','normalized','FontSize',fs(1),'Value',1,'Enable','off');
+leda2.gui.set.popm_template = uicontrol('Style','popupmenu','Units','normalized','Position',[dw(2) ds-(dy+dy2)*1 dw(3)-dw(2)+dx dy],'String', leda2.set.templateL,'FontUnits','normalized','FontSize',fs(1),'Value',leda2.set.template); %,'Enable','off'
 leda2.gui.set.text_tonicGridSize = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*2 .5 dy],'String','Grid size for tonic component fit [sec]:','FontUnits','normalized','FontSize',fs(1),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
 leda2.gui.set.edit_tonicGridSize = uicontrol('Style','edit','Units','normalized','Position',[dw(2) ds-(dy+dy2)*2 dx dy],'String',leda2.set.tonicGridSize,'FontUnits','normalized','FontSize',fs(1));
 %get initial values
@@ -75,6 +75,7 @@ function apply(scr, event) %#ok<INUSD>
 global leda2
 
 %general
+leda2.set.template = get(leda2.gui.set.popm_template,'Value');
 leda2.set.tonicGridSize = str2double(get(leda2.gui.set.edit_tonicGridSize,'String'));
 %leda2.set.initval.groundinterp = 'spline';
 %get initial values
@@ -104,5 +105,8 @@ leda2.set.tauMin = str2double(get(leda2.gui.set.edit_tauMin,'String'));
 leda2.set.tauMax = str2double(get(leda2.gui.set.edit_tauMax,'String'));
 leda2.set.tauMinDiff = str2double(get(leda2.gui.set.edit_tauMinDiff,'String'));
 %leda2.set.tauBinding = get(leda2.gui.set.chbx_tauBinding,'Value');
+
+leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
+set(leda2.gui.rangeview.cond_smooth,'YData',leda2.data.conductance.smoothData);
 
 close(leda2.gui.set.fig);

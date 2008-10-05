@@ -5,7 +5,7 @@ if ~leda2.file.open
     add2log(0,'Please open data file!',0,0,0,0,0,1);
     return;
 end
-add2log(1,'Get initial solution',1,1,1);
+add2log(1,' Get initial solution',1,1,1);
 
 delete_fit(0);
 
@@ -13,6 +13,8 @@ timeData = leda2.data.time.data;
 condData = leda2.data.conductance.data;
 tau1_tmp = leda2.set.parset.tmp.tau(1);
 tau2_tmp = leda2.set.parset.tmp.tau(2);
+sigma_tmp = leda2.set.parset.tmp.sigma;
+
 
 %Identify peaks (initial values)
 cond_smooth = smooth(condData, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);  %smooth data
@@ -22,18 +24,20 @@ leda2.analyze.initialvalues.peaktime = peaktime_iv;
 leda2.analyze.initialvalues.amp = amp_iv;
 leda2.data.conductance.smoothData = cond_smooth;
 
+
 %Generating initial solution
 %for the first fit parameters are already corrected
-[onset, peaktime, amp, phasicData, phasicComponent, phasicRemainder] = fit_iv(timeData, tau1_tmp, tau2_tmp, onset_iv, peaktime_iv, amp_iv);
+[onset, peaktime, amp, phasicData, phasicComponent, phasicRemainder] = fit_iv(timeData, tau1_tmp, tau2_tmp, sigma_tmp, onset_iv, peaktime_iv, amp_iv);
 leda2.analyze.initialsolution.phasiccoef.onset = onset;
 leda2.analyze.initialsolution.phasiccoef.peaktime = peaktime;
 leda2.analyze.initialsolution.phasiccoef.amp = amp;
+%tau and sigma have default values
 
 %Tonic
 tonicRawData = condData - phasicData;
 groundtimes = [timeData(1),(leda2.set.epoch.size/2) : leda2.set.tonicGridSize : timeData(end), timeData(end)];
 for i = 1:length(groundtimes)
-    ground(i) = median(tonicRawData(subrange_idx(groundtimes(i)-leda2.set.epoch.size/2, groundtimes(i)+leda2.set.epoch.size/2)));
+    ground(i) = median(tonicRawData(subrange_idx(groundtimes(i)-leda2.set.epoch.size/2, groundtimes(i)+leda2.set.epoch.size/2))); %#ok<AGROW>
 end
 
 tonicData = interp1(groundtimes, ground, timeData, leda2.set.initVal.groundInterp);
@@ -41,10 +45,12 @@ leda2.analyze.initialsolution.toniccoef.polycoef = interp1(groundtimes, ground,l
 leda2.analyze.initialsolution.toniccoef.groundtimes = groundtimes;
 leda2.analyze.initialsolution.toniccoef.ground = ground;
 
+
 %Set initial Fit-Values from convolution-estimates
 leda2.analyze.fit.phasiccoef.onset = onset;
 leda2.analyze.fit.phasiccoef.amp = amp;
 leda2.analyze.fit.phasiccoef.tau = [tau1_tmp; tau2_tmp] * ones(1,length(onset));
+leda2.analyze.fit.phasiccoef.sigma = sigma_tmp * ones(1,length(onset));
 
 leda2.analyze.fit.toniccoef.ground = ground;
 leda2.analyze.fit.toniccoef.time = groundtimes;
@@ -61,7 +67,7 @@ if leda2.intern.batchmode
     return;
 end
 
-
+%Graphics
 refresh_fitoverview;
 refresh_fitinfo;
 %refresh_progressinfo;
