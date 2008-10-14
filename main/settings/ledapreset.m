@@ -26,16 +26,18 @@ leda2.analyze.current.manualedit = 0;
 leda2.analyze.current.iEpoch = 0;
 leda2.analyze.current.iParset = 0;
 
-leda2.gui.overview.residual = [];
+leda2.gui.overview.driver = [];
 leda2.gui.overview.tonic_component = [];
 leda2.gui.overview.phasic = [];
+
+leda2.analysis = [];
 
 %Default Setting:
 
 %LEDASET
 %general
 leda2.set.templateL = {'Bateman'; 'Bateman x Gauss'};
-leda2.set.template = 1;
+leda2.set.template = 2;
 leda2.set.tonicGridSize = 12;
 % get peaks
 leda2.set.initVal.hannWinWidth = .5;
@@ -58,7 +60,7 @@ parset_tmp = [];
 parset_tmp.id = 0;
 parset_tmp.onset = [];
 parset_tmp.amp = [];
-parset_tmp.tau = [.5; 4];
+parset_tmp.tau = [.3; 6];
 parset_tmp.sigma = 1/4;
 parset_tmp.groundtime = [];
 parset_tmp.groundlevel = [];
@@ -76,32 +78,35 @@ leda2.set.parset.tmp = parset_tmp;
 %optimize
 leda2.set.errorThresholdFac = 10;%1.35;
 leda2.set.hThreshold = .0005;
+leda2.set.optimizeOnset = 1;
+leda2.set.optimizeAmp = 1;
 leda2.set.optimizeSigma = 1;
-leda2.set.optimizeGround = 1;
+leda2.set.optimizeTau = 0;
+leda2.set.optimizeGround = 0;
 leda2.set.ampMin = .02;
-leda2.set.ampMax = 10;
-leda2.set.tauMin = .1;
-leda2.set.tauMax = 20;
+leda2.set.ampMax = 15;
+leda2.set.tauMin = 0; %.1
+leda2.set.tauMax = 80;
 leda2.set.tauMinDiff = .001;
 leda2.set.tauBinding = 0;
 leda2.set.sigmaMin = .001;
-leda2.set.sigmaMax = .5; % 1: 1SD = 1sec
+leda2.set.sigmaMax = .8; % 1: 1SD = 1sec
+leda2.set.dist0_min = .001;
 %leda2.set.downsampleType
 %Export (ERA)
 leda2.set.export.SCRstart = 1.00; %sec
-leda2.set.export.SCRend   = 4.00; %sec
-leda2.set.export.SCRmin   = .03; %muS
+leda2.set.export.SCRend   = 3.00; %sec
+leda2.set.export.SCRmin   = .02; %muS
 leda2.set.export.savetype = 1;
 %Artifact
 leda2.set.artifact.ckk_thresh = .25;
 
 %Ledapref
 leda2.pref.showSmoothData = 0;
-leda2.pref.showTonicRawData = 0;
-leda2.pref.showEpochFringe = 0;
-leda2.pref.eventWindow = [5, 15];
-leda2.pref.updateFit = 3;
+leda2.pref.showMinMax = 0;
+leda2.pref.showOvershoot = 0;
 %not settable inside of Ledalab
+leda2.pref.eventWindow = [5, 15];
 leda2.pref.oldfile_maxn = 5;
 leda2.pref.scalewidth_min = .6; %muS
 leda2.gui.col.fig = [.8 .8 .8];

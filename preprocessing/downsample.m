@@ -9,7 +9,8 @@ if nargin == 0 %batchmode
 
 
     if isempty( FsL)
-        msgbox('Current sampling rate can not be further broken down')
+        mb = msgbox('Current sampling rate can not be further broken down');
+        waitfor(mb);
         return;
     end
 
@@ -30,7 +31,7 @@ if nargin == 0 %batchmode
         return
     end
 
-    if ~isempty(leda2.analyze.fit)
+    if ~isempty(leda2.analysis)
         cmd = questdlg('The current fit will be deleted!','Warning','Continue','Cancel','Continue');
         if isempty(cmd) || strcmp(cmd, 'Cancel')
             return
@@ -52,15 +53,14 @@ end
 %downsampling (type factor mean) may result in an additional offset = time(1), which will not be substracted (tim = time - offset) in order not to affect event times
 leda2.data.time.data = td(:)';
 leda2.data.conductance.data = scd(:)';
-%update data statistics
-leda2.data.N = length(leda2.data.time.data);
-leda2.data.samplingrate =  Fs/fac;
-leda2.data.conductance.error = sqrt(mean(diff(scd).^2)/2);
-leda2.data.conductance.min = min(scd);
-leda2.data.conductance.max = max(scd);
-leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
+leda2.data.conductance.smoothData = smooth_adapt(leda2.data.conductance.data, 'gauss', leda2.data.samplingrate*2, .00003);
+
 
 delete_fit(0);
+if leda2.intern.batchmode
+    return;
+end
+
 plot_data;
 file_changed(1);
 add2log(1,['Data downsampled to ',  sprintf('%d Hz   (Factor %d)', leda2.data.samplingrate, fac),'.'],1,1,1);

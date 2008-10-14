@@ -72,7 +72,7 @@ for iEpoch = 1:nEpochs
 
     %Setup epoch data
     epoch = leda2.analyze.epoch;  %needed?
-    epoch(iEpoch).data.ca_idx = subrange_idx(epoch(iEpoch).checkarea_start, epoch(iEpoch).checkarea_end);
+    epoch(iEpoch).data.ca_idx = subrange_idx(leda2.data.time.data, epoch(iEpoch).checkarea_start, epoch(iEpoch).checkarea_end);
     epoch(iEpoch).data.ca_time = leda2.data.time.data(epoch(iEpoch).data.ca_idx);
 
     epoch(iEpoch).n_phasicsbefore = length(find([leda2.analyze.fit.phasiccoef.onset] < leda2.analyze.epoch(iEpoch).start));

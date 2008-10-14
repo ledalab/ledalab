@@ -36,22 +36,24 @@ data.event = leda2.data.events.event;
 
 savevars = {'fileinfo','data'};
 
-fit = [];
-if ~isempty(leda2.analyze.fit)
-    initvals = leda2.analyze.initialvalues;
-    fit = leda2.analyze.fit;
-    fit = rmfield(fit, 'data');
-end
-if ~isempty(fit) && ~isempty(initvals)
-    savevars = [savevars, {'initvals'}, {'fit'}];
+% fit = [];
+% if ~isempty(leda2.analyze.fit)
+%     initvals = leda2.analyze.initialvalues;
+%     fit = leda2.analyze.fit;
+%     fit = rmfield(fit, 'data');
+% end
+if ~isempty(leda2.analysis)
+    analysis = leda2.analysis;
+    analysis = rmfield(analysis, {'phasicComponent', 'phasicRemainder','kernel'}); %#ok<NASGU>
+    savevars = [savevars, {'analysis'}];
 end
 
 
 try
-    save(file, savevars{:}, '-v6'); %
+    save(file, savevars{:}); %, '-v6'
     add2log(1,[' Save ',file,' in V',num2str(leda2.intern.version,'%1.2f')],1,1,1);   
     fileinfo.log = leda2.file.log; %if it there is no error, save again with updated filelog
-    save(file, savevars{:}, '-v6');  %
+    save(file, savevars{:});  %, '-v6
     
     file_changed(0);
 catch

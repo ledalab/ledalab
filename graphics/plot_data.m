@@ -1,6 +1,14 @@
 function plot_data
 global leda2
 
+%Data statistics
+refresh_data(0);
+% leda2.data.N = length(leda2.data.conductance.data);
+% leda2.data.samplingrate = (leda2.data.N - 1) / (leda2.data.time.data(end) - leda2.data.time.data(1));
+% leda2.data.conductance.min = min(leda2.data.conductance.data);
+% leda2.data.conductance.max = max(leda2.data.conductance.data);
+% leda2.data.conductance.error = sqrt(mean(diff(leda2.data.conductance.data).^2)/2);
+
 leda2.gui.rangeview.start = 0;
 
 cond = leda2.data.conductance;
@@ -30,15 +38,15 @@ if events.N > 0
 end
 
 leda2.gui.overview.max = (cond.max + .4); %ceil
-leda2.gui.overview.min = (cond.min - .4); %floor
+leda2.gui.overview.min = max(0, (cond.min - .4)); %floor
 set(leda2.gui.overview.ax,'XLim',[0,time.data(end)],'Ylim',[leda2.gui.overview.min, leda2.gui.overview.max],'Color',[.9 .9 .9])
 set(get(leda2.gui.overview.ax,'XLabel'),'String','Time [sec]')
 set(get(leda2.gui.overview.ax,'YLabel'),'String','SC [\muS]')
 
-set(leda2.gui.overview.edit_max,'String', num2str(leda2.gui.overview.max,'%3.1f'));
-set(leda2.gui.overview.text_max,'String', num2str(cond.max,'%3.1f'));
-set(leda2.gui.overview.edit_min,'String', num2str(leda2.gui.overview.min,'%3.1f'));
-set(leda2.gui.overview.text_min,'String', num2str(cond.min,'%3.1f'));
+set(leda2.gui.overview.edit_max,'String', num2str(leda2.gui.overview.max,'%4.2f'));
+set(leda2.gui.overview.text_max,'String', num2str(cond.max,'%4.2f'));
+set(leda2.gui.overview.edit_min,'String', num2str(leda2.gui.overview.min,'%4.2f'));
+set(leda2.gui.overview.text_min,'String', num2str(cond.min,'%4.2f'));
 
 set(leda2.gui.text_N,'String',['N: ',num2str(leda2.data.N),' smpls'])
 set(leda2.gui.text_time,'String',['Time: ',num2str(leda2.data.time.data(end),'%5.2f'),' s'])
@@ -55,13 +63,13 @@ cla;
 hold on
 leda2.gui.rangeview.conductance = plot(time.data, cond.data, 'Color',[0 0 0], 'LineWidth',1,'ButtonDownFcn','leda_click(2)');
 
-leda2.data.conductance.smoothData = smooth(cond.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
+leda2.data.conductance.smoothData = smooth_adapt(leda2.data.conductance.data, 'gauss', leda2.data.samplingrate*2, .00003);
 leda2.gui.rangeview.cond_smooth = plot(time.data, leda2.data.conductance.smoothData ,'m','Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showSmoothData),'ButtonDownFcn','leda_click(2)');
 
-if ~isempty(leda2.analyze.fit)
-    leda2.gui.rangeview.groundpoints = plot(leda2.analyze.fit.toniccoef.time, leda2.analyze.fit.toniccoef.ground,'ws','MarkerFaceColor',[.8 .8 .8],'MarkerEdgeColor',[1 1 1],'Tag','InitialSolutionInfo','ButtonDownFcn','leda_click(2)');
-    tonicRawData = cond.data - leda2.analyze.fit.data.phasic;
-    leda2.gui.rangeview.estim_ground = plot(time.data, tonicRawData,'Color',[.8 .8 .8],'Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showTonicRawData),'ButtonDownFcn','leda_click(2)');
+if ~isempty(leda2.analysis)
+    %leda2.gui.rangeview.groundpoints = plot(leda2.analyze.fit.toniccoef.time, leda2.analyze.fit.toniccoef.ground,'ws','MarkerFaceColor',[.8 .8 .8],'MarkerEdgeColor',[1 1 1],'Tag','InitialSolutionInfo','ButtonDownFcn','leda_click(2)');
+    %tonicRawData = cond.data - leda2.analyze.fit.data.phasic;
+    %leda2.gui.rangeview.estim_ground = plot(time.data, tonicRawData,'Color',[.8 .8 .8],'Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showTonicRawData),'ButtonDownFcn','leda_click(2)');
 end
 
 % kids = get(leda2.gui.rangeview.ax, 'Children');
@@ -83,4 +91,4 @@ set(get(leda2.gui.rangeview.ax,'YLabel'),'String','Skin Conductance [\muS]')
 
 refresh_fitinfo;
 change_range;
-refresh_progressinfo;
+%refresh_progressinfo;

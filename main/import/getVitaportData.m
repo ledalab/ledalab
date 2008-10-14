@@ -1,11 +1,11 @@
-function [time, conductance, event] = getBiotraceData(filename)
-%Import Biotrace data
+function [time, conductance, event] = getPortilabData(filename)
+%Import PortiLab data
 %
 %Mind: events (nid) must not be 0!
 
 event = [];
-headerLines = 14;
-footerLines = 2;
+headerLines = 5;
+footerLines = 1;
 
 %parsing file
 iLine = 0;
@@ -13,10 +13,11 @@ fid = fopen(filename);
 while  feof(fid) == 0
     iLine = iLine + 1;
     tline = fgetl(fid);
-    if iLine == 9
-        freq = strread(tline,'Ausgabegeschwindigkeit:\t%d\tSamples/sek.');
-    elseif iLine == 12
+    if iLine == 1
         labels = strread(tline,'%s','delimiter','\t');
+    elseif iLine == 5
+            fac = strread(tline,'%s','delimiter','\t');
+            fac = str2double(fac{2});
     end
 end
 fclose(fid);
@@ -24,22 +25,24 @@ nLines = iLine;  %total number of lines
 
 nSamples = nLines - (headerLines + footerLines);
 nSignals = length(labels) - 1;
+freq = 16;
 
 %read data
 M = dlmread(filename,'\t',[headerLines, 0, headerLines+nSamples-1, nSignals]);
-skip_samples = 1;  %avoid data errors at beginning
+skip_samples = 0;  %avoid data errors at beginning
 M = M(1+skip_samples :end, :);
 
 
 for i = 1:length(labels)
-    scCol(i) = any(strfind(labels{i}, 'SC/GSR'));
+    scCol(i) = any(strfind(labels{i}, 'GSR'));
+    eventCol(i) = any(strfind(labels{i},'MARKER'));
 end
-conductance = M(:,scCol);
-time = (M(:,1) - M(1,1)) / freq;
+conductance = M(:,scCol)/300; %fac
+time = (0:nSamples-1) / freq;
+marker = M(:,eventCol);
 
 %get events
-eventCol = find(strcmp(labels,'Ereignisse')); %column of events
-eventIdx = find(M(:,eventCol));
+eventIdx = find(marker > 0 & diff([0;marker]) & diff([marker;0]) == 0);  %marker value > 0, marker channel shows difference, new marker value is kept in next sample
 for iEvent = 1:length(eventIdx)
     iEventIdx = eventIdx(iEvent);
     event(iEvent).time = time(iEventIdx);

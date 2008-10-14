@@ -39,7 +39,11 @@ if any(strcmp(ledafile_vars,'data'))
     try
         cond_tmp = ledafile.data.conductance;
         time_tmp = ledafile.data.time;
-        timeoff_tmp = ledafile.data.timeoff;
+        timeoff_tmp = ledafile.data.timeoff;        
+        if isempty(cond_tmp) || isempty(time_tmp)
+                add2log(0,['Unable to open ',pathname, filename,':  Requested data not available!'],1,1,0,1,0,1);
+                return
+        end            
     catch
         add2log(0,['Unable to open ',pathname, filename],1,1,0,1,0,1);
         return
@@ -60,9 +64,8 @@ end
 leda2.data.conductance.data = ledafile.data.conductance;
 leda2.data.time.data = ledafile.data.time;
 leda2.data.time.timeoff = ledafile.data.timeoff;
-
-conductanceerror = sqrt(mean(diff(ledafile.data.conductance).^2)/2);
-leda2.data.conductance.error = conductanceerror;
+refresh_data(0); %stats
+leda2.data.conductance.smoothData = smooth_adapt(leda2.data.conductance.data, 'gauss', leda2.set.initVal.hannWinWidth * leda2.data.samplingrate, .00003);  %also done in plot
 
 leda2.file.filename = filename;
 leda2.file.pathname = pathname;
@@ -106,49 +109,58 @@ elseif any(strcmp(ledafile_vars,'fileinfo')) %version 2.x
         disp('Could not load File-Info properly!');
     end
 end
-add2log(0,[datestr(now,31), ' Open ',file,' V',num2str(leda2.file.version,'%1.2f')],1,1,1);
+add2log(0,[datestr(now,31), ' Open ',file,' ',leda2.intern.versiontxt],1,1,1);
 
 %Fit
-if leda2.file.version >= 2
-    leda2.analyze.fit = [];
-    if any(strcmp(ledafile_vars,'fit'))
-        try
-            leda2.analyze.fit = ledafile.fit;
-            %forward compatibility V2.00
-            if any(strcmp(fieldnames(leda2.analyze.fit.info),'error'))
-                leda2.analyze.fit.info = rmfield(leda2.analyze.fit.info, 'error');
-            end
-            if any(strcmp(fieldnames(leda2.analyze.fit.info),'err'))
-                leda2.analyze.fit.info = rmfield(leda2.analyze.fit.info, 'err');
-            end
-            if any(strcmp(fieldnames(leda2.analyze.fit.info),'rms'))
-                leda2.analyze.fit.info = rmfield(leda2.analyze.fit.info, 'rms');
-            end
+% if leda2.file.version >= 2 && leda2.file.version < 2.15
+%     leda2.analyze.fit = [];
+%     if any(strcmp(ledafile_vars,'fit'))
+%         try
+%             leda2.analyze.fit = ledafile.fit;
+%             %forward compatibility V2.00
+%             if any(strcmp(fieldnames(leda2.analyze.fit.info),'error'))
+%                 leda2.analyze.fit.info = rmfield(leda2.analyze.fit.info, 'error');
+%             end
+%             if any(strcmp(fieldnames(leda2.analyze.fit.info),'err'))
+%                 leda2.analyze.fit.info = rmfield(leda2.analyze.fit.info, 'err');
+%             end
+%             if any(strcmp(fieldnames(leda2.analyze.fit.info),'rms'))
+%                 leda2.analyze.fit.info = rmfield(leda2.analyze.fit.info, 'rms');
+%             end
+%             rebuilddata;
+%         catch
+%             add2log(0,'Could not load Fit-Info properly!',1,1,0,0,0,1)
+%         end
+%
+%         if any(strcmp(ledafile_vars,'initvals'))  %V2.14+
+%             try
+%                 leda2.analyze.initialvalues = ledafile.initvals;
+%             catch
+%                 add2log(0,'Could not load Initial Values Info properly!',1,1,0,0,0,1)
+%             end
+%         end
+%
+%     end
+% end
+
+leda2.analysis = [];
+if leda2.file.version >= 2.15
+    if any(strcmp(ledafile_vars,'analysis'))
+%        try
+            leda2.analysis = ledafile.analysis;
             rebuilddata;
-        catch
-            add2log(0,'Could not load Fit-Info properly!',1,1,0,0,0,1)
-        end
-
-        if any(strcmp(ledafile_vars,'initvals'))  %V2.14+
-            try
-                leda2.analyze.initialvalues = ledafile.initvals;
-            catch
-                add2log(0,'Could not load Initial Values Info properly!',1,1,0,0,0,1)
-            end
-        end
-
+%        catch
+%            add2log(0,'Could not load Analysis Info properly!',1,1,0,0,0,1)
+%        end
     end
 end
 
-%Data statistics
-leda2.data.N = length(leda2.data.conductance.data);
-leda2.data.samplingrate = (leda2.data.N - 1) / (leda2.data.time.data(end) - leda2.data.time.data(1));
-leda2.data.conductance.min = min(leda2.data.conductance.data);
-leda2.data.conductance.max = max(leda2.data.conductance.data);
-leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
+leda2.current.fileopen_ok = 1;
+
+if leda2.intern.batchmode
+    return;
+end
 
 plot_data;
 
 update_prevfilelist(pathname, filename);
-
-leda2.current.fileopen_ok = 1;

@@ -78,8 +78,8 @@ for p = 1:length(smallpeak_onset_ss)  % 2^smallpeak_N
     parset(p).df = length(epoch.data.ca_time) - (length(parset(p).onset)*2 + 2 + length(parset(p).groundlevel)); %datapoints - amps & taus, groundlevel
     parset(p).error = fiterror_parset(epoch, parset(p));
     %history
-    parset(p).history.x(1,:) = get_parset_position(parset(p));
-    parset(p).history.direction(1,:) = zeros(size(parset(p).history.x));
+    %parset(p).history.x(1,:) = get_parset_position(parset(p));
+    %parset(p).history.direction(1,:) = zeros(size(parset(p).history.x));
     parset(p).history.error = parset(p).error;
 end
 

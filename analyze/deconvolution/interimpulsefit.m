@@ -1,0 +1,121 @@
+function  targetdata_min = interimpulsefit(driver, t_ext, minL, maxL)  %[tonic, pp, groundtime, groundlevel, targetdata_min, iif_t, iif_data, groundlevel0]
+global leda2
+
+t = leda2.analysis0.target.t;
+d = leda2.analysis0.target.d;
+sr = leda2.analysis0.target.sr;
+% driver = leda2.analysis0.driver;
+% t_ext = [leda2.analysis0.time_ext, t];
+% minL = leda2.analysis0.impMin_idx;
+% maxL = leda2.analysis0.peaktime_idx;
+
+
+%Get inter-impulse-data
+iif_idx = [];
+for i = 2: length(maxL)-1
+    gap_idx = minL(i,2):minL(i+1,1);  %+1: removed otherwise no inter-impulse points may be available at highly smoothed data
+    iif_idx = [iif_idx, gap_idx];
+end
+iif_idx = [minL(2,1), iif_idx, minL(end,2):length(driver)-sr];  %
+iif_t = t_ext(iif_idx);
+iif_data = driver(iif_idx);
+
+
+%Compute tonic points and level
+if leda2.set.tonicIsConst %const
+    groundtime = t(end)/2;
+    groundlevel = mean(iif_data);
+    pp.coefs = groundlevel;
+    tonic = groundlevel * ones(size(d));
+    groundlevel_pre = groundlevel;
+
+    ddd = min(d - tonic) - leda2.set.dist0_min;
+    if ddd < 0
+        groundlevel = groundlevel + ddd;
+        pp.coefs = groundlevel;
+        tonic = groundlevel * ones(size(d));
+    end
+
+else
+    groundtime = [0:leda2.set.tonicGridSize:t(end), t(end)];
+    if groundtime(end) - groundtime(end-1) < leda2.set.tonicGridSize && length(groundtime) > 2  %adjust last but one groundtime
+        groundtime(end-1) = (groundtime(end-2) + groundtime(end))/2;
+    end
+    for i = 1:length(groundtime)
+        if i == 1
+            t_idx = iif_t <= groundtime(i) + leda2.set.tonicGridSize & iif_t > 1;
+        elseif i == length(groundtime)
+            t_idx = iif_t > groundtime(i) - leda2.set.tonicGridSize & iif_t < t(end) - 1;
+        else
+            t_idx = iif_t > groundtime(i) - leda2.set.tonicGridSize/2 & iif_t <= groundtime(i) + leda2.set.tonicGridSize/2;
+        end
+        p = polyfit(iif_t(t_idx), iif_data(t_idx),1);
+        groundlevel(i) = polyval(p, groundtime(i));%median(iif_data(t_idx));
+    end
+    groundlevel_pre = groundlevel;
+
+
+    %Correction of (too fast) increasing tonic level
+    for i = 2:length(groundtime)
+        if groundlevel(i) > groundlevel(i-1)
+            groundlevel(i) = mean(groundlevel(i-1:i));
+        end
+    end
+    tonic = spline(groundtime, groundlevel, t);
+    pp = spline(groundtime, groundlevel);
+
+
+    %Correction for tonic sections still higher than raw data
+    for i = 1:length(groundtime)-1
+
+        t_idx = subrange_idx(t, groundtime(i), groundtime(i+1));
+        ddd = min(d(t_idx) - tonic(t_idx)) - leda2.set.dist0_min;
+
+        if ddd < 0
+            groundlevel(i) = groundlevel(i) + ddd;
+            groundlevel(i+1) = groundlevel(i+1) + ddd;
+            %Correction of (too fast) increasing tonic level
+            for j = 2:length(groundtime)
+                if groundlevel(j) > groundlevel(j-1)
+                    groundlevel(j) = mean(groundlevel(j-1:j));
+                end
+            end
+            tonic = spline(groundtime, groundlevel, t);
+        end
+
+    end
+    pp = spline(groundtime, groundlevel);
+end
+
+%Rereferencing: tonic = tonic + targetdata_min
+targetdata_min = min(d - tonic);
+if targetdata_min <= 0  %necessary?!?
+    targetdata_min = leda2.set.dist0_min;
+    disp('Targetdata_min <= 0!!')
+end
+pp.coefs(:,end) = pp.coefs(:,end) + targetdata_min;
+groundlevel = groundlevel + targetdata_min;
+
+if leda2.set.tonicIsConst
+    tonic = groundlevel * ones(size(d));
+else
+    tonic = ppval(pp, t);
+end
+tonic(tonic < 0) = 0;
+d = d - tonic;
+
+%Save to vars
+% if targetdata_min > 0
+%     leda2.analysis0.dist0 = targetdata_min;
+% else
+%     leda2.analysis0.dist0 = .01;
+% end
+leda2.analysis0.target.d0 = d; %leda2.analysis0.target.d - tonic0;  %min(d) == 0;
+leda2.analysis0.target.tonic0 = tonic;
+leda2.analysis0.target.tonic0_poly = pp;
+leda2.analysis0.target.groundtime = groundtime;
+leda2.analysis0.target.groundlevel0 = groundlevel;
+leda2.analysis0.target.groundlevel_pre = groundlevel_pre;
+
+leda2.analysis0.target.iif_t = iif_t;
+leda2.analysis0.target.iif_data = iif_data;

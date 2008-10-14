@@ -13,44 +13,45 @@ timeData = leda2.data.time.data;
 condData = leda2.data.conductance.data;
 tau1_tmp = leda2.set.parset.tmp.tau(1);
 tau2_tmp = leda2.set.parset.tmp.tau(2);
-sigma_tmp = leda2.set.parset.tmp.sigma;
+%sigma_tmp = .8; %leda2.set.parset.tmp.sigma;
 
 
-%Identify peaks (initial values)
 cond_smooth = smooth(condData, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);  %smooth data
-[onset_iv, peaktime_iv, amp_iv] = get_peaks(timeData, cond_smooth, leda2.set.initVal.signHeight);
-leda2.analyze.initialvalues.onset = onset_iv;
-leda2.analyze.initialvalues.peaktime = peaktime_iv;
-leda2.analyze.initialvalues.amp = amp_iv;
 leda2.data.conductance.smoothData = cond_smooth;
 
+%Identify peaks (initial values)
+[onset, amp, sigma] = get_initial_values(timeData, cond_smooth);  %also yields tau
+leda2.analyze.initialvalues.onset = onset;
+leda2.analyze.initialvalues.amp = amp;
+leda2.analyze.initialvalues.sigma = sigma;
 
-%Generating initial solution
-%for the first fit parameters are already corrected
-[onset, peaktime, amp, phasicData, phasicComponent, phasicRemainder] = fit_iv(timeData, tau1_tmp, tau2_tmp, sigma_tmp, onset_iv, peaktime_iv, amp_iv);
-leda2.analyze.initialsolution.phasiccoef.onset = onset;
-leda2.analyze.initialsolution.phasiccoef.peaktime = peaktime;
-leda2.analyze.initialsolution.phasiccoef.amp = amp;
+%Generate initial solution
+[phasicData, phasicComponent, phasicRemainder] = fit_iv(timeData, tau1_tmp, tau2_tmp, onset, amp, sigma);
+%leda2.analyze.initialsolution.phasiccoef.onset = onset;
+%leda2.analyze.initialsolution.phasiccoef.amp = amp;
+%leda2.analyze.initialsolution.phasiccoef.peaktime = sigma;
 %tau and sigma have default values
 
 %Tonic
 tonicRawData = condData - phasicData;
 groundtimes = [timeData(1),(leda2.set.epoch.size/2) : leda2.set.tonicGridSize : timeData(end), timeData(end)];
 for i = 1:length(groundtimes)
-    ground(i) = median(tonicRawData(subrange_idx(groundtimes(i)-leda2.set.epoch.size/2, groundtimes(i)+leda2.set.epoch.size/2))); %#ok<AGROW>
+    ground(i) = median(tonicRawData(subrange_idx(timeData, groundtimes(i)-leda2.set.epoch.size/2, groundtimes(i)+leda2.set.epoch.size/2))); %#ok<AGROW>
 end
+% groundtimes = [timeData(1), timeData(end)];
+% ground = [min(condData), min(condData)]*.95;
+leda2.set.initVal.groundInterp = 'spline';
 
 tonicData = interp1(groundtimes, ground, timeData, leda2.set.initVal.groundInterp);
 leda2.analyze.initialsolution.toniccoef.polycoef = interp1(groundtimes, ground,leda2.set.initVal.groundInterp, 'pp');
 leda2.analyze.initialsolution.toniccoef.groundtimes = groundtimes;
 leda2.analyze.initialsolution.toniccoef.ground = ground;
 
-
-%Set initial Fit-Values from convolution-estimates
+%Set initial values as first fit values
 leda2.analyze.fit.phasiccoef.onset = onset;
 leda2.analyze.fit.phasiccoef.amp = amp;
 leda2.analyze.fit.phasiccoef.tau = [tau1_tmp; tau2_tmp] * ones(1,length(onset));
-leda2.analyze.fit.phasiccoef.sigma = sigma_tmp * ones(1,length(onset));
+leda2.analyze.fit.phasiccoef.sigma = sigma;
 
 leda2.analyze.fit.toniccoef.ground = ground;
 leda2.analyze.fit.toniccoef.time = groundtimes;

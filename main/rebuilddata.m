@@ -1,24 +1,36 @@
 function rebuilddata  
 global leda2
 
-%fit
-time = leda2.data.time.data;
-phasicData = zeros(size(time));
+n = length(leda2.data.conductance.data);
+t_ext = [leda2.analysis.time_ext, leda2.data.time.data];
+n_ext = length(t_ext);
+dt = 1/leda2.data.samplingrate;
+tau = leda2.analysis.tau;
+impulse = leda2.analysis.impulse;
+overshoot = leda2.analysis.overshoot;
+onset_idx = leda2.analysis.onset_idx;
+tb = t_ext - t_ext(1) + dt;
+kernel = bateman_gauss(tb, 0, 0, tau(1), tau(2), 0);
+
+
+n_offs = n_ext - n;
 phasicComponent = {};
 phasicRemainder = {};
-pc = leda2.analyze.fit.phasiccoef;
+phasicRemainder(1) = {zeros(1, n)};
 
-for p = 1:length(pc.onset)
+for i = 1:length(onset_idx)
+    ons = onset_idx(i);
+    imp = impulse{i};
+    ovs = overshoot{i};
+    pco = conv(imp, kernel);
 
-    phasicComponent(p) = {bateman(time, pc.onset(p), pc.amp(p), pc.tau(1,p), pc.tau(2,p))};
-    phasicRemainder(p) = {phasicData};
-    phasicData = phasicData + phasicComponent{p};
-
+    impResp = zeros(1, n_ext);
+    impResp(ons:ons+length(ovs)-1) = ovs;
+    impResp(ons:end) = impResp(ons:end) + pco(1:length(t_ext) - (ons-1));
+    impResp = impResp(n_offs+1:end);
+    phasicComponent(i) = {impResp};
+    phasicRemainder(i+1) = {phasicRemainder{i} + impResp};
 end
-phasicRemainder(p+1) = {phasicData};
 
-leda2.analyze.fit.data.tonic = ppval(leda2.analyze.fit.toniccoef.polycoef, time);
-leda2.analyze.fit.data.phasic = phasicData;
-leda2.analyze.fit.data.residual = leda2.data.conductance.data - (leda2.analyze.fit.data.tonic + leda2.analyze.fit.data.phasic);
-leda2.analyze.fit.data.phasicComponent = phasicComponent;
-leda2.analyze.fit.data.phasicRemainder = phasicRemainder;
+leda2.analysis.phasicComponent = phasicComponent;
+leda2.analysis.phasicRemainder = phasicRemainder;

@@ -16,7 +16,7 @@ if nargin == 0 %batchmode
         return
     end
 
-    if ~isempty(leda2.analyze.fit)
+    if ~isempty(leda2.analysis)
         cmd = questdlg('The current fit will be deleted!','Warning','Continue','Cancel','Continue');
         if isempty(cmd) || strcmp(cmd, 'Cancel')
             return
@@ -37,13 +37,8 @@ end
 scs = smooth(leda2.data.conductance.data, width, type);
 %downsampling (type factor mean) may result in an additional offset = time(1), which will not be substracted (tim = time - offset) in order not to affect event times
 leda2.data.conductance.data = scs(:)';
-%update data statistics
-leda2.data.conductance.error = sqrt(mean(diff(scs).^2)/2);
-leda2.data.conductance.min = min(scs);
-leda2.data.conductance.max = max(scs);
-leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
 
 delete_fit(0);
-plot_data;
+refresh_data(1);
 file_changed(1);
 add2log(1,['Data smoothed with ',  smoothWinL{typenr},' (',num2str(width), ' samples width)'],1,1,1);

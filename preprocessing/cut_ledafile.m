@@ -29,8 +29,6 @@ end
 leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
 
 delete_fit(0);
-
-leda2.gui.rangeview.range = 60;
 plot_data;
 file_changed(1);
 add2log(1,['Cut file down to selection ',sprintf('%5.2f', start),' : ',sprintf('%5.2f', ende)],1,1,1)

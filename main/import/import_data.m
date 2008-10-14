@@ -5,9 +5,12 @@ leda2.current.fileopen_ok = 0;
 switch datatype
     case 'mat', ext = {'*.mat'};
     case 'text', ext = {'*.txt'};
+    case 'text2', ext = {'*.txt'};
     case 'cassylab', ext = {'*.lab'};
     case 'biotrace', ext = {'*.txt'};
     case 'visionanalyzer', ext = {'*.mat'};
+    case 'portilab', ext = {'*.txt'};
+    case 'vitaport', ext = {'*.asc'};
     case 'userdef', ext = {'*.txt'};
 
     otherwise
@@ -36,6 +39,9 @@ try
 
         case 'text'
             [time, conductance, event] = gettextdata(file);
+            
+        case 'text2'
+            [time, conductance, event] = gettext2data(file);
 
         case 'cassylab',
             [time, conductance, event] = getcassydata(file);
@@ -45,6 +51,12 @@ try
 
         case 'visionanalyzer'
             [time, conductance, event] = getVisionanalyzerData(file);
+            
+        case 'portilab'
+            [time, conductance, event] = getPortilabData(file);
+            
+        case 'vitaport'
+            [time, conductance, event] = getVitaportData(file);
 
         case 'userdef'
             [time, conductance, event] = getuserdefdata(file);
@@ -122,8 +134,9 @@ if (leda2.data.samplingrate > 32 || leda2.data.N > 36000) && ~leda2.intern.batch
     end
 end
 
-if ~leda2.intern.batchmode
-    plot_data;
+leda2.current.fileopen_ok = 1;
+if leda2.intern.batchmode
+    return;
 end
 
-leda2.current.fileopen_ok = 1;
+plot_data;

@@ -106,7 +106,9 @@ leda2.set.tauMax = str2double(get(leda2.gui.set.edit_tauMax,'String'));
 leda2.set.tauMinDiff = str2double(get(leda2.gui.set.edit_tauMinDiff,'String'));
 %leda2.set.tauBinding = get(leda2.gui.set.chbx_tauBinding,'Value');
 
-leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
-set(leda2.gui.rangeview.cond_smooth,'YData',leda2.data.conductance.smoothData);
+if leda2.file.open
+    leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
+    set(leda2.gui.rangeview.cond_smooth,'YData',leda2.data.conductance.smoothData);
+end
 
 close(leda2.gui.set.fig);

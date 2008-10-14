@@ -16,5 +16,5 @@ leda2.gui.fig_logo = figure('visible','on','menubar','none','paperpositionmode',
 image(im);
 set(gca,'visible','off','Position',[0 0 1 1]);
 
-text(30,90, ['V',num2str(leda2.intern.version,'%3.2f'),'  (',leda2.intern.version_datestr,')'],'units','pixel','horizontalalignment','left','fontsize',14,'color',[.1 .1 .1]);
+text(30,90, [leda2.intern.versiontxt,'  (',leda2.intern.version_datestr,')'],'units','pixel','horizontalalignment','left','fontsize',14,'color',[.1 .1 .1]);
 text(30,70, 'Code by Mathias Benedek & Christian Kaernbach','units','pixel','horizontalalignment','left','fontsize',8,'color',[.1 .1 .1]);

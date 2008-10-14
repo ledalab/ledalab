@@ -1,4 +1,4 @@
-function [time, conductance, event] = gettextdata(fullpathname)
+function [time, conductance, event] = gettext2data(fullpathname)
 
 % Matlab V7.x+
 % fid = fopen(fullpathname);
@@ -15,8 +15,11 @@ function [time, conductance, event] = gettextdata(fullpathname)
 
 M = dlmread(fullpathname);
 
-time = M(:,1);
+%samples = M(:,1);
 conductance = M(:,2);
+answer = inputdlg('Enter Sampling Frequency:');
+sr = str2double(answer);
+time = (0:length(conductance)-1) / sr;
 
 if size(M,2) > 2
     eventCol = 3;

@@ -45,8 +45,8 @@ interpTypeVal = get(leda2.gui.remartf.popm_interptype,'Value');
 interpType = interpTypeTxt{interpTypeVal};
 
 %get time index
-pre_idx = subrange_idx(t1-preT, t1);
-post_idx = subrange_idx(t2, t2+postT);
+pre_idx = subrange_idx(time, t1-preT, t1);
+post_idx = subrange_idx(time, t2, t2+postT);
 art_idx = pre_idx(end)+1:post_idx(1)-1;
 
 %setup spline points
@@ -81,13 +81,7 @@ end
 %replace artifact section
 leda2.data.conductance.data(art_idx) = art_sc;
 close(leda2.gui.remartf.fig);
-set(leda2.gui.rangeview.conductance,'YData',leda2.data.conductance.data);
-set(leda2.gui.overview.conductance,'YData',leda2.data.conductance.data);
 
-leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
-set(leda2.gui.rangeview.cond_smooth,'YData', leda2.data.conductance.smoothData);
-
+refresh_data(1);
 file_changed(1);
 add2log(1,['Artifact section ',sprintf('%5.2f', t1),' : ',sprintf('%5.2f', t2),' corrected.'],1,1,1);
-
-

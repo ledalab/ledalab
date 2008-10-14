@@ -37,13 +37,20 @@ elseif ax_flag == 2 %epoch display
 
     if (pt1(1) > 0-leda2.data.samplingrate*.1) && (pt1(1) < leda2.data.N+leda2.data.samplingrate*.1) && (pt1(2) > leda2.gui.rangeview.bottom) && (pt1(2) < leda2.gui.rangeview.top) %Hit within rangeview-axes
         pt1(1) = withinlimits(pt1(1), 0, leda2.data.N);
-        leda2.gui.rangeview.start = pt1(1);
 
-        if (pt2(1) > 0) && (pt2(1) < leda2.data.N) && (pt2(2) > leda2.data.conductance.min-1) && (pt2(2) < leda2.data.conductance.max+1)
-            leda2.gui.rangeview.range = pt2(1) - pt1(1);
+        if norm(pt2-pt1) > 1
+            leda2.gui.rangeview.start = pt1(1);
+
+            if (pt2(1) > 0) && (pt2(1) < leda2.data.N) && (pt2(2) > leda2.data.conductance.min-1) && (pt2(2) < leda2.data.conductance.max+1)
+                leda2.gui.rangeview.range = pt2(1) - pt1(1);
+            end
+
+        else %when clicking in epoch window, center to this spot
+            leda2.gui.rangeview.start = pt1(1) - leda2.gui.rangeview.range/2;
         end
+
         change_range;
     end
-    set(leda2.gui.rangeview.slider,'value',leda2.gui.rangeview.start);
+    set(leda2.gui.rangeview.slider,'Value',leda2.gui.rangeview.start);
 
 end

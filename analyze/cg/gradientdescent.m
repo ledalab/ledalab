@@ -12,6 +12,10 @@ for iter = 1:Ndim
     if iter == 1
         gradient = get_gradient(parset, epoch);
         direction = -gradient;
+        if isempty(gradient)
+            parset.alive = 0;
+            return;
+        end
         
     else
         new_gradient = get_gradient(parset, epoch);

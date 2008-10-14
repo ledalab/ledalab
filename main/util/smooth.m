@@ -1,5 +1,9 @@
 function sdata = smooth(data, winwidth, type)
 
+if winwidth < 1
+    sdata = data;
+    return;
+end
 if nargin < 3
     type = 'gauss';
 end
@@ -13,6 +17,10 @@ switch type,
         window = ones(1,winwidth+1); %moving average
     case 'gauss'
         window = normpdf(1:(winwidth+1), winwidth/2+1, winwidth/8);
+    case 'expl'
+        window = [zeros(1, winwidth/2), exp(-4*(0:2/winwidth:1))];
+%     case 'bateman'
+%         window = bateman(1:winwidth,0,0,5,50);
     otherwise
         error('Unknown type')
 end
