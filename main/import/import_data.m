@@ -6,11 +6,12 @@ switch datatype
     case 'mat', ext = {'*.mat'};
     case 'text', ext = {'*.txt'};
     case 'text2', ext = {'*.txt'};
-    case 'cassylab', ext = {'*.lab'};
     case 'biotrace', ext = {'*.txt'};
+    case 'cassylab', ext = {'*.lab'};
     case 'visionanalyzer', ext = {'*.mat'};
-    case 'portilab', ext = {'*.txt'};
     case 'vitaport', ext = {'*.asc'};
+    case 'portilab', ext = {'*.txt'};
+    case 'psychlab', ext = {'*.txt'};
     case 'userdef', ext = {'*.txt'};
 
     otherwise
@@ -43,21 +44,24 @@ try
         case 'text2'
             [time, conductance, event] = gettext2data(file);
 
-        case 'cassylab',
-            [time, conductance, event] = getcassydata(file);
-
         case 'biotrace'
             [time, conductance, event] = getBiotraceData(file);
+
+        case 'cassylab',
+            [time, conductance, event] = getcassydata(file);
 
         case 'visionanalyzer'
             [time, conductance, event] = getVisionanalyzerData(file);
             
-        case 'portilab'
-            [time, conductance, event] = getPortilabData(file);
-            
         case 'vitaport'
             [time, conductance, event] = getVitaportData(file);
 
+        case 'portilab'
+            [time, conductance, event] = getPortilabData(file);
+            
+        case 'psychlab'
+            [time, conductance, event] = getPsychlabData(file);
+                        
         case 'userdef'
             [time, conductance, event] = getuserdefdata(file);
 

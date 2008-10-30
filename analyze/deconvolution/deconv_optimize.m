@@ -8,13 +8,13 @@ if nr_iv == 0
 end
     
 
-xList = {x0, [.5 20 0], [.5 40 0]};
+xList = {x0, [.75 40 0], [.75 60 0], [.75 2 0]};
 
 x_opt = {};
 err_opt = [];
 
 for i = 1: min(nr_iv, length(xList))
-    [x, history] = cgd(xList{i}, @deconv_analysis, [.3 1 .02], .01, 20, .05);
+    [x, history] = cgd(xList{i}, @deconv_analysis, [.3 20 .02], .01, 20, .05);
     opthistory(i) = history;
     x_opt(i) = {x};
     err_opt(i) = history.error(end);

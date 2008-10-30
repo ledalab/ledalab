@@ -1,4 +1,4 @@
-function [time, conductance, event] = getPortilabData(filename)
+function [time, conductance, event] = getVitaportData(filename)
 %Import PortiLab data
 %
 %Mind: events (nid) must not be 0!

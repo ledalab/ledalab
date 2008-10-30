@@ -11,14 +11,15 @@ end
 leda2.gui.menu.menu_1  = uimenu(leda2.gui.fig_main,'Label','File');
 leda2.gui.menu.menu_1a = uimenu(leda2.gui.menu.menu_1,'Label','Open','Callback','open_ledafile;','Accelerator','o');   %
 leda2.gui.menu.menu_1b = uimenu(leda2.gui.menu.menu_1,'Label','Import Data...'); %,'Accelerator','i'
-leda2.gui.menu.menu_1b1 = uimenu(leda2.gui.menu.menu_1b,'Label','Matlab File','Callback','import_data(''mat'');');
+leda2.gui.menu.menu_1b4 = uimenu(leda2.gui.menu.menu_1b,'Label','BioTrace (Text Export)','Callback','import_data(''biotrace'');');
+leda2.gui.menu.menu_1b3 = uimenu(leda2.gui.menu.menu_1b,'Label','Cassy Lab','Callback','import_data(''cassylab'');');
+leda2.gui.menu.menu_1b6 = uimenu(leda2.gui.menu.menu_1b,'Label','PortiLab','Callback','import_data(''portilab'');');
+leda2.gui.menu.menu_1b6 = uimenu(leda2.gui.menu.menu_1b,'Label','PsychLab (Text Export)','Callback','import_data(''psychlab'');');
+leda2.gui.menu.menu_1b5 = uimenu(leda2.gui.menu.menu_1b,'Label','Vision Analyzer (Matlab Export)','Callback','import_data(''visionanalyzer'');');
+leda2.gui.menu.menu_1b7 = uimenu(leda2.gui.menu.menu_1b,'Label','VitaPort','Callback','import_data(''vitaport'');');
+leda2.gui.menu.menu_1b1 = uimenu(leda2.gui.menu.menu_1b,'Label','Matlab File','Callback','import_data(''mat'');','Separator','on');
 leda2.gui.menu.menu_1b2 = uimenu(leda2.gui.menu.menu_1b,'Label','Text File [Time SC (Marker)]','Callback','import_data(''text'');');
 leda2.gui.menu.menu_1b2 = uimenu(leda2.gui.menu.menu_1b,'Label','Text File [Samples SC (Marker)]','Callback','import_data(''text2'');');
-leda2.gui.menu.menu_1b3 = uimenu(leda2.gui.menu.menu_1b,'Label','Cassy Lab','Callback','import_data(''cassylab'');');
-leda2.gui.menu.menu_1b4 = uimenu(leda2.gui.menu.menu_1b,'Label','BioTrace (Text Export)','Callback','import_data(''biotrace'');');
-leda2.gui.menu.menu_1b5 = uimenu(leda2.gui.menu.menu_1b,'Label','Vision Analyzer (Matlab Export)','Callback','import_data(''visionanalyzer'');');
-leda2.gui.menu.menu_1b6 = uimenu(leda2.gui.menu.menu_1b,'Label','PortiLab','Callback','import_data(''portilab'');');
-leda2.gui.menu.menu_1b7 = uimenu(leda2.gui.menu.menu_1b,'Label','VitaPort','Callback','import_data(''vitaport'');');
 leda2.gui.menu.menu_1b8 = uimenu(leda2.gui.menu.menu_1b,'Label','User-defined Data','Callback','import_data(''userdef'');','Enable','off');
 
 leda2.gui.menu.menu_1c = uimenu(leda2.gui.menu.menu_1,'Label','Import Event-Info...'); %,'Accelerator','i'
@@ -117,11 +118,12 @@ leda2.gui.text_conderr = uicontrol('Units','normalized','Style','text','Position
 leda2.gui.text_Nevents = uicontrol('Units','normalized','Style','text','Position',[x3a dy+.03*3 .08 .012],'String','Events: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
 leda2.gui.text_title2 = uicontrol('Units','normalized','Style','text','Position',[x3b+.01 dy+.03*8 .08 .012],'String','FIT ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1,'FontWeight','bold');
 leda2.gui.text_tau = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*7 .08 .012],'String','Tau: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-leda2.gui.text_adjR2 = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*6 .08 .012],'String','Adj. R2: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+%leda2.gui.text_adjR2 = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*6 .08 .012],'String','Adj. R2: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+leda2.gui.text_mse = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*6 .08 .012],'String','MSE: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
 leda2.gui.text_rmse = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*5 .08 .012],'String','RMSE: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
 leda2.gui.text_nPhasic = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*4 .08 .012],'String','SCRs: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
 leda2.gui.text_nTonic = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*3 .08 .012],'String','TPs: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-leda2.gui.text_df = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*1 .06 .012],'String','DF: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1,'Visible','off');
+%leda2.gui.text_df = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*1 .06 .012],'String','DF: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1,'Visible','off');
 
 %Event Info Display
 dx1 = .75; dx2 = dx1+ .03; dx3 = dx2 + .08;

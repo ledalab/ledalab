@@ -9,8 +9,10 @@ df = n - npar;
 SSE = sum(residual.^2);
 
 switch errortype
+    case 'MSE',
+        error = SSE/n; %MSE, non-normalized
     case 'RMSE',
-        error = sqrt(SSE/df); %RMSE
+        error = sqrt(SSE/n); %RMSE, non-normalized
     case 'adjR2',
         SST = std(data, 1) * n;
         r2 = 1 - SSE/SST;

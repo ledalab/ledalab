@@ -12,11 +12,17 @@ sr = leda2.analysis0.target.sr;
 
 %Get inter-impulse-data
 iif_idx = [];
-for i = 2: length(maxL)-1
-    gap_idx = minL(i,2):minL(i+1,1);  %+1: removed otherwise no inter-impulse points may be available at highly smoothed data
-    iif_idx = [iif_idx, gap_idx];
+if length(maxL) > 2
+    for i = 2: length(maxL)-1
+        gap_idx = minL(i,2):minL(i+1,1);  %+1: removed otherwise no inter-impulse points may be available at highly smoothed data
+        iif_idx = [iif_idx, gap_idx];
+    end
+    iif_idx = [minL(2,1), iif_idx, minL(end,2):length(driver)-sr];
+    
+else  %no peaks (exept for pre-peak and may last peak) so data represents tonic only, so ise all data for tonic estimation
+        iif_idx = find(t_ext > 0);
 end
-iif_idx = [minL(2,1), iif_idx, minL(end,2):length(driver)-sr];  %
+
 iif_t = t_ext(iif_idx);
 iif_data = driver(iif_idx);
 
@@ -42,15 +48,28 @@ else
         groundtime(end-1) = (groundtime(end-2) + groundtime(end))/2;
     end
     for i = 1:length(groundtime)
+        %Select relevant interimpulse time points for tonic estimate at groundtime
         if i == 1
             t_idx = iif_t <= groundtime(i) + leda2.set.tonicGridSize & iif_t > 1;
+            grid_idx = t_ext <= groundtime(i) + leda2.set.tonicGridSize & t_ext > 1;
         elseif i == length(groundtime)
             t_idx = iif_t > groundtime(i) - leda2.set.tonicGridSize & iif_t < t(end) - 1;
+            grid_idx = t_ext > groundtime(i) - leda2.set.tonicGridSize & t_ext < t(end) - 1;
         else
             t_idx = iif_t > groundtime(i) - leda2.set.tonicGridSize/2 & iif_t <= groundtime(i) + leda2.set.tonicGridSize/2;
+            grid_idx = t_ext > groundtime(i) - leda2.set.tonicGridSize/2 & t_ext <= groundtime(i) + leda2.set.tonicGridSize/2;
         end
-        p = polyfit(iif_t(t_idx), iif_data(t_idx),1);
-        groundlevel(i) = polyval(p, groundtime(i));%median(iif_data(t_idx));
+        %Estimate groundlevel at groundtime
+        if length(find(t_idx)) > 2
+            p = polyfit(iif_t(t_idx), iif_data(t_idx),1);
+            if abs(p(2)) < .5  %polyval usually is better, but if it produces unreasonable results its replaced by median
+                groundlevel(i) = polyval(p, groundtime(i));
+            else
+                groundlevel(i) = median(iif_data(t_idx));
+            end
+        else  %if inter-impulses, data may reflect pure tonic so just take median of data
+            groundlevel(i) = median(driver(grid_idx));
+        end
     end
     groundlevel_pre = groundlevel;
 
@@ -89,9 +108,9 @@ end
 
 %Rereferencing: tonic = tonic + targetdata_min
 targetdata_min = min(d - tonic);
-if targetdata_min <= 0  %necessary?!?
+if targetdata_min <= 0  %necessary!
     targetdata_min = leda2.set.dist0_min;
-    disp('Targetdata_min <= 0!!')
+    %disp('Targetdata_min <= 0!!')
 end
 pp.coefs(:,end) = pp.coefs(:,end) + targetdata_min;
 groundlevel = groundlevel + targetdata_min;
