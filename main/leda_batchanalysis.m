@@ -71,7 +71,7 @@ end
 function [wdir, open_datatype, downsample_factor, do_fit, do_optimize, do_export_scr, do_export_era, do_save_overview] = parse_arguments(varargin)
 
 wdir = varargin{1};
-if ~strcmp(wdir(end),'\') && ~strcmp(wdir(end),'/')
+if ~strcmp(wdir(end),'\') && ~strcmp(wdir(end),'/') && ~strcmp(wdir(end-4:end-3),'*.')
     wdir = [wdir,'\'];
 end
 wdir = [wdir, '*.mat'];
@@ -85,8 +85,8 @@ do_export_scr = 0;
 do_export_era = 0;
 do_save_overview = 0;
 
-valid_datatypeL = {'leda','mat','text','cassylab','biotrace','visionanalyzer','userdef'};
-datatype_extL = {'*.mat','*.mat','*.txt','*.txt','*.txt','',''};
+%valid_datatypeL = {'leda','mat','text','cassylab','biotrace','visionanalyzer','userdef'};
+%datatype_extL = {'*.mat','*.mat','*.txt','*.txt','*.txt','',''};
 
 if nargin > 1
     vars = varargin(2:end);
@@ -100,13 +100,14 @@ if nargin > 1
 
         switch option_name
             case 'open',
-                if ischar(option_arg) && any(strcmp(option_arg, valid_datatypeL))
+                %if ischar(option_arg) && any(strcmp(option_arg, valid_datatypeL))
                     open_datatype = option_arg;
-                    wdir = [wdir(1:end-5), datatype_extL{strcmp(option_arg, valid_datatypeL)}];
-                else
-                    disp(['Unknown datatype: ',option_arg])
-                    return;
-                end
+                    wdir = wdir(1:end-5);  %remove default value *.mat
+                    %wdir = [wdir(1:end-5), datatype_extL{strcmp(option_arg, valid_datatypeL)}];
+                %else
+                %    disp(['Unknown datatype: ',option_arg])
+                %    return;
+                %end
 
             case 'downsample'
                 if isnumeric(option_arg)
@@ -116,7 +117,7 @@ if nargin > 1
                     return;
                 end
 
-            case 'fit'
+            case 'analyze'
                 if isnumeric(option_arg)
                     do_fit = option_arg;
                 else

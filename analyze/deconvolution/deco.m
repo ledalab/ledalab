@@ -70,7 +70,7 @@ if ~leda2.intern.batchmode
     %         close(leda2.gui.deconv.fig)
     %     end
 
-    leda2.gui.deconv.fig = figure('Units','normalized','Position',[.1 .05 .8 .9],'Name','Deconvolve data','Color',leda2.gui.col.fig,'ToolBar','figure','NumberTitle','off','MenuBar','none');  %
+    leda2.gui.deconv.fig = figure('Units','normalized','Position',[.1 .05 .8 .9],'Name','Decomposition analysis','Color',leda2.gui.col.fig,'ToolBar','figure','NumberTitle','off','MenuBar','none');  %
     leda2.gui.deconv.edit_tau1 = uicontrol('Style','edit','Units','normalized','Position',[.1 .03 .05 .04],'String',leda2.analysis0.tau(1));  %tmp_tau1
     leda2.gui.deconv.edit_tau2 = uicontrol('Style','edit','Units','normalized','Position',[.18 .03 .05 .04],'String',leda2.analysis0.tau(2));  %tmp_tau2
     leda2.gui.deconv.edit_dist0 = uicontrol('Style','edit','Units','normalized','Position',[.26 .03 .05 .04],'String',leda2.analysis0.dist0);  %tmp_dist0

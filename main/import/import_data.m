@@ -3,9 +3,6 @@ global leda2
 leda2.current.fileopen_ok = 0;
 
 switch datatype
-    case 'mat', ext = {'*.mat'};
-    case 'text', ext = {'*.txt'};
-    case 'text2', ext = {'*.txt'};
     case 'biotrace', ext = {'*.txt'};
     case 'cassylab', ext = {'*.lab'};
     case 'varioport', ext = {'*.vpd'};
@@ -14,6 +11,9 @@ switch datatype
     case 'portilab', ext = {'*.txt'};
     case 'psychlab', ext = {'*.txt'};
     case 'userdef', ext = {'*.txt'};
+    case 'mat', ext = {'*.mat'};
+    case 'text', ext = {'*.txt'};
+    case 'text2', ext = {'*.txt'};
 
     otherwise
         if leda2.intern.prompt

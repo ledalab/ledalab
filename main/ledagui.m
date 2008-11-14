@@ -59,7 +59,7 @@ leda2.gui.menu.menu_3b  = uimenu(leda2.gui.menu.menu_3,'Label','Visual settings'
 
 %-Analyze
 leda2.gui.menu.menu_4  = uimenu(leda2.gui.fig_main,'Label','Analysis');
-leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Deconvolution analysis','Callback','deco');
+leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Decomposition analysis','Callback','deco');
 leda2.gui.menu.menu_4f = uimenu(leda2.gui.menu.menu_4,'Label','Delete analysis','Callback','delete_fit(1)','Separator','on');
 
 %-Tools
