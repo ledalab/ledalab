@@ -5,12 +5,13 @@ if nargin < 1
     nr_iv = 0;
 end
 
-leda2.set.dist0_min = leda2.data.conductance.error * 10;  %override setting
+leda2.set.dist0_min = leda2.data.conductance.error * 10;  %override setting  %*10
 leda2.set.segmWidth = 12;
 leda2.set.sigPeak = .01;  %.003
-leda2.set.tonicGridSize = 100; %100
+% leda2.set.tonicGridSize = 100; %100
 leda2.set.d0Autoupdate = 1;
 leda2.set.tonicIsConst = 0;
+leda2.set.tonicSlowIncrease = 0;
 %leda2.set.autoSmooth = 1;  %-> adaptive smoothing
 
 leda2.analysis0 = [];
@@ -57,7 +58,7 @@ end
 if isempty(leda2.analysis)
     leda2.analysis0.tau = [.75, 20];
     leda2.analysis0.dist0 = 0;
-    leda2.analysis0.smoothwin = 0;
+    leda2.analysis0.smoothwin = 1.5; %sec
 else
     leda2.analysis0.tau = leda2.analysis.tau;
     leda2.analysis0.dist0 = leda2.analysis.dist0;
@@ -71,13 +72,24 @@ if ~leda2.intern.batchmode
     %     end
 
     leda2.gui.deconv.fig = figure('Units','normalized','Position',[.1 .05 .8 .9],'Name','Decomposition analysis','Color',leda2.gui.col.fig,'ToolBar','figure','NumberTitle','off','MenuBar','none');  %
-    leda2.gui.deconv.edit_tau1 = uicontrol('Style','edit','Units','normalized','Position',[.1 .03 .05 .04],'String',leda2.analysis0.tau(1));  %tmp_tau1
-    leda2.gui.deconv.edit_tau2 = uicontrol('Style','edit','Units','normalized','Position',[.18 .03 .05 .04],'String',leda2.analysis0.tau(2));  %tmp_tau2
-    leda2.gui.deconv.edit_dist0 = uicontrol('Style','edit','Units','normalized','Position',[.26 .03 .05 .04],'String',leda2.analysis0.dist0);  %tmp_dist0
+
+    leda2.gui.deconv.text_tau1 = uicontrol('Style','text','Units','normalized','Position',[.1 .01 .05 .02],'String','tau1','BackgroundColor',get(gcf,'Color'));
+    leda2.gui.deconv.text_tau2 = uicontrol('Style','text','Units','normalized','Position',[.18 .01 .05 .02],'String','tau2','BackgroundColor',get(gcf,'Color'));
+    leda2.gui.deconv.text_dist0 = uicontrol('Style','text','Units','normalized','Position',[.26 .01 .05 .02],'String','dist0','BackgroundColor',get(gcf,'Color'));
+    leda2.gui.deconv.edit_tau1 = uicontrol('Style','edit','Units','normalized','Position',[.1 .04 .05 .03],'String',leda2.analysis0.tau(1));  %tmp_tau1
+    leda2.gui.deconv.edit_tau2 = uicontrol('Style','edit','Units','normalized','Position',[.18 .04 .05 .03],'String',leda2.analysis0.tau(2));  %tmp_tau2
+    leda2.gui.deconv.edit_dist0 = uicontrol('Style','edit','Units','normalized','Position',[.26 .04 .05 .03],'String',leda2.analysis0.dist0);  %tmp_dist0
     
-    leda2.gui.deconv.chbx_d0Autoupdate = uicontrol('Style','checkbox','Units','normalized','Position',[.36 .06 .09 .02],'String','d0 autopdate','Value',leda2.set.d0Autoupdate,'BackgroundColor',get(gcf,'Color'));  %tmp_tau1
-    leda2.gui.deconv.chbx_tonicIsConst = uicontrol('Style','checkbox','Units','normalized','Position',[.36 .03 .09 .02],'String','tonic = const','Value',leda2.set.tonicIsConst,'BackgroundColor',get(gcf,'Color'));  %tmp_tau1
-    leda2.gui.deconv.edit_smoothWinSize = uicontrol('Style','edit','Units','normalized','Position',[.48 .03 .05 .04],'String',leda2.analysis0.smoothwin,'Enable','inactive');  %tmp_dist0
+    leda2.gui.deconv.text_smoothWinSize = uicontrol('Style','text','Units','normalized','Position',[.34 .065 .05 .02],'String','Smooth-Win','BackgroundColor',get(gcf,'Color'));
+    leda2.gui.deconv.text_gridsize = uicontrol('Style','text','Units','normalized','Position',[.34 .035 .05 .02],'String','Grid-Size','BackgroundColor',get(gcf,'Color'));
+    leda2.gui.deconv.text_sigPeak = uicontrol('Style','text','Units','normalized','Position',[.34 .005 .05 .02],'String','Sig-Peak','BackgroundColor',get(gcf,'Color'));
+    leda2.gui.deconv.edit_smoothWinSize = uicontrol('Style','edit','Units','normalized','Position',[.4 .07 .05 .02],'String',leda2.analysis0.smoothwin);
+    leda2.gui.deconv.edit_gridSize = uicontrol('Style','edit','Units','normalized','Position',[.4 .04 .05 .02],'String',leda2.set.tonicGridSize);    
+    leda2.gui.deconv.edit_sigPeak = uicontrol('Style','edit','Units','normalized','Position',[.4 .01 .05 .02],'String',leda2.set.sigPeak);
+    
+    leda2.gui.deconv.chbx_d0Autoupdate = uicontrol('Style','checkbox','Units','normalized','Position',[.48 .07 .09 .02],'String','d0 autopdate','Value',leda2.set.d0Autoupdate,'BackgroundColor',get(gcf,'Color'));  %tmp_tau1
+    leda2.gui.deconv.chbx_tonicIsConst = uicontrol('Style','checkbox','Units','normalized','Position',[.48 .04 .09 .02],'String','tonic = const','Value',leda2.set.tonicIsConst,'BackgroundColor',get(gcf,'Color'));  %tmp_tau1
+    leda2.gui.deconv.chbx_tonicSlowIncrease = uicontrol('Style','checkbox','Units','normalized','Position',[.48 .01 .09 .02],'String','tonic slow increase','Value',leda2.set.tonicSlowIncrease,'BackgroundColor',get(gcf,'Color'));  %tmp_tau1
 
     leda2.gui.deconv.butt_analyze = uicontrol('Style','pushbutton','Units','normalized','Position',[.6 .05 .1 .03],'String','Analyze','Callback',@deconv_analysis_gui);
     leda2.gui.deconv.butt_optimize = uicontrol('Style','pushbutton','Units','normalized','Position',[.6 .02 .1 .02],'String','Optimize','Callback',@deconv_opt);
@@ -87,8 +99,8 @@ if ~leda2.intern.batchmode
 
 else
 
-    %[err, leda2.analysis0.tau, leda2.analysis0.dist0, leda2.analysis0.opthistory] = deconv_analysis([leda2.analysis0.tau, leda2.analysis0.dist0]);
-    [leda2.analysis0.tau, leda2.analysis0.dist0, leda2.analysis0.opthistory] = deconv_optimize([leda2.analysis0.tau, leda2.analysis0.dist0], nr_iv);
+    [err, x] = deconv_analysis([leda2.analysis0.tau, leda2.analysis0.dist0]);  %set dist0
+    [leda2.analysis0.tau, leda2.analysis0.dist0, leda2.analysis0.opt_history] = deconv_optimize(x, nr_iv);
     deconv_apply;
 
 end
@@ -102,6 +114,10 @@ x(2) = str2double(get(leda2.gui.deconv.edit_tau2,'String'));
 x(3) = str2double(get(leda2.gui.deconv.edit_dist0,'String'));
 leda2.set.d0Autoupdate = get(leda2.gui.deconv.chbx_d0Autoupdate,'Value');
 leda2.set.tonicIsConst = get(leda2.gui.deconv.chbx_tonicIsConst,'Value');
+leda2.set.tonicSlowIncrease = get(leda2.gui.deconv.chbx_tonicSlowIncrease,'Value');
+leda2.analysis0.smoothwin = str2double(get(leda2.gui.deconv.edit_smoothWinSize, 'String'));
+leda2.set.tonicGridSize = str2double(get(leda2.gui.deconv.edit_gridSize,'String'));
+leda2.set.sigPeak = str2double(get(leda2.gui.deconv.edit_sigPeak,'String'));
 
 [err, x] = deconv_analysis(x);
 
@@ -143,12 +159,13 @@ figure(leda2.gui.deconv.fig);
 
 subplot(5,1,1); hold on;
 cla; hold on;
+title('Raw data')
 plot(leda2.data.time.data, leda2.data.conductance.data,'k');
 set(gca,'XLim',[t_ext(1), t_ext(end)]);
 
 subplot(5,1,2); hold on;
 cla; hold on;
-%     plot(t_ext, leda2.analysis0.driver_standarddeconv,'Color',[.4 .4 .4])
+title('Standard Deconvolution - Estimate tonic component')
 plot(t_ext, driver_rawdata,'k')
 plot(iif_t, iif_data,'b.')
 plot(t, tonic0 - dist0,'m')
@@ -158,6 +175,7 @@ set(gca,'XLim',[t_ext(1), t_ext(end)], 'YLim',[min(driver_rawdata(n_off+1:end)),
 
 subplot(5,1,3);
 cla; hold on;
+title('Standard Deconvolution - Estimate tonic component')
 plot(t_ext, c0(1:length(t_ext)), 'm')
 plot(t_ext, dist0 + d_ext,'Color',[.5 .5 .5])
 plot(t, dist0 + d, 'k');
@@ -165,6 +183,7 @@ set(gca,'XLim',[t_ext(1), t_ext(end)]);
 
 subplot(5,1,4);
 cla; hold on;
+title('Raw data minus tonic component')
 plot(0,0,'b'); plot(0,0,'r'); plot(0,0,'k');
 plot(t_ext, driver, 'Color', [.75 .75 .75]);
 plot(t_ext, -remd*2, 'Color', [.8 .4 .4]);
@@ -191,6 +210,7 @@ legend(sprintf('Driver (error = %4.3f,  %4.1f)', leda2.analysis0.err_dev(1), led
 
 subplot(5,1,5);
 cla; hold on;
+title('Reconstruction of data')
 plot(t, tonic0 - dist0, 'k');
 for i = 2:length(phasicRemainder)
     plot(t, tonic0 - dist0 + phasicRemainder{i}) %leda2.analysis.tonicData +
@@ -236,10 +256,10 @@ else
     leda2.analysis0.target.tonic0 = ppval(leda2.analysis0.target.tonic0_poly, leda2.data.time.data);
 end
 leda2.analysis0.target.t = leda2.data.time.data;
-leda2.analysis0.target.d = leda2.data.conductance.smoothData;  % - leda2.analysis0.target.tonic0
+leda2.analysis0.target.d = leda2.data.conductance.data; %smoothData;  % - leda2.analysis0.target.tonic0
 leda2.analysis0.target.sr = leda2.data.samplingrate;
 
-leda2.set.sigPeak = .001;
+%leda2.set.sigPeak = .001;
 deconv_analysis([leda2.analysis0.tau, leda2.analysis0.dist0]);
 
 leda2.analysis0.tonicData = leda2.analysis0.target.tonic0 - leda2.analysis0.dist0;

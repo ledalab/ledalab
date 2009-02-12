@@ -20,9 +20,9 @@ end
 %maxL = cccrimax(data(cccrimax) - data(cccrimin(1:end-1)) > sigc);
 %maxL = cccrimax(s > sigc);
 
-%get peaks of remainder
-[rmdimin, rmdimax] = get_peaks(remd, ndiff);
-%[rmdimins, rmdimaxs] = signpeak(remd, rmdimin, rmdimax, .005);
+
+[rmdimin, rmdimax] = get_peaks(remd, ndiff);%get peaks of remainder
+[rmdimins, rmdimaxs] = signpeak(remd, rmdimin, rmdimax, .005); %get remainder segments
 
 %Segments: 12 sec, max 3 sec preceding maximum
 for i = 1:length(maxL)
@@ -37,29 +37,29 @@ for i = 1:length(maxL)
     segmImpulse(i) = {segm_data};
 
     %overshoot
-    %     oversh_data = zeros(size(segm_idx));
-    %     if i < length(maxL)
-    %         rmi = find(rmdimaxs > maxL(i) & rmdimaxs < maxL(i+1));
-    %     else
-    %         rmi = find(rmdimaxs > maxL(i));
-    %     end
-    %
-    %     if ~isempty(rmi)
-    %         rmi = rmi(1);
-    %         oversh_start = max(rmdimins(rmi), segm_start);
-    %         oversh_end = min(rmdimins(rmi+1), segm_end);
-    %         oversh_data((oversh_start - segm_start + 1) : end - (segm_end - oversh_end)) = remd(oversh_start:oversh_end);
-    %     end
+        oversh_data = zeros(size(segm_idx));
+        if i < length(maxL)
+            rmi = find(rmdimaxs > maxL(i) & rmdimaxs < maxL(i+1));
+        else
+            rmi = find(rmdimaxs > maxL(i));
+        end
+    
+        if ~isempty(rmi)
+            rmi = rmi(1);
+            oversh_start = max(rmdimins(rmi,1), segm_start);
+            oversh_end = min(rmdimins(rmi,2), segm_end); %min(rmdimins(rmi+1), segm_end);
+            oversh_data((oversh_start - segm_start + 1) : end - (segm_end - oversh_end)) = remd(oversh_start:oversh_end);
+        end
     %     %     if mean(oversh_data) < 2*leda2.data.conductance_error
     %     %         oversh_data = zeros(size(segm_idx));
     %     %     end
 
-    oversh_data = remd(segm_idx);
-    oversh_data(segm_idx < maxL(i)) = 0;
-    if i < length(maxL)
-        oversh_data(segm_idx >= maxL(i+1)) = 0;
-    end
-
+%     oversh_data = remd(segm_idx);
+%     oversh_data(segm_idx < maxL(i)) = 0;
+%     if i < length(maxL)
+%         oversh_data(segm_idx >= maxL(i+1)) = 0;
+%     end
+% 
     segmOversh(i) = {oversh_data};
 end
 

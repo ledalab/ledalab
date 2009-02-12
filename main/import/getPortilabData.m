@@ -26,7 +26,7 @@ nSamples = nLines - (headerLines + footerLines);
 nSignals = length(labels) - 1;
 
 %read data
-M = dlmread(filename,'\t',[headerLines, 0, headerLines+nSamples-1, nSignals]);
+M = dlmread(filename,'\t',[headerLines, 0, headerLines+nSamples-2, nSignals]);
 skip_samples = 16;  %avoid data errors at beginning
 M = M(1+skip_samples :end, :);
 

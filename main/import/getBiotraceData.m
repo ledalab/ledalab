@@ -34,7 +34,8 @@ M = M(1+skip_samples :end, :);
 for i = 1:length(labels)
     scCol(i) = any(strfind(labels{i}, 'SC/GSR'));
 end
-conductance = M(:,scCol);
+scIdx = find(scCol);
+conductance = M(:,scIdx(1));
 time = (M(:,1) - M(1,1)) / freq;
 
 %get events

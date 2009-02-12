@@ -18,9 +18,9 @@ if length(maxL) > 2
         iif_idx = [iif_idx, gap_idx];
     end
     iif_idx = [minL(2,1), iif_idx, minL(end,2):length(driver)-sr];
-    
+
 else  %no peaks (exept for pre-peak and may last peak) so data represents tonic only, so ise all data for tonic estimation
-        iif_idx = find(t_ext > 0);
+    iif_idx = find(t_ext > 0);
 end
 
 iif_t = t_ext(iif_idx);
@@ -62,7 +62,7 @@ else
         %Estimate groundlevel at groundtime
         if length(find(t_idx)) > 2
             p = polyfit(iif_t(t_idx), iif_data(t_idx),1);
-            if abs(p(2)) < .5  %polyval usually is better, but if it produces unreasonable results its replaced by median
+            if 0%abs(p(1)) < .1  %polyval usually is better, but if it produces unreasonable results its replaced by median  %abs(p(2)) < .5
                 groundlevel(i) = polyval(p, groundtime(i));
             else
                 groundlevel(i) = median(iif_data(t_idx));
@@ -75,11 +75,14 @@ else
 
 
     %Correction of (too fast) increasing tonic level
-    for i = 2:length(groundtime)
-        if groundlevel(i) > groundlevel(i-1)
-            groundlevel(i) = mean(groundlevel(i-1:i));
+    if leda2.set.tonicSlowIncrease
+        for i = 2:length(groundtime)
+            if groundlevel(i) > groundlevel(i-1)
+                groundlevel(i) = mean(groundlevel(i-1:i));
+            end
         end
     end
+    groundlevel_pre1 = groundlevel;
     tonic = spline(groundtime, groundlevel, t);
     pp = spline(groundtime, groundlevel);
 
@@ -94,9 +97,11 @@ else
             groundlevel(i) = groundlevel(i) + ddd;
             groundlevel(i+1) = groundlevel(i+1) + ddd;
             %Correction of (too fast) increasing tonic level
-            for j = 2:length(groundtime)
-                if groundlevel(j) > groundlevel(j-1)
-                    groundlevel(j) = mean(groundlevel(j-1:j));
+            if leda2.set.tonicSlowIncrease
+                for j = 2:length(groundtime)
+                    if groundlevel(j) > groundlevel(j-1)
+                        groundlevel(j) = mean(groundlevel(j-1:j));
+                    end
                 end
             end
             tonic = spline(groundtime, groundlevel, t);
@@ -120,6 +125,7 @@ if leda2.set.tonicIsConst
 else
     tonic = ppval(pp, t);
 end
+
 tonic(tonic < 0) = 0;
 d = d - tonic;
 
@@ -129,7 +135,7 @@ d = d - tonic;
 % else
 %     leda2.analysis0.dist0 = .01;
 % end
-leda2.analysis0.target.d0 = d; %leda2.analysis0.target.d - tonic0;  %min(d) == 0;
+leda2.analysis0.target.d0 = d; %d0 = d - (tonic + targetdata_min),  min(d0) == 0;
 leda2.analysis0.target.tonic0 = tonic;
 leda2.analysis0.target.tonic0_poly = pp;
 leda2.analysis0.target.groundtime = groundtime;
@@ -138,3 +144,23 @@ leda2.analysis0.target.groundlevel_pre = groundlevel_pre;
 
 leda2.analysis0.target.iif_t = iif_t;
 leda2.analysis0.target.iif_data = iif_data;
+
+%Plot tonic fit
+if 0
+    figure;
+    plot(t, d + tonic,'k')
+    hold on;
+    plot(t_ext, driver,'b')
+    plot(iif_t,iif_data,'.','Color',[.5 .5 .5])
+
+    plot(groundtime, groundlevel_pre,'mo')
+    tonic_pre = spline(groundtime, groundlevel_pre, t);
+    plot(t, tonic_pre,'m:')
+
+    plot(groundtime, groundlevel_pre1,'mo')
+    tonic_pre1 = spline(groundtime, groundlevel_pre1, t);
+    plot(t, tonic_pre1,'m--')
+
+    plot(groundtime, groundlevel - targetdata_min,'mo')
+    plot(t, tonic - targetdata_min,'m')
+end

@@ -60,7 +60,7 @@ for iFile = 1:nFile
     save_ledafile(0);
 
     catch
-        add2log(1,'ERROR !!!',1,0,0,1)
+       add2log(1,'ERROR !!!',1,0,0,1)
     end
 
 
@@ -190,7 +190,12 @@ plot(t, analysis.tonicData,'g');
 plot(analysis.groundtime, analysis.groundlevel,'g*')
 plot(t, leda2.data.conductance.data, 'k');
 legend(sprintf('tau = %4.2f, %4.2f,  dist0 = %4.4f',analysis.tau, analysis.dist0), sprintf('err = %4.2f', analysis.err),'Location','NorthWest')
-set(gca, 'XLim', [t(1), t(end)])
+%ensure minimum sclaing of 2 muS
+yl = get(gca,'YLim');
+if abs(diff(yl)) < 2
+    yl(2) = yl(1) + 2;
+end
+set(gca, 'XLim', [t(1), t(end)],'Ylim',yl)
 %Events
 yl = ylim;
 for i = 1:events.N
@@ -203,14 +208,14 @@ subplot(2,1,2);
 cla; hold on;
 plot(t_ext, analysis.driver);
 plot(t_ext, -2*analysis.remainder,'g');
-set(gca, 'XLim', [t(1), t(end)], 'YLim', [min(-2*analysis.remainder)*1.2, max(analysis.driver(analysis.peaktime_idx))*1.2])
+set(gca, 'XLim', [t(1), t(end)], 'YLim', [min(-2*analysis.remainder)*1.2, max(analysis.driver(analysis.impMax_idx))*1.2])
 %Events
 yl = ylim;
 for i = 1:events.N
     plot([events.event(i).time, events.event(i).time], yl, 'r')
 end
 set(gca,'YLim',yl)
-legend(sprintf('err-adjR2 = %6.4f',analysis.err_adjR2), sprintf('err-chi2 = %4.2f',analysis.err_chi2), sprintf('err-succz = %4.2f,  %4.2f', analysis.err_succz),'Location','NorthWest')   %sprintf('err-dev = %4.2f,  %4.2f',analysis.err_dev)
+legend(sprintf('err = %6.4f',analysis.err), sprintf('err-chi2 = %4.2f',analysis.err_chi2), sprintf('err-succz = %4.2f,  %4.2f', analysis.err_succz),'Location','NorthWest')   %sprintf('err-dev = %4.2f,  %4.2f',analysis.err_dev)
 
 saveas(gcf, leda2.file.filename(1:end-4), 'jpg')
 

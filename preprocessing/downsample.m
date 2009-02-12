@@ -53,8 +53,8 @@ end
 %downsampling (type factor mean) may result in an additional offset = time(1), which will not be substracted (tim = time - offset) in order not to affect event times
 leda2.data.time.data = td(:)';
 leda2.data.conductance.data = scd(:)';
+refresh_data(0);
 leda2.data.conductance.smoothData = smooth_adapt(leda2.data.conductance.data, 'gauss', leda2.data.samplingrate*2, .00003);
-
 
 delete_fit(0);
 if leda2.intern.batchmode

@@ -53,7 +53,7 @@ leda2.gui.menu.menu_2f  = uimenu(leda2.gui.menu.menu_2,'Label','Artifact correct
 
 %-Settings
 leda2.gui.menu.menu_3  = uimenu(leda2.gui.fig_main,'Label','Settings');
-leda2.gui.menu.menu_3a  = uimenu(leda2.gui.menu.menu_3,'Label','Analysis settings','Callback','ledaset');
+%leda2.gui.menu.menu_3a  = uimenu(leda2.gui.menu.menu_3,'Label','Analysis settings','Callback','ledaset');
 leda2.gui.menu.menu_3b  = uimenu(leda2.gui.menu.menu_3,'Label','Visual settings','Callback','ledapref');
 %leda2.gui.menu.menu_3c  = uimenu(leda2.gui.menu.menu_3,'Label','Resore default settings','Callback','restore_settings','Separator','on');
 

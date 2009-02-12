@@ -44,7 +44,7 @@ savevars = {'fileinfo','data'};
 % end
 if ~isempty(leda2.analysis)
     analysis = leda2.analysis;
-    analysis = rmfield(analysis, {'phasicComponent', 'phasicRemainder','kernel'}); %#ok<NASGU>
+    analysis = rmfield(analysis, {'phasicComponent', 'phasicRemainder'}); %#ok<NASGU>
     savevars = [savevars, {'analysis'}];
 end
 
