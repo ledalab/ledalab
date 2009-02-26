@@ -7,10 +7,10 @@ clear global leda2
 global leda2
 
 leda2.intern.name = 'Ledalab';
-leda2.intern.version = 3.04;
+leda2.intern.version = 3.05;
 versiontxt = num2str(leda2.intern.version,'%3.2f');
 leda2.intern.versiontxt = ['V',versiontxt(1:3),'.',versiontxt(4:end)];
-leda2.intern.version_datestr = '2009-02-13';
+leda2.intern.version_datestr = '2009-02-27';
 
 %Add all subdirectories to Matlab path
 file = which('Ledalab.m');

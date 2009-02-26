@@ -8,7 +8,7 @@ if nr_iv == 0
 end
     
 
-xList = {x0, [.75 40 0], [.75 60 0], [.75 2 0]};
+xList = {x0, [.75 40 x0(end)], [.75 60 x0(end)], [.75 2 x0(end)]};
 
 x_opt = {};
 err_opt = [];

@@ -44,15 +44,17 @@ t_ext = (t(1)-dt):-dt:(t(1)-nfi*dt);
 t_ext = [fliplr(t_ext), t];
 tb = t_ext - t_ext(1) + dt;
 kernel = bateman_gauss(tb, 0, 0, tau(1), tau(2), 0);
+kernel(kernel < eps) = eps; %avoid division by 0
 
 
-sigc = max(.01, leda2.set.sigPeak/(5*max(kernel)));  %threshold for burst peak
+sigc = max(.01, 2*leda2.set.sigPeak/max(bg));  %threshold for burst peak
+%sigc = max(.01, leda2.set.sigPeak/(5*max(kernel)));  %replaced because max(kernel) is dependent of sr
 
 %Estimate tonic
 qt = deconv([d_ext,ones(1,length(kernel)-1)], kernel);
 %[qts, win] = smooth_adapt(qt, 'gauss', winwidth_max, .0002);  %.0002
 qts = smooth(qt, swin, 'gauss');  %%%
-[onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(qts, zeros(size(qts)), 1, sigc*2, round(sr * leda2.set.segmWidth));  %.05,
+[onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(qts, zeros(size(qts)), 1, .01, round(sr * leda2.set.segmWidth));  %.05,
 targetdata_min = interimpulsefit(qts, t_ext, impMin, impMax);  %writes target.xxx0
 
 %if the dist0 is always overwriten dist0 can not be fitted, but is set by taus
@@ -72,16 +74,16 @@ d_ext = [fade_in(:)', d];
 
 %Deconvolution
 [q, r] = longdiv(d_ext, kernel);
+r = r(1:n+nfi);
+driver = smooth(q, swin, 'gauss');
+remd = smooth(r, swin, 'gauss'); %%%
 
 %[driver, smoothwin_driver] = smooth_adapt(q, 'gauss', winwidth_max, .0005);  %.0002
-driver = smooth(q, swin, 'gauss');  %%%
-remd = r(1:n+nfi);
-remd = smooth(remd, swin, 'gauss'); %%%
-
+%driver_s = smooth(driver, swin, 'gauss');  %%%
+%remd_s = smooth(remd, swin, 'gauss'); %%%
 q0 = deconv([d_ext,ones(1,length(kernel)-1)], kernel);
 q0s = smooth(q0, swin, 'gauss');  %%%
 %r0s = smooth(r0, smoothwin_driver, 'gauss');
-
 [onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(driver, remd, 1, sigc, round(sr * leda2.set.segmWidth));  %.05,  %leda2.set.sigPeak*max(1,(tau(2)-tau(1)))
 
 
@@ -123,7 +125,7 @@ driver_dirac = driver_dirac(n_offs+1:end);
 err_MSE = fiterror(d, phasicData, 0, 'MSE');
 err_RMSE = sqrt(err_MSE);
 %err_adjR2 = fiterror(d, phasicData, df, 'adjR2');
-err_chi2 = err_RMSE / leda2.data.conductance.error; 
+err_chi2 = err_RMSE / leda2.data.conductance.error;
 
 %residual_t = data - (tonicData + phasicData);
 %err = sqrt(mean(residual_t.^2))*1000;

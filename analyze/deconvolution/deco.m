@@ -7,11 +7,6 @@ end
 
 leda2.set.dist0_min = leda2.data.conductance.error * 10;  %override setting  %*10
 leda2.set.segmWidth = 12;
-leda2.set.sigPeak = .01;  %.003
-% leda2.set.tonicGridSize = 100; %100
-leda2.set.d0Autoupdate = 1;
-leda2.set.tonicIsConst = 0;
-leda2.set.tonicSlowIncrease = 0;
 %leda2.set.autoSmooth = 1;  %-> adaptive smoothing
 
 leda2.analysis0 = [];
@@ -58,7 +53,7 @@ end
 if isempty(leda2.analysis)
     leda2.analysis0.tau = [.75, 20];
     leda2.analysis0.dist0 = 0;
-    leda2.analysis0.smoothwin = 1.5; %sec
+    leda2.analysis0.smoothwin = 2; %sec
 else
     leda2.analysis0.tau = leda2.analysis.tau;
     leda2.analysis0.dist0 = leda2.analysis.dist0;
@@ -259,7 +254,7 @@ leda2.analysis0.target.t = leda2.data.time.data;
 leda2.analysis0.target.d = leda2.data.conductance.data; %smoothData;  % - leda2.analysis0.target.tonic0
 leda2.analysis0.target.sr = leda2.data.samplingrate;
 
-%leda2.set.sigPeak = .001;
+%leda2.set.sigPeak = .003;
 deconv_analysis([leda2.analysis0.tau, leda2.analysis0.dist0]);
 
 leda2.analysis0.tonicData = leda2.analysis0.target.tonic0 - leda2.analysis0.dist0;

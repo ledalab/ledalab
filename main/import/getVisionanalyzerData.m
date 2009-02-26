@@ -4,6 +4,7 @@ file = load(filename);
 
 time = file.t/1000;  %convert ms to sec
 conductance = file.EDA;
+%conductance = file.GSR_MR_100_xx;
 
 %control for mismatching vector length
 n1 = length(time);

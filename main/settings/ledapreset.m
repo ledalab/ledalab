@@ -38,7 +38,12 @@ leda2.analysis = [];
 %general
 leda2.set.templateL = {'Bateman'; 'Bateman x Gauss'};
 leda2.set.template = 2;
-leda2.set.tonicGridSize = 100;
+leda2.set.tonicGridSize = 60;
+leda2.set.sigPeak = .001;
+leda2.set.d0Autoupdate = 1;
+leda2.set.tonicIsConst = 0;
+leda2.set.tonicSlowIncrease = 0;
+
 % get peaks
 leda2.set.initVal.hannWinWidth = .5;
 leda2.set.initVal.signHeight = .01;
