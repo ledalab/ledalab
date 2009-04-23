@@ -1,9 +1,13 @@
-function [err, x] = deconv_analysis(x)
+function [err, x] = sdeconv_analysis(x, tonic_flag)
 global leda2
 
+if nargin < 2
+    tonic_flag = 1;
+end
+
 %Check Limits
-x(1) = withinlimits(x(1), leda2.set.tauMin, 2);  %leda2.set.tauMax);
-x(2) = withinlimits(x(2), leda2.set.tauMin, leda2.set.tauMax);
+x(1) = withinlimits(x(1), leda2.set.tauMin, 2);
+x(2) = withinlimits(x(2), leda2.set.tauMin, 20);
 x(3) = withinlimits(x(3), leda2.set.dist0_min, leda2.data.conductance.min);
 if x(2) < x(1)   %tau1 < tau2
     x(1:2) = fliplr(x(1:2));
@@ -35,7 +39,7 @@ tb = t - t(1) + dt;
 bg = bateman_gauss(tb, 5, 1, tau(1), tau(2), .4);
 [mx, idx] = max(bg);
 
-fade_in = bg(1:(idx+10)) / bg(idx+10) * d(1);
+fade_in = bg(1:(idx+10)) / bg(idx+10) * d(1); %+10
 fade_in = nonzeros(fade_in);
 nfi = length(fade_in);
 d_ext = [fade_in(:)', d];
@@ -46,21 +50,22 @@ tb = t_ext - t_ext(1) + dt;
 kernel = bateman_gauss(tb, 0, 0, tau(1), tau(2), 0);
 kernel(kernel < eps) = eps; %avoid division by 0
 
-
 sigc = max(.01, 2*leda2.set.sigPeak/max(bg));  %threshold for burst peak
-%sigc = max(.01, leda2.set.sigPeak/(5*max(kernel)));  %replaced because max(kernel) is dependent of sr
 
-%Estimate tonic
-qt = deconv([d_ext,ones(1,length(kernel)-1)], kernel);
-%[qts, win] = smooth_adapt(qt, 'gauss', winwidth_max, .0002);  %.0002
-qts = smooth(qt, swin, 'gauss');  %%%
-[onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(qts, zeros(size(qts)), 1, sigc*20, round(sr * leda2.set.segmWidth));  %.05,
-targetdata_min = interimpulsefit(qts, t_ext, impMin, impMax);  %writes target.xxx0
+if tonic_flag
 
-%if the dist0 is always overwriten dist0 can not be fitted, but is set by taus
-if leda2.analysis0.dist0 == 0 || leda2.set.d0Autoupdate  %first analysis OR autoupdate
-    dist0 = targetdata_min;
-    x(3) = targetdata_min;
+    %Estimate tonic
+    qt = deconv([d_ext,ones(1,length(kernel)-1)], kernel);
+    %[qts, win] = smooth_adapt(qt, 'gauss', winwidth_max, .0002);  %.0002
+    qts = smooth(qt, swin, 'gauss');  %%%
+    [onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(qts, zeros(size(qts)), 1, sigc*10, round(sr * leda2.set.segmWidth));  %.05,
+    targetdata_min = interimpulsefit_sdeco(qts, t_ext, impMin, impMax);  %writes target.xxx0
+
+    %if the dist0 is always overwriten dist0 can not be fitted, but is set by taus
+    if leda2.analysis0.dist0 == 0 || leda2.set.d0Autoupdate  %first analysis OR autoupdate
+        dist0 = targetdata_min;
+        x(3) = targetdata_min;
+    end
 end
 
 
@@ -73,8 +78,10 @@ d_ext = [fade_in(:)', d];
 
 
 %Deconvolution
-[q, r] = longdiv(d_ext, kernel);
-r = r(1:n+nfi);
+%[q, r] = longdiv(d_ext, kernel);
+%r = r(1:n+nfi);
+q = deconv([d_ext,ones(1,length(kernel)-1)], kernel);
+r = zeros(size(q));
 driver = smooth(q, swin, 'gauss');
 remd = smooth(r, swin, 'gauss'); %%%
 
@@ -110,7 +117,7 @@ for i = 1:length(onset_idx)
     impResp = impResp(n_offs+1:end);
     phasicComponent(i) = {impResp};
     phasicRemainder(i+1) = {phasicRemainder{i} + impResp};
-    
+
     [amp(i), peaktime_idx(i)] = max(impResp);
     area(i) = (sum(imp) + sum(ovs)) / sr;
     driver_dirac(impMax(i)) = area(i);
@@ -156,7 +163,9 @@ leda2.analysis0.phasicComponent = phasicComponent;
 leda2.analysis0.phasicRemainder = phasicRemainder;
 leda2.analysis0.driver_raw = q;
 leda2.analysis0.driver_standarddeconv = q0s;
-leda2.analysis0.driver_rawdata = qts;
+if tonic_flag
+    leda2.analysis0.driver_rawdata = qts;
+end
 leda2.analysis0.driver_dirac = driver_dirac;
 %phasic
 leda2.analysis0.onset = t_ext(onset_idx);

@@ -1,4 +1,4 @@
-function deco(nr_iv)
+function nndeco(nr_iv)
 global leda2
 
 if nargin < 1
@@ -51,9 +51,9 @@ if leda2.intern.batchmode
 end
 
 if isempty(leda2.analysis)
-    leda2.analysis0.tau = [.75, 20];
+    leda2.analysis0.tau = leda2.set.tau0;
     leda2.analysis0.dist0 = 0;
-    leda2.analysis0.smoothwin = 2; %sec
+    leda2.analysis0.smoothwin = leda2.set.smoothwin; %sec
 else
     leda2.analysis0.tau = leda2.analysis.tau;
     leda2.analysis0.dist0 = leda2.analysis.dist0;
@@ -170,7 +170,7 @@ set(gca,'XLim',[t_ext(1), t_ext(end)], 'YLim',[min(driver_rawdata(n_off+1:end)),
 
 subplot(5,1,3);
 cla; hold on;
-title('Standard Deconvolution - Estimate tonic component')
+title('Raw data minus tonic component')
 plot(t_ext, c0(1:length(t_ext)), 'm')
 plot(t_ext, dist0 + d_ext,'Color',[.5 .5 .5])
 plot(t, dist0 + d, 'k');
@@ -178,7 +178,7 @@ set(gca,'XLim',[t_ext(1), t_ext(end)]);
 
 subplot(5,1,4);
 cla; hold on;
-title('Raw data minus tonic component')
+title('Nonnegative deconvolution')
 plot(0,0,'b'); plot(0,0,'r'); plot(0,0,'k');
 plot(t_ext, driver, 'Color', [.75 .75 .75]);
 plot(t_ext, -remd*2, 'Color', [.8 .4 .4]);

@@ -120,11 +120,11 @@ for iEvent = 1:leda2.data.events.N
 
         scr_idx = find(phasics.onset >= (event.time + scrWindow_t1) & phasics.onset <= (event.time + scrWindow_t2) & phasics.amp > scrAmplitudeMin);
         nPeaks = length(scr_idx);
+        tonic = mean(leda2.analysis.tonicData(idx_respwin));
 
         if nPeaks == 0
             ampsum = 0;
             areasum = 0;
-            tonic = 0;
             onsetT1 = 0;
             %riseT1 = 0;
             %inclination1 = 0;
@@ -135,30 +135,8 @@ for iEvent = 1:leda2.data.events.N
             scr1 = scr_idx(1);
             onsetT1_abs = phasics.onset(scr1);          % = onset_time of first peak in SCR-window
             onsetT1 = onsetT1_abs - event.time;         % = onset_time of first peak in SCR-window relative to event
-
-            %             if iFit == 1
-            %                 riseT1 = batemandelay(phasics.tau(1,scr1), phasics.tau(2,scr1)); %riseT1 = time when first peak in SCR-window reaches maximum, relative to onset
-            %             elseif iFit == 2
-            %                 riseT1 = phasics.peaktime(scr1) - onsetT1;
-            %             end
-            %             amp1 = phasics.amp(scr1);                   % = amplitude of first peak in SCR-window
-            %             inclination1 = atan(amp1/riseT1)/(pi/2)*90;
-
             if iFit == 1
-                %                 peakInitValue = leda2.analyze.fit.data.phasicRemainder{scr1}(time_idx(leda2.data.time.data, onsetT1));
-                %                 ampsumrel = ampsum/peakInitValue;
-                %
-                %                 area = 0;
-                %                 for p = 1:nPeaks
-                %                     tau1 = phasics.tau(1, scr_idx(p));
-                %                     tau2 = phasics.tau(2, scr_idx(p));
-                %                     delay = tau1 * tau2 * log(tau1/tau2) / (tau1 - tau2);
-                %                     maxamp = exp(-delay/tau1) - exp(-delay/tau2);
-                %                     area = area + phasics.amp(scr_idx(p)) / maxamp * (tau1 - tau2);
-                %                 end
-                %phasic = mean(leda2.analyze.fit.data.phasic(rwintidx));
                 areasum = sum(phasics.area(scr_idx));
-                tonic = mean(leda2.analysis.tonicData(idx_respwin));
             else
                 tonic = [];
             end
@@ -172,17 +150,11 @@ for iEvent = 1:leda2.data.events.N
                 era(iEvent).deconv.areasum = areasum;
                 era(iEvent).deconv.tonic = tonic;
                 era(iEvent).deconv.onset = onsetT1;
-                %era(iEvent).fit.risetime1 = riseT1;
-                %era(iEvent).fit.inclination1 = inclination1;
-                %era(iEvent).ampsumrel = ampsumrel;
-                %era(iEvent).area = area;
 
             case 2 %Trough-to-Peak (TTP)
                 era(iEvent).ttp.npeaks = nPeaks;
                 era(iEvent).ttp.ampsum = ampsum;
                 era(iEvent).ttp.onset = onsetT1;
-                %era(iEvent).ttp.risetime1 = riseT1;
-                %era(iEvent).ttp.inclination1 = inclination1;
         end
 
     end %iFit
@@ -212,6 +184,7 @@ savefname = [leda2.file.filename(1:end-4), '_era'];
 %-Text Export
 if any(leda2.set.export.savetype == [2,3])
     fid = fopen([savefname,'.txt'],'wt');
+    fprintf(fid,'EventNr\tnSCR\tAmpSum\tAreaSum\tOnset\tTonic\tnSCR_ttp\tAmpSum_ttp\tOnset_ttp\tMean\tMaxDeflection\tEventNId\tEventName\tUserdata\n');
 
     for i = 1:leda2.data.events.N
         if isempty(era(i).event_ud) || ~ischar(era(i).event_ud)

@@ -35,12 +35,12 @@ for iFile = 1:nFile
     end
 
     %Fit
-    if do_fit
+    if do_fit == 1
         delete_fit;
         if do_optimize == 0,  %work-around
             do_optimize = 1;
         end
-        deco(do_optimize);
+        nndeco(do_optimize);
         leda2.current.batchmode.err(iFile) = leda2.analysis.err;
     end
 
