@@ -63,8 +63,11 @@ cla;
 hold on
 leda2.gui.rangeview.conductance = plot(time.data, cond.data, 'Color',[0 0 0], 'LineWidth',1,'ButtonDownFcn','leda_click(2)');
 
-leda2.data.conductance.smoothData = smooth_adapt(leda2.data.conductance.data, 'gauss', leda2.data.samplingrate*2, .00003);
+%leda2.data.conductance.smoothData = smooth_adapt(leda2.data.conductance.data, 'gauss', leda2.data.samplingrate*2, .00003);
 leda2.gui.rangeview.cond_smooth = plot(time.data, leda2.data.conductance.smoothData ,'m','Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showSmoothData),'ButtonDownFcn','leda_click(2)');
+%Min/Max
+leda2.gui.rangeview.minima = plot(leda2.trough2peakAnalysis.onset, leda2.data.conductance.data(leda2.trough2peakAnalysis.onset_idx),'g*','Visible',onoffstr(leda2.pref.showMinMax),'Tag','FitComp');
+leda2.gui.rangeview.maxima = plot(leda2.trough2peakAnalysis.peaktime, leda2.data.conductance.data(leda2.trough2peakAnalysis.peaktime_idx),'r*','Visible',onoffstr(leda2.pref.showMinMax),'Tag','FitComp');
 
 if ~isempty(leda2.analysis)
     %leda2.gui.rangeview.groundpoints = plot(leda2.analyze.fit.toniccoef.time, leda2.analyze.fit.toniccoef.ground,'ws','MarkerFaceColor',[.8 .8 .8],'MarkerEdgeColor',[1 1 1],'Tag','InitialSolutionInfo','ButtonDownFcn','leda_click(2)');

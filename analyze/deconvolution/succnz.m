@@ -5,7 +5,7 @@ cntr = 0;
 n = length(data);
 
 for i = 1:n
-    if data(i) > crit
+    if abs(data(i)) > crit
         cntr = cntr + 1;
     else
         if cntr > 0

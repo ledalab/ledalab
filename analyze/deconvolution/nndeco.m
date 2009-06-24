@@ -267,7 +267,7 @@ leda2.analysis0 = rmfield(leda2.analysis0, 'target');
 leda2.analysis = leda2.analysis0;
 leda2 = rmfield(leda2, 'analysis0');
 
-trough2peak_analysis;
+%trough2peak_analysis;
 
 add2log(1,'Deconvolution analysis.',1,1,1)
 
@@ -278,32 +278,12 @@ end
 %Graphics update
 close(leda2.gui.deconv.fig);
 
+leda2.gui.rangeview.range = min(leda2.gui.rangeview.range, 60);  %show no more than 60 sec epoch, since differentiated fir model display is memory-consuming
+change_range;
+
 file_changed(1);
 refresh_fitinfo;
 refresh_fitoverview;
 showfit;
 
 
-function trough2peak_analysis
-global leda2
-
-ds = leda2.data.conductance.smoothData;  %smooth(leda2.data.conductance.data, round(leda2.data.samplingrate / 2), 'gauss');
-t = leda2.data.time.data;
-[minL, maxL] = get_peaks(ds, 1);
-dmm = ds(maxL)-ds(minL(1:end-1));
-tau1 = leda2.analysis.tau(1);
-tau2 = leda2.analysis.tau(2);
-if tau1 ~= 0
-    maxx = tau1 * tau2 * log(tau1/tau2) / (tau1 - tau2);
-    maxamp = abs(exp(-maxx/tau2) - exp(-maxx/tau1));
-else
-    maxamp =  1;
-end
-sigc = maxamp/((tau2-tau1)*leda2.data.samplingrate)*leda2.set.sigPeak;
-minL = minL(dmm >= sigc);
-maxL = maxL(dmm >= sigc);
-leda2.analysis.trough2peak.onset = t(minL);
-leda2.analysis.trough2peak.peaktime = t(maxL);
-leda2.analysis.trough2peak.onset_idx = minL;
-leda2.analysis.trough2peak.peaktime_idx = maxL;
-leda2.analysis.trough2peak.amp = ds(maxL) - ds(minL);

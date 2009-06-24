@@ -128,12 +128,11 @@ file_changed(1);
 add2log(1,[' Imported ',file,' successfully.'],1,1,1);
 
 %Data statistics
-leda2.data.N = length(leda2.data.conductance.data);
-leda2.data.samplingrate = (leda2.data.N - 1) / (leda2.data.time.data(end) - leda2.data.time.data(1));
-leda2.data.conductance.min = min(leda2.data.conductance.data);
-leda2.data.conductance.max = max(leda2.data.conductance.data);
-leda2.data.conductance.error = conductanceerror;
-leda2.data.conductance.smoothData = smooth(leda2.data.conductance.data, leda2.set.initVal.hannWinWidth * leda2.data.samplingrate);
+refresh_data(0); %leda2.data.N = length(leda2.data.conductance.data);
+%leda2.data.samplingrate = (leda2.data.N - 1) / (leda2.data.time.data(end) - leda2.data.time.data(1));
+%leda2.data.conductance.min = min(leda2.data.conductance.data);
+%leda2.data.conductance.max = max(leda2.data.conductance.data);
+%leda2.data.conductance.error = conductanceerror;
 
 %Downsample?
 if (leda2.data.samplingrate > 32 || leda2.data.N > 36000) && ~leda2.intern.batchmode

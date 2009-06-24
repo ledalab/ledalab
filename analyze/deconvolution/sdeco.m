@@ -269,7 +269,7 @@ leda2.analysis0 = rmfield(leda2.analysis0, 'target');
 leda2.analysis = leda2.analysis0;
 leda2 = rmfield(leda2, 'analysis0');
 
-trough2peak_analysis;
+%trough2peak_analysis;
 
 add2log(1,'Deconvolution analysis.',1,1,1)
 
@@ -279,6 +279,9 @@ end
 
 %Graphics update
 close(leda2.gui.deconv.fig);
+
+leda2.gui.rangeview.range = min(leda2.gui.rangeview.range, 60);  %show no more than 60 sec epoch, since differentiated fir model display is memory-consuming
+change_range;
 
 file_changed(1);
 refresh_fitinfo;

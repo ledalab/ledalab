@@ -39,7 +39,7 @@ tb = t - t(1) + dt;
 bg = bateman_gauss(tb, 5, 1, tau(1), tau(2), .4);
 [mx, idx] = max(bg);
 
-fade_in = bg(1:(idx+10)) / bg(idx+10) * d(1); %+10
+fade_in = bg(1:(idx+1)) / bg(idx+1) * d(1); %+10
 fade_in = nonzeros(fade_in);
 nfi = length(fade_in);
 d_ext = [fade_in(:)', d];
@@ -71,7 +71,7 @@ end
 
 %Data preparation 2
 d = leda2.analysis0.target.d0 + dist0;
-fade_in = bg(1:(idx+10)) / bg(idx+10) * d(1);
+fade_in = bg(1:(idx+1)) / bg(idx+1) * d(1);
 fade_in = nonzeros(fade_in);
 nfi = length(fade_in);
 d_ext = [fade_in(:)', d];

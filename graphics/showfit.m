@@ -69,9 +69,6 @@ fitcomps = kids(1:(leda2.pref.showOvershoot+1)*nPhasics + 1);
 set(fitcomps,'Tag','FitComp');
 set(leda2.gui.rangeview.ax, 'Children',[kids(((leda2.pref.showOvershoot+1)*nPhasics+2):end); fitcomps(end:-1:1)]);
 
-%Min/Max
-leda2.gui.rangeview.minima = plot(leda2.analysis.trough2peak.onset, leda2.data.conductance.smoothData(leda2.analysis.trough2peak.onset_idx),'g*','Visible',onoffstr(leda2.pref.showMinMax),'Tag','FitComp');
-leda2.gui.rangeview.maxima = plot(leda2.analysis.trough2peak.peaktime, leda2.data.conductance.smoothData(leda2.analysis.trough2peak.peaktime_idx),'r*','Visible',onoffstr(leda2.pref.showMinMax),'Tag','FitComp');
 
 %driver_sc = leda2.analysis.driver(length(leda2.analysis.time_ext)+1 : end);
 %driver_sc = leda2.gui.overview + driver_sc / max(leda2.analysis.driver_dirac) * (leda2.gui.rangeview.top-leda2.gui.rangeview.bottom)/10;

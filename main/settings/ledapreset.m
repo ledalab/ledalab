@@ -36,7 +36,7 @@ leda2.set.tonicSlowIncrease = 0;
 leda2.set.tau0 = [.75 20];
 
 %Sdeco
-leda2.set.tonicGridSize_sdeco = 10;
+leda2.set.tonicGridSize_sdeco = 5;
 leda2.set.tau0_sdeco = [.75 2];
 
 

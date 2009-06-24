@@ -54,7 +54,8 @@ end
 leda2.data.time.data = td(:)';
 leda2.data.conductance.data = scd(:)';
 refresh_data(0);
-leda2.data.conductance.smoothData = smooth_adapt(leda2.data.conductance.data, 'gauss', leda2.data.samplingrate*2, .00003);
+leda2.data.conductance.smoothData = smooth_adapt(leda2.data.conductance.data, 'gauss', leda2.data.samplingrate*.5, .0003);
+trough2peak_analysis;
 
 delete_fit(0);
 if leda2.intern.batchmode

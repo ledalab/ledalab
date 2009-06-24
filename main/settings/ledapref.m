@@ -46,6 +46,8 @@ close(leda2.gui.set.fig)
 
 change_range;
 set(leda2.gui.rangeview.cond_smooth,'Visible',onoffstr(leda2.pref.showSmoothData));
+set(leda2.gui.rangeview.minima,'Visible',onoffstr(leda2.pref.showMinMax))
+set(leda2.gui.rangeview.maxima,'Visible',onoffstr(leda2.pref.showMinMax))
 % if ~isempty(leda2.analysis.fit)
 %     set(leda2.gui.rangeview.estim_ground,'Visible',onoffstr(leda2.pref.showMinMax));
 % end

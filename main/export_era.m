@@ -53,12 +53,6 @@ if leda2.data.events.N < 1
     end
     return
 end
-if isempty(leda2.analysis)
-    if leda2.intern.prompt
-        msgbox('File has no Fit yet!','Export Fit','error')
-    end
-    return
-end
 
 
 leda2.gui.export.fig_pl = figure('Units','normalized','Position',[.2 .5 .6 .2],'Name','Export Fit','MenuBar','none','NumberTitle','off');
@@ -105,30 +99,38 @@ for iEvent = 1:leda2.data.events.N
 
     [t_respwin, cs_respwin, idx_respwin] = subrange(event.time + scrWindow_t1, event.time + scrWindow_t2);  %data of response window
 
+
     for iFit = 1:2
+
+        if iFit == 1 && isempty(leda2.analysis)
+            era(iEvent).deconv.npeaks = NaN;
+            era(iEvent).deconv.ampsum = NaN;
+            era(iEvent).deconv.areasum = NaN;
+            era(iEvent).deconv.driverint = NaN;
+            era(iEvent).deconv.tonic = NaN;
+            era(iEvent).deconv.onset = NaN;
+
+            continue;
+        end
 
         phasics = [];
         switch iFit
-            case 1, %Bateman-Fit
+            case 1, %Decomposition analysis
                 phasics.onset = leda2.analysis.impulsePeakTime;
                 phasics.amp = leda2.analysis.amp;
                 phasics.area = leda2.analysis.area;
             case 2, %Trough-to-peak (Min/Max) analysis
-                phasics.onset = leda2.analysis.trough2peak.onset;
-                phasics.amp = leda2.analysis.trough2peak.amp;
+                phasics.onset = leda2.trough2peakAnalysis.onset;
+                phasics.amp = leda2.trough2peakAnalysis.amp;
         end
 
         scr_idx = find(phasics.onset >= (event.time + scrWindow_t1) & phasics.onset <= (event.time + scrWindow_t2) & phasics.amp > scrAmplitudeMin);
         nPeaks = length(scr_idx);
-        tonic = mean(leda2.analysis.tonicData(idx_respwin));
 
         if nPeaks == 0
             ampsum = 0;
             areasum = 0;
-            onsetT1 = 0;
-            %riseT1 = 0;
-            %inclination1 = 0;
-            %ampsumrel = 0;
+            onsetT1 = NaN;
 
         else  %nPeaks > 0
             ampsum = sum(phasics.amp(scr_idx));
@@ -137,17 +139,22 @@ for iEvent = 1:leda2.data.events.N
             onsetT1 = onsetT1_abs - event.time;         % = onset_time of first peak in SCR-window relative to event
             if iFit == 1
                 areasum = sum(phasics.area(scr_idx));
-            else
-                tonic = [];
             end
-
         end %if nPeaks
+
+        if iFit == 1
+            driver0 = leda2.analysis.driver_raw(length(leda2.analysis.data_ext)+1 : end);
+            driverint = sum(driver0(idx_respwin)) / leda2.data.samplingrate;
+            tonic = mean(leda2.analysis.tonicData(idx_respwin));
+        end
+
 
         switch iFit
             case 1, %Bateman-Fit
                 era(iEvent).deconv.npeaks = nPeaks;
                 era(iEvent).deconv.ampsum = ampsum;
                 era(iEvent).deconv.areasum = areasum;
+                era(iEvent).deconv.driverint = driverint;
                 era(iEvent).deconv.tonic = tonic;
                 era(iEvent).deconv.onset = onsetT1;
 
@@ -162,11 +169,7 @@ for iEvent = 1:leda2.data.events.N
 
     %Global measures
     %%%%%%%%%%%%%%%%%%
-    if ~isempty(idx_respwin)
-        era(iEvent).global.mean = mean(leda2.data.conductance.data(idx_respwin));       %simple mean of data within response window
-    else
-        era(iEvent).global.mean = mean(leda2.data.conductance.data);
-    end
+    era(iEvent).global.mean = mean(leda2.data.conductance.data(idx_respwin));       %simple mean of data within response window
 
     %Maximum-deflection
     diff = 0;
@@ -184,7 +187,7 @@ savefname = [leda2.file.filename(1:end-4), '_era'];
 %-Text Export
 if any(leda2.set.export.savetype == [2,3])
     fid = fopen([savefname,'.txt'],'wt');
-    fprintf(fid,'EventNr\tnSCR\tAmpSum\tAreaSum\tOnset\tTonic\tnSCR_ttp\tAmpSum_ttp\tOnset_ttp\tMean\tMaxDeflection\tEventNId\tEventName\tUserdata\n');
+    fprintf(fid,'EvNr\tnSCR\tAmpSum\tAreaSum\tDriverInt\tOnset1\tTonic\tnSCR_ttp\tAmpSum_ttp\tOnset1_ttp\tMean\tMaxDeflection\tEventNId\tEventName\tUserdata\n');
 
     for i = 1:leda2.data.events.N
         if isempty(era(i).event_ud) || ~ischar(era(i).event_ud)
@@ -192,7 +195,7 @@ if any(leda2.set.export.savetype == [2,3])
         else
             ud = era(i).event_ud;
         end
-        fprintf(fid,'%3.0f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\t"%s"\n',i , era(i).deconv.npeaks, era(i).deconv.ampsum, era(i).deconv.areasum, era(i).deconv.onset, era(i).deconv.tonic, era(i).ttp.npeaks, era(i).ttp.ampsum, era(i).ttp.onset, era(i).global.mean, era(i).global.max_deflection, era(i).event_nid, era(i).event_name, ud);
+        fprintf(fid,'%3.0f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\t"%s"\n',i , era(i).deconv.npeaks, era(i).deconv.ampsum, era(i).deconv.areasum, era(i).deconv.driverint, era(i).deconv.onset, era(i).deconv.tonic, era(i).ttp.npeaks, era(i).ttp.ampsum, era(i).ttp.onset, era(i).global.mean, era(i).global.max_deflection, era(i).event_nid, era(i).event_name, ud);
     end
     fclose(fid);
 end

@@ -60,7 +60,7 @@ leda2.gui.menu.menu_3b  = uimenu(leda2.gui.menu.menu_3,'Label','Visual settings'
 %-Analyze
 leda2.gui.menu.menu_4  = uimenu(leda2.gui.fig_main,'Label','Analysis');
 leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Decomposition Analysis (Nonnegative decovolution)','Callback','nndeco');
-%leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Fast Decomposition Analysis (Standard deconvolution)','Callback','sdeco');
+leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Fast Decomposition Analysis (Standard deconvolution) - beta version -','Callback','sdeco');
 leda2.gui.menu.menu_4f = uimenu(leda2.gui.menu.menu_4,'Label','Delete analysis','Callback','delete_fit(1)','Separator','on');
 
 %-Tools
@@ -107,6 +107,7 @@ leda2.gui.rangeview.slider = uicontrol('Style','Slider','Units','normalized','Po
 
 %Driver-Axes
 leda2.gui.driver.ax = axes('Units','normalized','Position',[x1 .02 x2-x1 y7-y8],'XLim',[leda2.gui.rangeview.start, leda2.gui.rangeview.start + leda2.gui.rangeview.range],'YLim',[0,20],'Color',[1 1 1],'DrawMode','fast','ButtonDownFcn','leda_click(2)');
+set(get(leda2.gui.driver.ax,'YLabel'),'String','Phasic Driver [\muS]')
 
 %Overview-Info (= Data Info Display)
 dy = .40; 

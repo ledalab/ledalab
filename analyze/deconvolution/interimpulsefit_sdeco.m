@@ -42,7 +42,7 @@ if leda2.set.tonicIsConst %const
 
 else
     %groundtime = [0:tonicGridSize:t(end), t(end)];
-    groundtime = [0, t_ext(iif_idx(sr*tonicGridSize:sr*tonicGridSize:end)), t(end)];
+    groundtime = [.5, t_ext(iif_idx(sr*tonicGridSize:sr*tonicGridSize:end)), t(end)];
     if groundtime(end) - groundtime(end-1) < tonicGridSize && length(groundtime) > 2  %adjust last but one groundtime
         groundtime(end-1) = (groundtime(end-2) + groundtime(end))/2;
     end

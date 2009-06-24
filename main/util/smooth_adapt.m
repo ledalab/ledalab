@@ -1,23 +1,28 @@
 function [scs, winwidth] = smooth_adapt(data, type, winwidth_max, err_crit)
 
 success = 0;
-iterL = 2:4:winwidth_max;
-for i = 1:length(iterL)
+ce(1) = sqrt(mean(diff(data).^2)/2);
 
-    scs = smooth(data, iterL(i), type);
+iterL = 0:4:winwidth_max;
+if length(iterL) < 2
+    iterL = [0, 2];
+end
+
+for i = 2:length(iterL)
+
+    winwidth = iterL(i);
+    scs = smooth(data, winwidth, type);
     scd = diff(scs);
     ce(i) = sqrt(mean(scd.^2)/2);  %conductance_error
 
-    if i > 1
         if abs(ce(i) - ce(i-1)) < err_crit
             success = 1;
             break;
         end
-    end
 
 end
 
-if success
+if success  %take before-last result
     
     if i > 2
         scs = smooth(data, iterL(i-1), type);
@@ -26,8 +31,5 @@ if success
         scs = data;
         winwidth = 0;
     end
-
-else
-    winwidth = winwidth_max;
     
 end

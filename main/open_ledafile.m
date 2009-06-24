@@ -65,7 +65,8 @@ leda2.data.conductance.data = ledafile.data.conductance;
 leda2.data.time.data = ledafile.data.time;
 leda2.data.time.timeoff = ledafile.data.timeoff;
 refresh_data(0); %stats
-leda2.data.conductance.smoothData = smooth_adapt(leda2.data.conductance.data, 'gauss', leda2.set.initVal.hannWinWidth * leda2.data.samplingrate, .00003);  %also done in plot
+%[leda2.data.conductance.smoothData, leda2.data.conductance.smoothData_win] = smooth_adapt(leda2.data.conductance.data, 'gauss', .5 * leda2.data.samplingrate, .0003);  %also done in plot
+%trough2peak_analysis;
 
 leda2.file.filename = filename;
 leda2.file.pathname = pathname;
