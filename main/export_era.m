@@ -7,13 +7,13 @@ function export_era(action)
 %  - Textfile-Variables are:
 %       column 1: EpochNr
 %     Based on Bateman-Decomposition Fit
-%       column 2-5: #SCRs, amplitude sum, area sum and onset latency (of the SCRs within the response window)
-%       column 6: mean tonic activation
+%       column 2-6: #SCRs, amplitude sum, area sum, driver area and onset latency (of the SCRs within the response window)
+%       column 7: mean tonic activation
 %     Based on Trough-to-Peak (Min/Max) Method
-%       column 7-9: #SCRs, amplitude sum, onset time (of the SCRs within the response window)
+%       column 8-10: #SCRs, amplitude sum, onset time (of the SCRs within the response window)
 %     Based on global analysis
-%       column 10: mean of response window data
-%       column 11: maximum positive difference of succeeding samples (within response window)
+%       column 11: mean of response window data
+%       column 12: maximum positive difference of succeeding samples (within response window)
 %     Event info
 %       column 12-14: event.nid, event.name, event.userdata
 

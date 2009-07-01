@@ -17,51 +17,55 @@ for iFile = 1:nFile
     leda2.current.batchmode.file{iFile} = filename;
     add2log(1,['Batch-Analyzing ',filename],1,0,0,1)
 
-    try
-    %Open
-    if strcmp(open_datatype,'leda')
-        open_ledafile(0, pathname, filename);
-    else
-        import_data(open_datatype, pathname, filename);
-    end
-    if ~leda2.current.fileopen_ok
-        disp('Unable to open file!');
-        continue;
-    end
-
-    %Downsample
-    if downsample_factor > 0
-        downsample(downsample_factor, 'mean');
-    end
-
-    %Fit
-    if do_fit == 1
-        delete_fit;
-        if do_optimize == 0,  %work-around
-            do_optimize = 1;
+    %try
+        %Open
+        if strcmp(open_datatype,'leda')
+            open_ledafile(0, pathname, filename);
+        else
+            import_data(open_datatype, pathname, filename);
         end
-        nndeco(do_optimize);
-        leda2.current.batchmode.err(iFile) = leda2.analysis.err;
-    end
+        if ~leda2.current.fileopen_ok
+            disp('Unable to open file!');
+            continue;
+        end
 
-    %Export
-    if do_export_scr
-        export_scrlist
-    end
-    if do_export_era
-        export_era('savePeaks')
-    end
+        %Downsample
+        if downsample_factor > 0
+            downsample(downsample_factor, 'mean');
+        end
 
-    %Save
-    if do_save_overview
-        analysis_overview;
-    end
+        %Analysis
+        if do_fit > 0
+            delete_fit;
+            if do_optimize == 0,  %work-around
+                do_optimize = 1;
+            end
+            if do_fit == 1
+                nndeco(do_optimize);
+            elseif do_fit == 2
+                sdeco(do_optimize);
+            end
+            leda2.current.batchmode.err(iFile) = leda2.analysis.err;
+        end
 
-    save_ledafile(0);
+        %Export
+        if do_export_scr
+            export_scrlist
+        end
+        if do_export_era
+            export_era('savePeaks')
+        end
 
-    catch
-       add2log(1,'ERROR !!!',1,0,0,1)
-    end
+        %Save
+        if do_save_overview
+            analysis_overview;
+        end
+
+        save_ledafile(0);
+
+    %catch
+    %    add2log(1,'ERROR !!!',1,0,0,1)
+    %end
 
 
 end
@@ -101,9 +105,9 @@ if nargin > 1
         switch option_name
             case 'open',
                 %if ischar(option_arg) && any(strcmp(option_arg, valid_datatypeL))
-                    open_datatype = option_arg;
-                    wdir = wdir(1:end-5);  %remove default value *.mat
-                    %wdir = [wdir(1:end-5), datatype_extL{strcmp(option_arg, valid_datatypeL)}];
+                open_datatype = option_arg;
+                wdir = wdir(1:end-5);  %remove default value *.mat
+                %wdir = [wdir(1:end-5), datatype_extL{strcmp(option_arg, valid_datatypeL)}];
                 %else
                 %    disp(['Unknown datatype: ',option_arg])
                 %    return;

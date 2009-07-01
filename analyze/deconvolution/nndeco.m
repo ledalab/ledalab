@@ -5,6 +5,8 @@ if nargin < 1
     nr_iv = 0;
 end
 
+leda2.current.method = 'nndeco';
+
 leda2.set.dist0_min = leda2.data.conductance.error * 10;  %override setting  %*10
 leda2.set.segmWidth = 12;
 %leda2.set.autoSmooth = 1;  %-> adaptive smoothing
@@ -50,7 +52,7 @@ if leda2.intern.batchmode
     leda2.analysis = [];
 end
 
-if isempty(leda2.analysis)
+if isempty(leda2.analysis) || ~isfield(leda2.analysis,'method') || ~strcmp(leda2.analysis.method,'nndeco')
     leda2.analysis0.tau = leda2.set.tau0;
     leda2.analysis0.dist0 = 0;
     leda2.analysis0.smoothwin = leda2.set.smoothwin; %sec
@@ -95,7 +97,7 @@ if ~leda2.intern.batchmode
 else
 
     [err, x] = deconv_analysis([leda2.analysis0.tau, leda2.analysis0.dist0]);  %set dist0
-    [leda2.analysis0.tau, leda2.analysis0.dist0, leda2.analysis0.opt_history] = deconv_optimize(x, nr_iv);
+    [leda2.analysis0.tau, leda2.analysis0.dist0, leda2.analysis0.opt_history] = deconv_optimize(x, nr_iv,'nndeco');
     deconv_apply;
 
 end
@@ -265,6 +267,7 @@ leda2.analysis0.groundlevel = leda2.analysis0.target.groundlevel0 - leda2.analys
 
 leda2.analysis0 = rmfield(leda2.analysis0, 'target');
 leda2.analysis = leda2.analysis0;
+leda2.analysis.method = 'nndeco';
 leda2 = rmfield(leda2, 'analysis0');
 
 %trough2peak_analysis;
