@@ -20,8 +20,8 @@ if plot_flag
     set(leda2.gui.rangeview.conductance,'YData',leda2.data.conductance.data);
     set(leda2.gui.overview.conductance,'YData',leda2.data.conductance.data);
     set(leda2.gui.rangeview.cond_smooth,'YData', leda2.data.conductance.smoothData);
-    leda2.gui.rangeview.minima = plot(leda2.trough2peakAnalysis.onset, leda2.data.conductance.data(leda2.trough2peakAnalysis.onset_idx),'g*','Visible',onoffstr(leda2.pref.showMinMax),'Tag','FitComp');
-    leda2.gui.rangeview.maxima = plot(leda2.trough2peakAnalysis.peaktime, leda2.data.conductance.data(leda2.trough2peakAnalysis.peaktime_idx),'r*','Visible',onoffstr(leda2.pref.showMinMax),'Tag','FitComp');
+    set(leda2.gui.rangeview.minima,'XData',leda2.trough2peakAnalysis.onset, 'YData', leda2.data.conductance.data(leda2.trough2peakAnalysis.onset_idx));
+    set(leda2.gui.rangeview.maxima,'XData',leda2.trough2peakAnalysis.peaktime, 'YData', leda2.data.conductance.data(leda2.trough2peakAnalysis.peaktime_idx));
 
     leda2.gui.overview.max = (leda2.data.conductance.max + .4); %ceil
     leda2.gui.overview.min = (leda2.data.conductance.min - .4); %floor

@@ -44,8 +44,7 @@ t_ext = (t(1)-dt):-dt:(t(1)-nfi*dt);
 t_ext = [fliplr(t_ext), t];
 tb = t_ext - t_ext(1) + dt;
 kernel = bateman_gauss(tb, 0, 0, tau(1), tau(2), 0);
-kernel(kernel < eps) = eps; %avoid division by 0
-
+kernel = kernel / sum(kernel); %normalize to sum = 1
 
 sigc = max(.01, 2*leda2.set.sigPeak/max(bg));  %threshold for burst peak
 %sigc = max(.01, leda2.set.sigPeak/(5*max(kernel)));  %replaced because max(kernel) is dependent of sr
@@ -93,7 +92,6 @@ n_offs = n_ext - n;
 phasicComponent = {};
 phasicRemainder = {};
 phasicRemainder(1) = {zeros(1, n)};
-driver_dirac = zeros(1, n_ext);
 amp = [];
 area = [];
 overshoot_amp = [];
@@ -113,68 +111,74 @@ for i = 1:length(onset_idx)
     
     [amp(i), peaktime_idx(i)] = max(impResp);
     area(i) = (sum(imp) + sum(ovs)) / sr;
-    driver_dirac(impMax(i)) = area(i);
     overshoot_amp(i) = max(overshoot{i});
 end
 phasicData = phasicRemainder{end};
-driver_dirac = driver_dirac(n_offs+1:end);
+
+
+
+%Rescale to data range
+onset = t_ext(onset_idx);
+tidx = find(onset >= 0);
+n_offset = length(t_ext) - length(t);
+driver = driver(n_offset+1:end);
+remainder = remd(n_offset+1:end);
+driver_raw = q(n_offset+1:end);
+driver_rawdata = qts(n_offset+1:end);
+driver_sdeconv = q0s(n_offset+1:end);
 
 
 %Compute model error
-%df = length(d) - (3 + 2*length(onset_idx));  %ignoring tonic coefs and leda2.set.segmWidth and dependent of sampling rate
 err_MSE = fiterror(d, phasicData, 0, 'MSE');
 err_RMSE = sqrt(err_MSE);
-%err_adjR2 = fiterror(d, phasicData, df, 'adjR2');
 err_chi2 = err_RMSE / leda2.data.conductance.error;
-
-%residual_t = data - (tonicData + phasicData);
-%err = sqrt(mean(residual_t.^2))*1000;
 err1d = deverror(driver, [0, .2]);
-err2d = deverror(remd, [0, .005]);
-err1s = succnz(driver, .05, 2);
-err2s = succnz(remd, .005, 2);
-%err = err_chi2 + (err1s + err2s);
-%err = ((err1d + err2d) + (err1s + err2s)) * err_chi2;
-err = (err1d + err2d) * (err1s + err2s) * err_chi2 * (10 + length(onset_idx)/4)/t(end);
+err2d = deverror(remainder, [0, .005]);
+err1s = succnz(driver, max(.01, max(driver)/20), 2);
+err2s = succnz(remainder, max(.001, max(remainder)/20), 2);
+err_negativity = sqrt(sum(driver(driver < 0).^2)) / length(driver)*10^3;
 
-n_offset = length(t_ext) - length(t);
+err = (err1d + err2d) * (err1s + err2s) * err_chi2 * (10 + length(onset_idx)/4)/t(end);  %compound err criterion to be optimized
 
 
 %Save vars
 leda2.analysis0.tau = tau;
 leda2.analysis0.dist0 = dist0;
-%leda2.analysis0.smoothwin = smoothwin_driver;
-%leda2.analysis0.smoothwin_remainder = smoothwin_remainder;
 %data
-leda2.analysis0.time_ext = t_ext(1:n_offset);
-leda2.analysis0.data_ext = d_ext(1:n_offset) - dist0;
+%leda2.analysis0.time_ext = t_ext(1:n_offset);
+%leda2.analysis0.data_ext = d_ext(1:n_offset) - dist0;
 leda2.analysis0.driver = driver;
-leda2.analysis0.remainder = remd;
+leda2.analysis0.remainder = remainder;
 leda2.analysis0.kernel = kernel;
 leda2.analysis0.phasicData = phasicData;
 leda2.analysis0.phasicComponent = phasicComponent;
 leda2.analysis0.phasicRemainder = phasicRemainder;
-leda2.analysis0.driver_raw = q;
-leda2.analysis0.driver_standarddeconv = q0s;
-leda2.analysis0.driver_rawdata = qts;
-leda2.analysis0.driver_dirac = driver_dirac;
+leda2.analysis0.driver_raw = driver_raw;
+leda2.analysis0.driver_standarddeconv = driver_sdeconv;
+leda2.analysis0.driver_rawdata = driver_rawdata;
 %phasic
-leda2.analysis0.onset = t_ext(onset_idx);
-leda2.analysis0.amp = amp;
-leda2.analysis0.area = area;
-leda2.analysis0.impulsePeakTime = t_ext(impMax);
-leda2.analysis0.scrPeakTime = t_ext(peaktime_idx);
-leda2.analysis0.onset_idx = onset_idx;
-leda2.analysis0.scrPeakTime_idx = peaktime_idx;
-leda2.analysis0.impMin_idx = impMin;
-leda2.analysis0.impMax_idx = impMax;
-leda2.analysis0.impulse = impulse;
-leda2.analysis0.overshoot = overshoot;
-leda2.analysis0.overshoot_amp = overshoot_amp;
+leda2.analysis0.onset = onset(tidx);
+leda2.analysis0.amp = amp(tidx);
+leda2.analysis0.area = area(tidx);
+leda2.analysis0.impulsePeakTime = t_ext(impMax(tidx));
+leda2.analysis0.scrPeakTime = t_ext(peaktime_idx(tidx));
+leda2.analysis0.onset_idx = onset_idx(tidx) - n_offset;
+leda2.analysis0.scrPeakTime_idx = peaktime_idx(tidx) - n_offset;
+leda2.analysis0.impMin_idx = impMin(tidx,:) - n_offset;
+leda2.analysis0.impMax_idx = impMax(tidx) - n_offset;
+leda2.analysis0.impulse = impulse(tidx);
+leda2.analysis0.overshoot = overshoot(tidx);
+leda2.analysis0.overshoot_amp = overshoot_amp(tidx);
+leda2.analysis0.prefix.time = t_ext(1:n_offset);
+leda2.analysis0.prefix.data = d_ext(1:n_offset);
+leda2.analysis0.prefix.onset_idx = onset_idx(onset < 0);
+leda2.analysis0.prefix.impulse = impulse(onset < 0);
+leda2.analysis0.prefix.overshoot = overshoot(onset < 0);
 %error
-leda2.analysis0.err_MSE = err_MSE;
-leda2.analysis0.err_RMSE = err_RMSE;
-leda2.analysis0.err_chi2 = err_chi2;
-leda2.analysis0.err_dev = [err1d, err2d];
-leda2.analysis0.err_succz = [err1s, err2s];
-leda2.analysis0.err = err;
+leda2.analysis0.error.MSE = err_MSE;
+leda2.analysis0.error.RMSE = err_RMSE;
+leda2.analysis0.error.chi2 = err_chi2;
+leda2.analysis0.error.deviation = [err1d, err2d];
+leda2.analysis0.error.discreteness = [err1s, err2s];
+leda2.analysis0.error.negativity = err_negativity;
+leda2.analysis0.error.compound = err;

@@ -7,13 +7,14 @@ end
 
 leda2.current.method = 'sdeco';
 
-leda2.set.dist0_min = leda2.data.conductance.error * 10;  %override setting  %*10
+leda2.set.dist0_min = 0; %leda2.data.conductance.error * 10;  %override setting  %*10
 leda2.set.segmWidth = 12;
 %leda2.set.autoSmooth = 1;  %-> adaptive smoothing
 
 leda2.analysis0 = [];
 
-%Downsample data for preanalysis, downsample if N > N_max
+%Downsample data for preanalysis, downsample if N > N_max but keep
+%samplingrate at 4 Hz minimum
 leda2.analysis0.target.t = leda2.data.time.data;
 leda2.analysis0.target.d = leda2.data.conductance.data;
 leda2.analysis0.target.sr = leda2.data.samplingrate;
@@ -54,12 +55,16 @@ end
 
 if isempty(leda2.analysis) || ~isfield(leda2.analysis,'method') || ~strcmp(leda2.analysis.method,'sdeco')
     leda2.analysis0.tau = leda2.set.tau0_sdeco;
-    leda2.analysis0.dist0 = 0;
-    leda2.analysis0.smoothwin = leda2.set.smoothwin; %sec
+    leda2.analysis0.smoothwin = leda2.set.smoothwin_sdeco; %sec
+    leda2.analysis0.tonicGridSize = leda2.set.tonicGridSize_sdeco;
 else
     leda2.analysis0.tau = leda2.analysis.tau;
-    leda2.analysis0.dist0 = leda2.analysis.dist0;
     leda2.analysis0.smoothwin = leda2.analysis.smoothwin;
+    if isfield(leda2.analysis,'tonicGridSize')  %workaround since this var is introduced in V3.2.0
+        leda2.analysis0.tonicGridSize = leda2.analysis.tonicGridSize;
+    else
+        leda2.set.tonicGridSize_sdeco = round(mean(diff(leda2.analysis.groundtime)));
+    end
 end
 
 
@@ -68,25 +73,25 @@ if ~leda2.intern.batchmode
     %         close(leda2.gui.deconv.fig)
     %     end
 
-    leda2.gui.deconv.fig = figure('Units','normalized','Position',[.1 .05 .8 .9],'Name','Fast Decomposition analysis','Color',leda2.gui.col.fig,'ToolBar','figure','NumberTitle','off','MenuBar','none');  %
+    leda2.gui.deconv.fig = figure('Units','normalized','Position',[.1 .05 .8 .9],'Name','Continuous Decomposition Analysis','Color',leda2.gui.col.fig,'ToolBar','figure','NumberTitle','off','MenuBar','none');  %
 
     leda2.gui.deconv.text_tau1 = uicontrol('Style','text','Units','normalized','Position',[.1 .01 .05 .02],'String','tau1','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.text_tau2 = uicontrol('Style','text','Units','normalized','Position',[.18 .01 .05 .02],'String','tau2','BackgroundColor',get(gcf,'Color'));
-    leda2.gui.deconv.text_dist0 = uicontrol('Style','text','Units','normalized','Position',[.26 .01 .05 .02],'String','dist0','BackgroundColor',get(gcf,'Color'));
+    %leda2.gui.deconv.text_dist0 = uicontrol('Style','text','Units','normalized','Position',[.26 .01 .05 .02],'String','dist0','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.edit_tau1 = uicontrol('Style','edit','Units','normalized','Position',[.1 .04 .05 .03],'String',leda2.analysis0.tau(1));  %tmp_tau1
     leda2.gui.deconv.edit_tau2 = uicontrol('Style','edit','Units','normalized','Position',[.18 .04 .05 .03],'String',leda2.analysis0.tau(2));  %tmp_tau2
-    leda2.gui.deconv.edit_dist0 = uicontrol('Style','edit','Units','normalized','Position',[.26 .04 .05 .03],'String',leda2.analysis0.dist0);  %tmp_dist0
-    
+    %leda2.gui.deconv.edit_dist0 = uicontrol('Style','edit','Units','normalized','Position',[.26 .04 .05 .03],'String',leda2.analysis0.dist0);  %tmp_dist0
+
     leda2.gui.deconv.text_smoothWinSize = uicontrol('Style','text','Units','normalized','Position',[.34 .065 .05 .02],'String','Smooth-Win','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.text_gridsize = uicontrol('Style','text','Units','normalized','Position',[.34 .035 .05 .02],'String','Grid-Size','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.text_sigPeak = uicontrol('Style','text','Units','normalized','Position',[.34 .005 .05 .02],'String','Sig-Peak','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.edit_smoothWinSize = uicontrol('Style','edit','Units','normalized','Position',[.4 .07 .05 .02],'String',leda2.analysis0.smoothwin);
-    leda2.gui.deconv.edit_gridSize = uicontrol('Style','edit','Units','normalized','Position',[.4 .04 .05 .02],'String',leda2.set.tonicGridSize_sdeco);    
+    leda2.gui.deconv.edit_gridSize = uicontrol('Style','edit','Units','normalized','Position',[.4 .04 .05 .02],'String',leda2.set.tonicGridSize_sdeco);
     leda2.gui.deconv.edit_sigPeak = uicontrol('Style','edit','Units','normalized','Position',[.4 .01 .05 .02],'String',leda2.set.sigPeak);
-    
-    leda2.gui.deconv.chbx_d0Autoupdate = uicontrol('Style','checkbox','Units','normalized','Position',[.48 .07 .09 .02],'String','d0 autopdate','Value',leda2.set.d0Autoupdate,'BackgroundColor',get(gcf,'Color'));  %tmp_tau1
-    leda2.gui.deconv.chbx_tonicIsConst = uicontrol('Style','checkbox','Units','normalized','Position',[.48 .04 .09 .02],'String','tonic = const','Value',leda2.set.tonicIsConst,'BackgroundColor',get(gcf,'Color'));  %tmp_tau1
-    leda2.gui.deconv.chbx_tonicSlowIncrease = uicontrol('Style','checkbox','Units','normalized','Position',[.48 .01 .09 .02],'String','tonic slow increase','Value',leda2.set.tonicSlowIncrease,'BackgroundColor',get(gcf,'Color'));  %tmp_tau1
+
+    %leda2.gui.deconv.chbx_d0Autoupdate = uicontrol('Style','checkbox','Units','normalized','Position',[.48 .07 .09 .02],'String','d0 autopdate','Value',leda2.set.d0Autoupdate,'BackgroundColor',get(gcf,'Color'));  %tmp_tau1
+    leda2.gui.deconv.chbx_tonicIsConst = uicontrol('Style','checkbox','Units','normalized','Position',[.48 .04 .09 .02],'String','tonic = const','Value',leda2.set.tonicIsConst,'BackgroundColor',get(gcf,'Color'),'Enable','Off');  %tmp_tau1
+    leda2.gui.deconv.chbx_tonicSlowIncrease = uicontrol('Style','checkbox','Units','normalized','Position',[.48 .01 .09 .02],'String','tonic slow increase','Value',leda2.set.tonicSlowIncrease,'BackgroundColor',get(gcf,'Color'),'Enable','Off');  %tmp_tau1
 
     leda2.gui.deconv.butt_analyze = uicontrol('Style','pushbutton','Units','normalized','Position',[.6 .05 .1 .03],'String','Analyze','Callback',@deconv_analysis_gui);
     leda2.gui.deconv.butt_optimize = uicontrol('Style','pushbutton','Units','normalized','Position',[.6 .02 .1 .02],'String','Optimize','Callback',@deconv_opt);
@@ -96,8 +101,8 @@ if ~leda2.intern.batchmode
 
 else
 
-    [err, x] = sdeconv_analysis([leda2.analysis0.tau, leda2.analysis0.dist0]);  %set dist0
-    [leda2.analysis0.tau, leda2.analysis0.dist0, leda2.analysis0.opt_history] = deconv_optimize(x, nr_iv,'sdeco');
+    [err, x] = sdeconv_analysis(leda2.analysis0.tau);  %set dist0
+    [leda2.analysis0.tau, leda2.analysis0.opt_history] = deconv_optimize(x, nr_iv,'sdeco');
     deconv_apply;
 
 end
@@ -108,8 +113,8 @@ global leda2
 
 x(1) = str2double(get(leda2.gui.deconv.edit_tau1,'String'));
 x(2) = str2double(get(leda2.gui.deconv.edit_tau2,'String'));
-x(3) = str2double(get(leda2.gui.deconv.edit_dist0,'String'));
-leda2.set.d0Autoupdate = get(leda2.gui.deconv.chbx_d0Autoupdate,'Value');
+%x(3) = str2double(get(leda2.gui.deconv.edit_dist0,'String'));
+%leda2.set.d0Autoupdate = get(leda2.gui.deconv.chbx_d0Autoupdate,'Value');
 leda2.set.tonicIsConst = get(leda2.gui.deconv.chbx_tonicIsConst,'Value');
 leda2.set.tonicSlowIncrease = get(leda2.gui.deconv.chbx_tonicSlowIncrease,'Value');
 leda2.analysis0.smoothwin = str2double(get(leda2.gui.deconv.edit_smoothWinSize, 'String'));
@@ -120,34 +125,21 @@ leda2.set.sigPeak = str2double(get(leda2.gui.deconv.edit_sigPeak,'String'));
 
 set(leda2.gui.deconv.edit_tau1, 'String', x(1));
 set(leda2.gui.deconv.edit_tau2, 'String', x(2));
-set(leda2.gui.deconv.edit_dist0, 'String', x(3));
 set(leda2.gui.deconv.edit_smoothWinSize, 'String', leda2.analysis0.smoothwin);
 
 %get vars from analysis0
 t = leda2.analysis0.target.t; %leda2.data.time.data;
 iif_t = leda2.analysis0.target.iif_t;
 iif_data = leda2.analysis0.target.iif_data;
-dist0 = leda2.analysis0.dist0;
 groundtime = leda2.analysis0.target.groundtime;
-groundlevel = leda2.analysis0.target.groundlevel0 - dist0;
-groundlevel_pre = leda2.analysis0.target.groundlevel_pre;
+groundlevel = leda2.analysis0.target.groundlevel;
 
-tonic0 = leda2.analysis0.target.tonic0;
-d = leda2.analysis0.target.d0;
-kernel = leda2.analysis0.kernel;
+phasicData = leda2.analysis0.phasicData;
+tonicData = leda2.analysis0.tonicData;
+tonicDriver = leda2.analysis0.tonicDriver;
+data = leda2.analysis0.target.d;
 driver = leda2.analysis0.driver;
-remd = leda2.analysis0.remainder;
-t_ext = [leda2.analysis0.time_ext, t];
-d_ext = [leda2.analysis0.data_ext, d];
-n_off = length(leda2.analysis0.time_ext);
-onset_idx = leda2.analysis0.onset_idx;
-impulse = leda2.analysis0.impulse;
-overshoot = leda2.analysis0.overshoot;
-minL = leda2.analysis0.impMin_idx;
-maxL = leda2.analysis0.impMax_idx;
-phasicRemainder = leda2.analysis0.phasicRemainder;
-c0 = conv(driver, kernel);
-driver_rawdata = leda2.analysis0.driver_rawdata;
+driverSC =leda2.analysis0.driverSC;
 
 
 %Plot
@@ -156,71 +148,49 @@ figure(leda2.gui.deconv.fig);
 
 subplot(5,1,1); hold on;
 cla; hold on;
-title('Raw data')
+title('SC data')
 plot(leda2.data.time.data, leda2.data.conductance.data,'k');
-set(gca,'XLim',[t_ext(1), t_ext(end)]);
+set(gca,'XLim',[t(1), t(end)]);
 
 subplot(5,1,2); hold on;
 cla; hold on;
-title('Standard Deconvolution: Estimate tonic component')
-plot(t_ext, driver_rawdata,'k')
-plot(iif_t, iif_data,'b.')
-plot(t, tonic0 - dist0,'m')
-%plot(groundtime, groundlevel_pre,'c*')
-plot(groundtime, groundlevel,'m*')
-set(gca,'XLim',[t_ext(1), t_ext(end)], 'YLim',[min(driver_rawdata(n_off+1:end)), max(driver_rawdata(n_off+1:end))*1.1]);
+title('Standard Deconvolution: Inter-impulse Fit = Tonic Driver')
+plot(t, driverSC,'b')
+plot(iif_t, iif_data,'.','Color',[.5 .5 .5])
+plot(t, tonicDriver,'Color',[.3 .3 .3])
+plot(groundtime, groundlevel,'o','LineWidth',1,'MarkerEdgeColor',[.5 .5 .5],'MarkerFaceColor',[.9 .9 .9],'MarkerSize',5)
+set(gca,'XLim',[t(1), t(end)], 'YLim',[min(driverSC)*.9, max(driverSC)*1.1]);
 
 subplot(5,1,3);
 cla; hold on;
-title('Raw data minus tonic component')
-plot(t_ext, c0(1:length(t_ext)), 'm')
-plot(t_ext, dist0 + d_ext,'Color',[.5 .5 .5])
-plot(t, dist0 + d, 'k');
-plot([t_ext(1) t_ext(end)], [0 0],':','Color',[.5 .5 .5])
-set(gca,'XLim',[t_ext(1), t_ext(end)]);
+title('SC Data minus Tonic Data')
+plot(t, phasicData, 'm')
+plot(t,data - tonicData, 'k');
+plot([t(1) t(end)], [0 0],':','Color',[.5 .5 .5])
+set(gca,'XLim',[t(1), t(end)], 'YLim',[min(phasicData)-.1, max(1, max(phasicData) *1.1)]);
 
 subplot(5,1,4);
 cla; hold on;
-title('Standard deconvolution')
+title('Phasic Driver')
 plot(0,0,'b'); plot(0,0,'r'); plot(0,0,'k');
-plot(t_ext, driver, 'Color', [.75 .75 .75]);
-plot(t_ext, -remd*2, 'Color', [.8 .4 .4]);
-for i = 1:length(maxL)
-    if mod(i,2)
-        col = [0 0 1];
-    else
-        col = [.5 .5 1];
-    end
-    imp_nzidx = find(impulse{i});
-    ovs_nzidx = find(overshoot{i});
-    %    plot(t_ext([onset_idx(i), onset_idx(i)+imp_nzidx-1, onset_idx(i)+imp_nzidx(end)-1]), [0, impulse{i}(imp_nzidx), 0], 'Color',col)
-    plot(t_ext(onset_idx(i)+imp_nzidx-1), impulse{i}(imp_nzidx),'Color',col)
-    plot(t_ext(onset_idx(i)+ovs_nzidx-1), -2*overshoot{i}(ovs_nzidx),'Color',col)
-end
-%plot(t_ext(minL), driver(minL), 'g*');
-%plot(t_ext(maxL), driver(maxL), 'r*');
-set(gca,'XLim',[t_ext(1),t_ext(end)], 'YLim',[min(driver(t_ext > 0)) - .2, max(driver(n_off+1:end)) + .2])
-% err1d = deverror(driver, [0, .2]);
-% err2d = deverror(remd, [0, 005]);
-% err1s = succnz(driver, .05, 1.4);
-% err2s = succnz(remd, .05, 1.7);
-legend(sprintf('Driver (error = %4.3f,  %4.1f)', leda2.analysis0.err_dev(1), leda2.analysis0.err_succz(1)), sprintf('Remainder (error = %4.3f,  %4.1f)', leda2.analysis0.err_dev(2), leda2.analysis0.err_succz(2)), sprintf('Total error = %4.4f, %4.4f', sum(leda2.analysis0.err_dev), sum(leda2.analysis0.err_succz)),'Location','NorthWest');
+plot(t, driver, 'Color', 'b');
+plot([t(1),t(end)],[0 0],'--','Color',[.3 .3 .3])
+set(gca,'XLim',[t(1),t(end)], 'YLim',[min(driver)-.1, max(1, max(driver) *1.1)])
+
+legend(sprintf('Fit RMSE = %5.4f', leda2.analysis0.error.RMSE), sprintf('Driver discreteness = %4.3f', leda2.analysis0.error.discreteness(1)), sprintf('Driver negativity = %4.3f', leda2.analysis0.error.negativity(1)), 'Location','NorthEast');
 
 subplot(5,1,5);
 cla; hold on;
-title('Reconstruction of data')
-plot(t, tonic0 - dist0, 'k');
-for i = 2:length(phasicRemainder)
-    plot(t, tonic0 - dist0 + phasicRemainder{i}) %leda2.analysis.tonicData +
-end
-plot(t, tonic0 + d, 'k');
-set(gca,'XLim',[t_ext(1),t_ext(end)])
+title('Reconstruction of SC Data')
+plot(t, tonicData, 'Color',[.5 .5 .5]);
+% for i = 2:length(phasicRemainder)
+%     plot(t, tonic0 - dist0 + phasicRemainder{i}) %leda2.analysis.tonicData +
+% end
+plot(t, tonicData + phasicData, 'm');
+plot(leda2.data.time.data, leda2.data.conductance.data,'k');
+set(gca,'XLim',[t(1),t(end)])
 
-% %residual = d - (tonic + phasicData);
-% %err_chi2 = sqrt(mean(residual.^2));
-% residual = d - phasicData;
-% err_chi2 = sqrt(mean(residual.^2));
-legend(sprintf('chi2 = %4.3f,  err = %4.3f', leda2.analysis0.err_chi2, leda2.analysis0.err),'Location','NorthWest')  %, sprintf('chi2 (fit t) = %4.5f', err_chi2_t)
+legend(sprintf('err = %4.3f', leda2.analysis0.error.compound),'Location','NorthEast')
 
 
 function deconv_opt(scr, event)
@@ -228,18 +198,18 @@ global leda2
 
 tau(1) = str2double(get(leda2.gui.deconv.edit_tau1,'String'));
 tau(2) = str2double(get(leda2.gui.deconv.edit_tau2,'String'));
-dist0 = str2double(get(leda2.gui.deconv.edit_dist0,'String'));
-leda2.set.d0Autoupdate = get(leda2.gui.deconv.chbx_d0Autoupdate,'Value');
+%dist0 = str2double(get(leda2.gui.deconv.edit_dist0,'String'));
+%leda2.set.d0Autoupdate = get(leda2.gui.deconv.chbx_d0Autoupdate,'Value');
 leda2.set.tonicIsConst = get(leda2.gui.deconv.chbx_tonicIsConst,'Value');
 
-[x, history] = cgd([tau, dist0], @sdeconv_analysis, [.3 20 .02], .01, 20, .05);
+[x, history] = cgd(tau, @sdeconv_analysis, [.3 20], .01, 20, .05);
 leda2.analysis0.tau = x(1:2);
-leda2.analysis0.dist0 = x(3);
+%leda2.analysis0.dist0 = x(3);
 leda2.analysis0.opt_history = history;
 
 set(leda2.gui.deconv.edit_tau1, 'String', x(1));
 set(leda2.gui.deconv.edit_tau2, 'String', x(2));
-set(leda2.gui.deconv.edit_dist0, 'String', x(3));
+%set(leda2.gui.deconv.edit_dist0, 'String', x(3));
 
 deconv_analysis_gui;
 
@@ -248,33 +218,34 @@ function deconv_apply(scr, event)
 global leda2
 
 %Prepare target data for full resolution analysis
-if leda2.set.tonicIsConst
-   leda2.analysis0.target.tonic0 = leda2.analysis0.target.groundlevel0 * ones(size(leda2.data.time.data));
-else
-   leda2.analysis0.target.tonic0 = ppval(leda2.analysis0.target.tonic0_poly, leda2.data.time.data);
-end
+% if leda2.set.tonicIsConst
+%     leda2.analysis0.target.tonicData = leda2.analysis0.target.groundlevel * ones(size(leda2.data.time.data));
+% else
+%     leda2.analysis0.target.tonicData = ppval(leda2.analysis0.target.tonic_poly, leda2.data.time.data);
+% end
 leda2.analysis0.target.t = leda2.data.time.data;
 leda2.analysis0.target.d = leda2.data.conductance.data;
-leda2.analysis0.target.d0 = leda2.analysis0.target.d - leda2.analysis0.target.tonic0;
+%leda2.analysis0.target.phasicData = leda2.analysis0.target.d - leda2.analysis0.tonicData;
 leda2.analysis0.target.sr = leda2.data.samplingrate;
 
 %leda2.set.sigPeak = .003;
-sdeconv_analysis([leda2.analysis0.tau, leda2.analysis0.dist0],0);
+sdeconv_analysis([leda2.analysis0.tau]);
 
-leda2.analysis0.tonicData = leda2.analysis0.target.tonic0 - leda2.analysis0.dist0;
-leda2.analysis0.tonic_poly = leda2.analysis0.target.tonic0_poly;
-leda2.analysis0.tonic_poly.coefs(:,end) = leda2.analysis0.tonic_poly.coefs(:,end) - leda2.analysis0.dist0;
-leda2.analysis0.groundtime = leda2.analysis0.target.groundtime;
-leda2.analysis0.groundlevel = leda2.analysis0.target.groundlevel0 - leda2.analysis0.dist0;
+% leda2.analysis0.tonicDriver = leda2.analysis0.target.tonicDriver;
+% leda2.analysis0.tonic_poly = leda2.analysis0.target.tonic_poly;
+% leda2.analysis0.tonic_poly.coefs(:,end) = leda2.analysis0.tonic_poly.coefs(:,end);
+% leda2.analysis0.groundtime = leda2.analysis0.target.groundtime;
+% leda2.analysis0.groundlevel = leda2.analysis0.target.groundlevel;
 
-leda2.analysis0 = rmfield(leda2.analysis0, 'target');
+leda2.analysis0 = rmfield(leda2.analysis0, {'target','driverSC'});
 leda2.analysis = leda2.analysis0;
 leda2.analysis.method = 'sdeco';
 leda2 = rmfield(leda2, 'analysis0');
 
 %trough2peak_analysis;
 
-add2log(1,'Deconvolution analysis.',1,1,1)
+add2log(1,'Robust decomposition analysis.',1,1,1)
+leda2.file.version = leda2.intern.version; %work around indicating analysis version of current fit
 
 if leda2.intern.batchmode
     return;
@@ -292,26 +263,26 @@ refresh_fitoverview;
 showfit;
 
 
-function trough2peak_analysis
-global leda2
-
-ds = leda2.data.conductance.smoothData;  %smooth(leda2.data.conductance.data, round(leda2.data.samplingrate / 2), 'gauss');
-t = leda2.data.time.data;
-[minL, maxL] = get_peaks(ds, 1);
-dmm = ds(maxL)-ds(minL(1:end-1));
-tau1 = leda2.analysis.tau(1);
-tau2 = leda2.analysis.tau(2);
-if tau1 ~= 0
-    maxx = tau1 * tau2 * log(tau1/tau2) / (tau1 - tau2);
-    maxamp = abs(exp(-maxx/tau2) - exp(-maxx/tau1));
-else
-    maxamp =  1;
-end
-sigc = maxamp/((tau2-tau1)*leda2.data.samplingrate)*leda2.set.sigPeak;
-minL = minL(dmm >= sigc);
-maxL = maxL(dmm >= sigc);
-leda2.analysis.trough2peak.onset = t(minL);
-leda2.analysis.trough2peak.peaktime = t(maxL);
-leda2.analysis.trough2peak.onset_idx = minL;
-leda2.analysis.trough2peak.peaktime_idx = maxL;
-leda2.analysis.trough2peak.amp = ds(maxL) - ds(minL);
+%function trough2peak_analysis
+% global leda2
+%
+% ds = leda2.data.conductance.smoothData;  %smooth(leda2.data.conductance.data, round(leda2.data.samplingrate / 2), 'gauss');
+% t = leda2.data.time.data;
+% [minL, maxL] = get_peaks(ds, 1);
+% dmm = ds(maxL)-ds(minL(1:end-1));
+% tau1 = leda2.analysis.tau(1);
+% tau2 = leda2.analysis.tau(2);
+% if tau1 ~= 0
+%     maxx = tau1 * tau2 * log(tau1/tau2) / (tau1 - tau2);
+%     maxamp = abs(exp(-maxx/tau2) - exp(-maxx/tau1));
+% else
+%     maxamp =  1;
+% end
+% sigc = maxamp/((tau2-tau1)*leda2.data.samplingrate)*leda2.set.sigPeak;
+% minL = minL(dmm >= sigc);
+% maxL = maxL(dmm >= sigc);
+% leda2.analysis.trough2peak.onset = t(minL);
+% leda2.analysis.trough2peak.peaktime = t(maxL);
+% leda2.analysis.trough2peak.onset_idx = minL;
+% leda2.analysis.trough2peak.peaktime_idx = maxL;
+% leda2.analysis.trough2peak.amp = ds(maxL) - ds(minL);

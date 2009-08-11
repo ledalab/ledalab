@@ -60,7 +60,7 @@ leda2.gui.menu.menu_3b  = uimenu(leda2.gui.menu.menu_3,'Label','Visual settings'
 %-Analyze
 leda2.gui.menu.menu_4  = uimenu(leda2.gui.fig_main,'Label','Analysis');
 leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Decomposition Analysis (Nonnegative decovolution)','Callback','nndeco');
-leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Fast Decomposition Analysis (Standard deconvolution) - beta version -','Callback','sdeco');
+leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Continuous Decomposition Analysis (Standard deconvolution) - beta version -','Callback','sdeco');
 leda2.gui.menu.menu_4f = uimenu(leda2.gui.menu.menu_4,'Label','Delete analysis','Callback','delete_fit(1)','Separator','on');
 
 %-Tools
@@ -69,13 +69,13 @@ leda2.gui.menu.menu_5a = uimenu(leda2.gui.menu.menu_5,'Label','FFT','Callback','
 
 %-Results
 leda2.gui.menu.menu_6  = uimenu(leda2.gui.fig_main,'Label','Results');
-leda2.gui.menu.menu_6a = uimenu(leda2.gui.menu.menu_6,'Label','Export SCR-List','Callback','export_scrlist');
+%leda2.gui.menu.menu_6a = uimenu(leda2.gui.menu.menu_6,'Label','Export SCR-List','Callback','export_scrlist');
 leda2.gui.menu.menu_6b = uimenu(leda2.gui.menu.menu_6,'Label','Export Event-Related Activation','Callback','export_era','Accelerator','e');
 
 %-Info
 leda2.gui.menu.menu_7 =  uimenu(leda2.gui.fig_main,'Label','Info');
-leda2.gui.menu.menu_7a = uimenu(leda2.gui.menu.menu_7,'Label','Ledalab Website','Callback','web(''www.ledalab.de'',''-browser'')');
-leda2.gui.menu.menu_7b = uimenu(leda2.gui.menu.menu_7,'Label','Documentation','Callback','web(''www.ledalab.de/download/Ledalab_Documentation.pdf'',''-browser'')');
+leda2.gui.menu.menu_7a = uimenu(leda2.gui.menu.menu_7,'Label','Ledalab Website','Callback','web(''www.ledalab.de'')');
+%leda2.gui.menu.menu_7b = uimenu(leda2.gui.menu.menu_7,'Label','Documentation','Callback','web(''www.ledalab.de/download/Ledalab_Documentation.pdf'',''-browser'')');
 leda2.gui.menu.menu_7c = uimenu(leda2.gui.menu.menu_7,'Label','Check for updates','Callback','version_check');
 leda2.gui.menu.menu_7d = uimenu(leda2.gui.menu.menu_7,'Label','About Ledalab','Callback','ledalogo','Separator','on');
 

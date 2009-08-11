@@ -77,6 +77,16 @@ if isempty(cmd) || strcmp(cmd, 'Cancel')
     delete(pointsplot)
     return;
 end
+if ~isempty(leda2.analysis)
+    cmd = questdlg('The current fit will be deleted!','Warning','Continue','Cancel','Continue');
+    if isempty(cmd) || strcmp(cmd, 'Cancel')
+        delete(interplot)
+        delete(pointsplot)
+        return;
+    else
+        delete_fit(1);
+    end
+end
 
 %replace artifact section
 leda2.data.conductance.data(art_idx) = art_sc;

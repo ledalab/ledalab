@@ -134,19 +134,20 @@ groundlevel_pre = leda2.analysis0.target.groundlevel_pre;
 
 tonic0 = leda2.analysis0.target.tonic0;
 d = leda2.analysis0.target.d0;
-kernel = leda2.analysis0.kernel;
+%kernel = leda2.analysis0.kernel;
 driver = leda2.analysis0.driver;
 remd = leda2.analysis0.remainder;
-t_ext = [leda2.analysis0.time_ext, t];
-d_ext = [leda2.analysis0.data_ext, d];
-n_off = length(leda2.analysis0.time_ext);
+%t_ext = [leda2.analysis0.time_ext, t];
+%d_ext = [leda2.analysis0.data_ext, d];
+%n_off = length(leda2.analysis0.time_ext);
 onset_idx = leda2.analysis0.onset_idx;
 impulse = leda2.analysis0.impulse;
 overshoot = leda2.analysis0.overshoot;
 minL = leda2.analysis0.impMin_idx;
 maxL = leda2.analysis0.impMax_idx;
 phasicRemainder = leda2.analysis0.phasicRemainder;
-c0 = conv(driver, kernel);
+%c0 = conv(driver, kernel);
+phasicData = leda2.analysis0.phasicData;
 driver_rawdata = leda2.analysis0.driver_rawdata;
 
 
@@ -158,32 +159,32 @@ subplot(5,1,1); hold on;
 cla; hold on;
 title('Raw data')
 plot(leda2.data.time.data, leda2.data.conductance.data,'k');
-set(gca,'XLim',[t_ext(1), t_ext(end)]);
+set(gca,'XLim',[t(1), t(end)]);
 
 subplot(5,1,2); hold on;
 cla; hold on;
 title('Standard Deconvolution - Estimate tonic component')
-plot(t_ext, driver_rawdata,'k')
+plot(t, driver_rawdata,'k')
 plot(iif_t, iif_data,'b.')
 plot(t, tonic0 - dist0,'m')
 plot(groundtime, groundlevel_pre,'c*')
 plot(groundtime, groundlevel,'m*')
-set(gca,'XLim',[t_ext(1), t_ext(end)], 'YLim',[min(driver_rawdata(n_off+1:end)), max(driver_rawdata(n_off+1:end))*1.1]);
+set(gca,'XLim',[t(1), t(end)], 'YLim',[min(driver_rawdata), max(driver_rawdata)*1.1]);
 
 subplot(5,1,3);
 cla; hold on;
 title('Raw data minus tonic component')
-plot(t_ext, c0(1:length(t_ext)), 'm')
-plot(t_ext, dist0 + d_ext,'Color',[.5 .5 .5])
+plot(t, phasicData, 'm')
+%plot(t, dist0 + d_ext,'Color',[.5 .5 .5])
 plot(t, dist0 + d, 'k');
-set(gca,'XLim',[t_ext(1), t_ext(end)]);
+set(gca,'XLim',[t(1), t(end)]);
 
 subplot(5,1,4);
 cla; hold on;
 title('Nonnegative deconvolution')
 plot(0,0,'b'); plot(0,0,'r'); plot(0,0,'k');
-plot(t_ext, driver, 'Color', [.75 .75 .75]);
-plot(t_ext, -remd*2, 'Color', [.8 .4 .4]);
+plot(t, driver, 'Color', [.75 .75 .75]);
+plot(t, -remd*2, 'Color', [.8 .4 .4]);
 for i = 1:length(maxL)
     if mod(i,2)
         col = [0 0 1];
@@ -192,18 +193,20 @@ for i = 1:length(maxL)
     end
     imp_nzidx = find(impulse{i});
     ovs_nzidx = find(overshoot{i});
-    %    plot(t_ext([onset_idx(i), onset_idx(i)+imp_nzidx-1, onset_idx(i)+imp_nzidx(end)-1]), [0, impulse{i}(imp_nzidx), 0], 'Color',col)
-    plot(t_ext(onset_idx(i)+imp_nzidx-1), impulse{i}(imp_nzidx),'Color',col)
-    plot(t_ext(onset_idx(i)+ovs_nzidx-1), -2*overshoot{i}(ovs_nzidx),'Color',col)
+    %    plot(t([onset_idx(i), onset_idx(i)+imp_nzidx-1, onset_idx(i)+imp_nzidx(end)-1]), [0, impulse{i}(imp_nzidx), 0], 'Color',col)
+    plot(t(onset_idx(i)+imp_nzidx-1), impulse{i}(imp_nzidx),'Color',col)
+    plot(t(onset_idx(i)+ovs_nzidx-1), -2*overshoot{i}(ovs_nzidx),'Color',col)
 end
-plot(t_ext(minL), driver(minL), 'g*');
-plot(t_ext(maxL), driver(maxL), 'r*');
-set(gca,'XLim',[t_ext(1),t_ext(end)], 'YLim',[-max(remd)*2 - .2, max(driver(n_off+1:end)) + .2])
+plot(t(minL), driver(minL), 'g*');
+plot(t(maxL), driver(maxL), 'r*');
+set(gca,'XLim',[t(1),t(end)], 'YLim',[-max(remd)*2 - .2, max(driver) + .2])
 % err1d = deverror(driver, [0, .2]);
 % err2d = deverror(remd, [0, 005]);
 % err1s = succnz(driver, .05, 1.4);
 % err2s = succnz(remd, .05, 1.7);
-legend(sprintf('Driver (error = %4.3f,  %4.1f)', leda2.analysis0.err_dev(1), leda2.analysis0.err_succz(1)), sprintf('Remainder (error = %4.3f,  %4.1f)', leda2.analysis0.err_dev(2), leda2.analysis0.err_succz(2)), sprintf('Total error = %4.4f, %4.4f', sum(leda2.analysis0.err_dev), sum(leda2.analysis0.err_succz)),'Location','NorthWest');
+legend(sprintf('Driver error (dev/discr) = %4.3f,  %4.1f)', leda2.analysis0.error.deviation(1), leda2.analysis0.error.discreteness(1)), ...
+    sprintf('Remainder error (dev/discr) = %4.3f,  %4.1f)', leda2.analysis0.error.deviation(2), leda2.analysis0.error.discreteness(2)), ...
+    sprintf('Total error (dev/discr) = %4.4f, %4.4f', sum(leda2.analysis0.error.deviation), sum(leda2.analysis0.error.discreteness)),'Location','NorthEast');
 
 subplot(5,1,5);
 cla; hold on;
@@ -213,13 +216,13 @@ for i = 2:length(phasicRemainder)
     plot(t, tonic0 - dist0 + phasicRemainder{i}) %leda2.analysis.tonicData +
 end
 plot(t, tonic0 + d, 'k');
-set(gca,'XLim',[t_ext(1),t_ext(end)])
+set(gca,'XLim',[t(1),t(end)])
 
 % %residual = d - (tonic + phasicData);
 % %err_chi2 = sqrt(mean(residual.^2));
 % residual = d - phasicData;
 % err_chi2 = sqrt(mean(residual.^2));
-legend(sprintf('chi2 = %4.3f,  err = %4.3f', leda2.analysis0.err_chi2, leda2.analysis0.err),'Location','NorthWest')  %, sprintf('chi2 (fit t) = %4.5f', err_chi2_t)
+legend(sprintf('chi2 = %4.3f,  err = %4.3f', leda2.analysis0.error.chi2, leda2.analysis0.error.compound),'Location','NorthEast')
 
 
 function deconv_opt(scr, event)
@@ -272,7 +275,8 @@ leda2 = rmfield(leda2, 'analysis0');
 
 %trough2peak_analysis;
 
-add2log(1,'Deconvolution analysis.',1,1,1)
+add2log(1,'Decomposition analysis.',1,1,1)
+leda2.file.version = leda2.intern.version;
 
 if leda2.intern.batchmode
     return;

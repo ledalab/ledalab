@@ -44,17 +44,19 @@ savevars = {'fileinfo','data'};
 % end
 if ~isempty(leda2.analysis)
     analysis = leda2.analysis;
-    analysis = rmfield(analysis, {'phasicComponent', 'phasicRemainder'}); %#ok<NASGU>
+    if strcmp(leda2.analysis.method,'nndeco')
+        analysis = rmfield(analysis, {'phasicComponent', 'phasicRemainder'}); %#ok<NASGU>
+    end
     savevars = [savevars, {'analysis'}];
 end
 
 
 try
     save(file, savevars{:}); %, '-v6'
-    add2log(1,[' Save ',file,' in V',num2str(leda2.intern.version,'%1.2f')],1,1,1);   
+    add2log(1,[' Save ',file,' in V',num2str(leda2.intern.version,'%1.2f')],1,1,1);
     fileinfo.log = leda2.file.log; %if it there is no error, save again with updated filelog
     save(file, savevars{:});  %, '-v6
-    
+
     file_changed(0);
 catch
     add2log(1,[' Saving ',file,' failed!!!'],1,1,0,1,0,1);

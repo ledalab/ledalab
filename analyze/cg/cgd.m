@@ -2,15 +2,15 @@ function [x, history] = cgd(start_val, error_fcn, h, crit_error, crit_iter, crit
 
 
 x = start_val;
-iter = 0;
 newerror = error_fcn(x);
+starterror = newerror;
 history.x = x;
 history.direction = zeros(size(x));
 history.step = -1;
 history.h = -ones(size(h));
 history.error = newerror;
-disp([x, newerror, max(h)])
-
+%disp(['Initial parameter:  ',sprintf(' %5.2f\t',x),sprintf('  Error: %6.3f',newerror)])
+iter = 0;
 
 while 1
     iter = iter + 1;
@@ -85,4 +85,5 @@ while 1
 
 end
 
-disp([x, newerror, max(h)])
+add2log(0,['Optimized parameter: ',sprintf('%5.2f\t',x),sprintf(' Error: %6.3f',newerror),' (Initial parameter: ',sprintf('%5.2f\t',start_val), sprintf(' Error: %6.3f)',starterror)], 0,0,1,1,0)
+

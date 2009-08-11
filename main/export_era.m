@@ -89,94 +89,99 @@ global leda2
 scrWindow_t1 = leda2.set.export.SCRstart;
 scrWindow_t2 = leda2.set.export.SCRend;
 scrAmplitudeMin = leda2.set.export.SCRmin;
+sr = leda2.data.samplingrate;
+
+onset_ttp = leda2.trough2peakAnalysis.onset;
+amp_ttp = leda2.trough2peakAnalysis.amp;
+if ~isempty(leda2.analysis)
+    if strcmp(leda2.analysis.method,'nndeco')
+        onset_nndeco = leda2.analysis.impulsePeakTime;
+        amp_nndeco = leda2.analysis.amp;
+    end
+end
+
 
 for iEvent = 1:leda2.data.events.N
 
+    %Set event data
     event = leda2.data.events.event(iEvent);
+    era(iEvent).event_time = event.time;
     era(iEvent).event_nid = event.nid;
     era(iEvent).event_name = event.name;
     era(iEvent).event_ud = event.userdata;
 
     [t_respwin, cs_respwin, idx_respwin] = subrange(event.time + scrWindow_t1, event.time + scrWindow_t2);  %data of response window
 
-
-    for iFit = 1:2
-
-        if iFit == 1 && isempty(leda2.analysis)
-            era(iEvent).deconv.npeaks = NaN;
-            era(iEvent).deconv.ampsum = NaN;
-            era(iEvent).deconv.areasum = NaN;
-            era(iEvent).deconv.driverint = NaN;
-            era(iEvent).deconv.tonic = NaN;
-            era(iEvent).deconv.onset = NaN;
-
-            continue;
-        end
-
-        phasics = [];
-        switch iFit
-            case 1, %Decomposition analysis
-                phasics.onset = leda2.analysis.impulsePeakTime;
-                phasics.amp = leda2.analysis.amp;
-                phasics.area = leda2.analysis.area;
-            case 2, %Trough-to-peak (Min/Max) analysis
-                phasics.onset = leda2.trough2peakAnalysis.onset;
-                phasics.amp = leda2.trough2peakAnalysis.amp;
-        end
-
-        scr_idx = find(phasics.onset >= (event.time + scrWindow_t1) & phasics.onset <= (event.time + scrWindow_t2) & phasics.amp > scrAmplitudeMin);
-        nPeaks = length(scr_idx);
-
-        if nPeaks == 0
-            ampsum = 0;
-            areasum = 0;
-            onsetT1 = NaN;
-
-        else  %nPeaks > 0
-            ampsum = sum(phasics.amp(scr_idx));
-            scr1 = scr_idx(1);
-            onsetT1_abs = phasics.onset(scr1);          % = onset_time of first peak in SCR-window
-            onsetT1 = onsetT1_abs - event.time;         % = onset_time of first peak in SCR-window relative to event
-            if iFit == 1
-                areasum = sum(phasics.area(scr_idx));
-            end
-        end %if nPeaks
-
-        if iFit == 1
-            driver0 = leda2.analysis.driver_raw(length(leda2.analysis.data_ext)+1 : end);
-            driverint = sum(driver0(idx_respwin)) / leda2.data.samplingrate;
-            tonic = mean(leda2.analysis.tonicData(idx_respwin));
-        end
+    %Reset all measures
+    %Measures yielded by nonnegative deconvolution
+    era(iEvent).nndeconv.scr_nr = NaN;
+    era(iEvent).nndeconv.scr_ampsum = NaN;
+    era(iEvent).nndeconv.scr_areasum = NaN;
+    era(iEvent).nndeconv.scr_latency = NaN;
+    era(iEvent).nndeconv.tonic = NaN;  %average tonic level
+    %Measures yielded by (robust) standard deconvolution
+    era(iEvent).sdeconv.phasic_area = NaN;  %phasic driver area (integral over response window)
+    era(iEvent).sdeconv.phasic_max = NaN;   %Driver maximum within response window
+    era(iEvent).sdeconv.phasic_amp = NaN;   %SCR amp resulting from phasic segment re-convoluted with driver impulse
+    era(iEvent).sdeconv.tonic = NaN;   %average tonic level
+    %Measures yielded by (robust) trough-to-peak analysis
+    era(iEvent).ttp.scr_nr = NaN;
+    era(iEvent).ttp.scr_ampsum = NaN;
+    era(iEvent).ttp.scr_latency = NaN;
+    %Measures based on raw SC data
+    era(iEvent).global.mean = NaN;
+    era(iEvent).global.max_deflection = NaN;
 
 
-        switch iFit
-            case 1, %Bateman-Fit
-                era(iEvent).deconv.npeaks = nPeaks;
-                era(iEvent).deconv.ampsum = ampsum;
-                era(iEvent).deconv.areasum = areasum;
-                era(iEvent).deconv.driverint = driverint;
-                era(iEvent).deconv.tonic = tonic;
-                era(iEvent).deconv.onset = onsetT1;
+    %Set Measures
+    %TTP
+    scr_idx = find(onset_ttp >= (event.time + scrWindow_t1) & onset_ttp <= (event.time + scrWindow_t2) & amp_ttp >= scrAmplitudeMin);
+    nPeaks = length(scr_idx);
 
-            case 2 %Trough-to-Peak (TTP)
-                era(iEvent).ttp.npeaks = nPeaks;
-                era(iEvent).ttp.ampsum = ampsum;
-                era(iEvent).ttp.onset = onsetT1;
-        end
-
-    end %iFit
-
+    era(iEvent).ttp.scr_nr = nPeaks;
+    era(iEvent).ttp.scr_ampsum = sum(amp_ttp(scr_idx));
+    if nPeaks > 0
+        era(iEvent).ttp.scr_latency = onset_ttp(scr_idx(1)) - event.time;
+    end
 
     %Global measures
-    %%%%%%%%%%%%%%%%%%
     era(iEvent).global.mean = mean(leda2.data.conductance.data(idx_respwin));       %simple mean of data within response window
-
-    %Maximum-deflection
     diff = 0;
     for i = 1:length(cs_respwin)-1
         diff(i) = max(cs_respwin(i+1:end)) - cs_respwin(i);
     end
     era(iEvent).global.max_deflection = max([diff, 0]);
+
+    %Decomposition measures
+    if ~isempty(leda2.analysis)
+        if strcmp(leda2.analysis.method,'nndeco')
+            %NNDECONV
+            scr_idx = find(onset_nndeco >= (event.time + scrWindow_t1) & onset_nndeco <= (event.time + scrWindow_t2) & amp_nndeco >= scrAmplitudeMin);
+            nPeaks = length(scr_idx);
+
+            era(iEvent).nndeconv.scr_nr = nPeaks;
+            era(iEvent).nndeconv.scr_ampsum = sum(amp_nndeco(scr_idx));
+            era(iEvent).nndeconv.scr_areasum = sum(leda2.analysis.area(scr_idx)); % / (scrWindow_t2 - scrWindow_t1) would result in real muS/sec
+            if nPeaks > 0
+                era(iEvent).nndeconv.scr_latency = onset_nndeco(scr_idx(1)) - event.time;
+            end
+            era(iEvent).nndeconv.tonic = mean(leda2.analysis.tonicData(idx_respwin));
+
+        elseif strcmp(leda2.analysis.method,'sdeco')
+            %SDECO
+            era(iEvent).sdeconv.phasic_area = max(0, sum(leda2.analysis.driver(idx_respwin))/sr);  %  mean() == sum()/(sr*winsize)  would result in real muS/sec
+            era(iEvent).sdeconv.phasic_max = max(0, max(leda2.analysis.driver(idx_respwin)));
+            sc_reconv = conv(leda2.analysis.driver(idx_respwin), leda2.analysis.kernel);
+            if max(sc_reconv) >= scrAmplitudeMin
+                era(iEvent).sdeconv.phasic_amp = max(sc_reconv);
+            else
+                era(iEvent).sdeconv.phasic_amp = 0;
+            end
+            era(iEvent).sdeconv.tonic = mean(leda2.analysis.tonicData(idx_respwin));
+
+        end
+
+    end
 
 end %iEvent
 
@@ -184,25 +189,42 @@ end %iEvent
 %Export
 %%%%%%%%%
 savefname = [leda2.file.filename(1:end-4), '_era'];
-%-Text Export
-if any(leda2.set.export.savetype == [2,3])
-    fid = fopen([savefname,'.txt'],'wt');
-    fprintf(fid,'EvNr\tnSCR\tAmpSum\tAreaSum\tDriverInt\tOnset1\tTonic\tnSCR_ttp\tAmpSum_ttp\tOnset1_ttp\tMean\tMaxDeflection\tEventNId\tEventName\tUserdata\n');
 
-    for i = 1:leda2.data.events.N
-        if isempty(era(i).event_ud) || ~ischar(era(i).event_ud)
-            ud = '-';
-        else
-            ud = era(i).event_ud;
-        end
-        fprintf(fid,'%3.0f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\t"%s"\n',i , era(i).deconv.npeaks, era(i).deconv.ampsum, era(i).deconv.areasum, era(i).deconv.driverint, era(i).deconv.onset, era(i).deconv.tonic, era(i).ttp.npeaks, era(i).ttp.ampsum, era(i).ttp.onset, era(i).global.mean, era(i).global.max_deflection, era(i).event_nid, era(i).event_name, ud);
-    end
-    fclose(fid);
-end
 %-Matlab Export
 if any(leda2.set.export.savetype == [1,3])
     results = era;
     save(savefname,'results');
+end
+
+%-Text Export
+if any(leda2.set.export.savetype == [2,3])
+    fid = fopen([savefname,'.txt'],'wt');
+
+    if isempty(leda2.analysis)
+        fprintf(fid,'EvNr\tnSCR_ttp\tAmpSum_ttp\tOnset1_ttp\tMean\tMaxDeflection\tEventNId\tEventName\n');
+        for i = 1:leda2.data.events.N
+            fprintf(fid,'%3.0f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\n', ...
+                i, era(i).ttp.scr_nr, era(i).ttp.scr_ampsum, era(i).ttp.scr_latency, era(i).global.mean, era(i).global.max_deflection, era(i).event_nid, era(i).event_name);
+        end
+
+    else
+        if strcmp(leda2.analysis.method,'nndeco')
+            fprintf(fid,'EvNr\tnSCR\tAmpSum\tAreaSum\tOnset1\tTonic\tnSCR_ttp\tAmpSum_ttp\tOnset1_ttp\tMean\tMaxDeflection\tEventNId\tEventName\n');
+            for i = 1:leda2.data.events.N
+                fprintf(fid,'%3.0f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\n',...
+                    i, era(i).nndeconv.scr_nr, era(i).nndeconv.scr_ampsum, era(i).nndeconv.scr_areasum, era(i).nndeconv.scr_latency, era(i).nndeconv.tonic, era(i).ttp.scr_nr, era(i).ttp.scr_ampsum, era(i).ttp.scr_latency, era(i).global.mean, era(i).global.max_deflection, era(i).event_nid, era(i).event_name);
+            end
+
+        elseif strcmp(leda2.analysis.method,'sdeco')
+            fprintf(fid,'EvNr\tPhasicArea\tPhasicMax\tPhasicAmp\tTonic\tnSCR_ttp\tAmpSum_ttp\tOnset1_ttp\tMean\tMaxDeflection\tEventNId\tEventName\n');
+            for i = 1:leda2.data.events.N
+                fprintf(fid,'%3.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\n',...
+                    i, era(i).sdeconv.phasic_area, era(i).sdeconv.phasic_max, era(i).sdeconv.phasic_amp, era(i).sdeconv.tonic, era(i).ttp.scr_nr, era(i).ttp.scr_ampsum, era(i).ttp.scr_latency, era(i).global.mean, era(i).global.max_deflection, era(i).event_nid, era(i).event_name);
+            end
+
+        end
+    end
+    fclose(fid);
 end
 
 add2log(1,[num2str(leda2.data.events.N),' events written to ',fullfile(cd, savefname)],1,1,1,0,0,1)

@@ -4,20 +4,21 @@ global leda2
 %parse batch-mode arguments and check thei validity
 [pathname, open_datatype, downsample_factor, do_fit, do_optimize, do_export_scr, do_export_era, do_save_overview] = parse_arguments(varargin{:});
 
+
 dirL = dir(pathname);
 dirL = dirL(~[dirL.isdir]);
 nFile = length(dirL);
+
 add2log(1,['Starting Ledalab batch for ',pathname,' (',num2str(nFile),' file/s)'],1,0,0,1)
 pathname = fileparts(pathname);
-leda2.current.batchmode.file = {};
-leda2.current.batchmode.err = [];
+leda2.current.batchmode.file = [];
 
 for iFile = 1:nFile
     filename = dirL(iFile).name;
-    leda2.current.batchmode.file{iFile} = filename;
-    add2log(1,['Batch-Analyzing ',filename],1,0,0,1)
+    leda2.current.batchmode.file(iFile).name = filename;
+    disp(' '); add2log(1,['Batch-Analyzing ',filename],1,0,0,1)
 
-    %try
+    try
         %Open
         if strcmp(open_datatype,'leda')
             open_ledafile(0, pathname, filename);
@@ -37,15 +38,12 @@ for iFile = 1:nFile
         %Analysis
         if do_fit > 0
             delete_fit;
-            if do_optimize == 0,  %work-around
-                do_optimize = 1;
-            end
             if do_fit == 1
                 nndeco(do_optimize);
             elseif do_fit == 2
                 sdeco(do_optimize);
             end
-            leda2.current.batchmode.err(iFile) = leda2.analysis.err;
+            leda2.current.batchmode.file(iFile).error = leda2.analysis.error;
         end
 
         %Export
@@ -61,11 +59,13 @@ for iFile = 1:nFile
             analysis_overview;
         end
 
-        save_ledafile(0);
+        if downsample_factor > 0 || do_fit
+            save_ledafile(0);
+        end
 
-    %catch
-    %    add2log(1,'ERROR !!!',1,0,0,1)
-    %end
+    catch
+        add2log(1,'ERROR !!!',1,0,0,1)
+    end
 
 
 end
@@ -174,27 +174,42 @@ function analysis_overview
 global leda2
 
 t = leda2.data.time.data;
-t_ext = [leda2.analysis.time_ext, t];
 analysis = leda2.analysis;
 events = leda2.data.events;
-%N = leda2.data.N;
+%correct for extended data range of older versions
+if leda2.file.version < 3.12
+    n_offset = length(analysis.time_ext);
+    remainder = analysis.remainder(n_offset+1:end);
+    driver = leda2.analysis.driver(n_offset+1:end);
+else
+    remainder = analysis.remainder;
+    driver = leda2.analysis.driver;
+end
+
 
 figure('Units','normalized','Position',[0 0.05 1 .9],'MenuBar','none','NumberTitle','off');
 
 %Fit
 subplot(2,1,1);
 cla; hold on;
-if length(analysis.phasicRemainder) * length(analysis.tonicData) < 4*10^6
-    for i = 2:length(analysis.phasicRemainder)
-        plot(t, analysis.tonicData + analysis.phasicRemainder{i})
+if leda2.file.version < 3.12 || strcmp(leda2.analysis.method,'nndeco')
+    if length(analysis.phasicRemainder) * length(analysis.tonicData) < 4*10^6
+        for i = 2:length(analysis.phasicRemainder)
+            plot(t, analysis.tonicData + analysis.phasicRemainder{i})
+        end
     end
 end
+
 plot(t, analysis.tonicData + analysis.phasicData,'c');
-plot(t, analysis.tonicData,'g');
-plot(analysis.groundtime, analysis.groundlevel,'g*')
+plot(t, analysis.tonicData,'Color',[.3 .3 .3]);
+plot(analysis.groundtime, analysis.groundlevel,'o','LineWidth',2,'MarkerEdgeColor',[.5 .5 .5],'MarkerFaceColor',[.9 .9 .9],'MarkerSize',3)
 plot(t, leda2.data.conductance.data, 'k');
-legend(sprintf('tau = %4.2f, %4.2f,  dist0 = %4.4f',analysis.tau, analysis.dist0), sprintf('err = %4.2f', analysis.err),'Location','NorthWest')
-%ensure minimum sclaing of 2 muS
+if strcmp(analysis.method,'nndeco')
+    legend(sprintf('tau = %4.2f, %4.2f,  dist0 = %4.4f',analysis.tau, analysis.dist0), sprintf('RMSE = %4.2f', analysis.error.RMSE),'Location','NorthWest')
+else
+    legend(sprintf('tau = %4.2f, %4.2f',analysis.tau), sprintf('RMSE = %4.2f', analysis.error.RMSE),'Location','NorthWest')
+end
+%ensure minimum scaling of 2 muS
 yl = get(gca,'YLim');
 if abs(diff(yl)) < 2
     yl(2) = yl(1) + 2;
@@ -210,16 +225,16 @@ set(gca,'YLim',yl)
 %Driver
 subplot(2,1,2);
 cla; hold on;
-plot(t_ext, analysis.driver);
-plot(t_ext, -2*analysis.remainder,'g');
-set(gca, 'XLim', [t(1), t(end)], 'YLim', [min(-2*analysis.remainder)*1.2, max(analysis.driver(analysis.impMax_idx))*1.2])
+plot(t, driver,'b');
+plot(t, -2*remainder,'r');
+set(gca, 'XLim', [t(1), t(end)], 'YLim', [min(min(driver), min(-2*remainder))*1.2, max(1, max(driver)*1.2)])
 %Events
 yl = ylim;
 for i = 1:events.N
     plot([events.event(i).time, events.event(i).time], yl, 'r')
 end
 set(gca,'YLim',yl)
-legend(sprintf('err = %6.4f',analysis.err), sprintf('err-chi2 = %4.2f',analysis.err_chi2), sprintf('err-succz = %4.2f,  %4.2f', analysis.err_succz),'Location','NorthWest')   %sprintf('err-dev = %4.2f,  %4.2f',analysis.err_dev)
+legend(sprintf('err-compound = %6.4f',analysis.error.compound), sprintf('err-discreteness = %4.2f,  %4.2f', analysis.error.discreteness), sprintf('err-negativity = %4.2f', analysis.error.negativity),'Location','NorthWest')
 
 saveas(gcf, leda2.file.filename(1:end-4), 'jpg')
 

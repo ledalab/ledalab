@@ -35,7 +35,7 @@ for i = 1:length(labels)
     scCol(i) = any(strfind(labels{i}, 'SC/GSR'));
 end
 scIdx = find(scCol);
-conductance = M(:,scIdx(1));
+conductance = M(:,scIdx(1)); %take first SC channel
 time = (M(:,1) - M(1,1)) / freq;
 
 %get events

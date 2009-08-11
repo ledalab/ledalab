@@ -1,8 +1,7 @@
-function [tau, dist0, opthistory] = deconv_optimize(x0, nr_iv, method)
+function [xopt, opthistory] = deconv_optimize(x0, nr_iv, method)
 
 if nr_iv == 0
-    tau = x0(1:2);
-    dist0 = x0(3);
+    xopt = x0;
     opthistory = [];
     return;
 end
@@ -10,7 +9,7 @@ end
 if strcmp(method, 'nndeco')
     xList = {x0, [.75 40 x0(end)], [.75 60 x0(end)], [.75 2 x0(end)]};
 else
-    xList = {x0, [.75 4 x0(end)], [.75 8 x0(end)], [.75 12 x0(end)]};
+    xList = {x0, [.75 4], [.75 8], [.75 12]};
 end
 
 
@@ -21,7 +20,7 @@ for i = 1: min(nr_iv, length(xList))
     if strcmp(method, 'nndeco')
         [x, history] = cgd(xList{i}, @deconv_analysis, [.3 20 .02], .01, 20, .05);
     else
-        [x, history] = cgd(xList{i}, @sdeconv_analysis, [.3 20 .02], .01, 20, .05);
+        [x, history] = cgd(xList{i}, @sdeconv_analysis, [.3 2], .01, 20, .05);
     end
     opthistory(i) = history;
     x_opt(i) = {x};
@@ -31,5 +30,5 @@ end
 
 [mn, idx] = min(err_opt);
 
-tau = x_opt{idx}(1:2);
-dist0 = x_opt{idx}(3);
+xopt = x_opt{idx};
+add2log(0, ['Optimized parameter: ',sprintf(' %5.2f\t',xopt),sprintf(' Error: %6.3f',mn)], 0,1,1,1,0)
