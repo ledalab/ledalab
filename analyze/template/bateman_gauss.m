@@ -13,3 +13,5 @@ if sigma > 0
     component = bg((winwidth2*2+1) : (end-winwidth2*2));
 
 end
+
+%component = component / max(component) * amp;

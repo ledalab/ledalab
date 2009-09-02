@@ -1,4 +1,4 @@
-function snz = succnz(data, crit, fac)
+function snz = succnz(data, crit, fac, sr)
 
 nzL = [];
 cntr = 0;
@@ -21,7 +21,7 @@ if cntr > 0
 end
 
 if ~isempty(nzL)
-    snz = sum(nzL.^fac)/n;
+    snz = sum((nzL/sr).^fac)/(n/sr);
 else
     snz = 0;
 end

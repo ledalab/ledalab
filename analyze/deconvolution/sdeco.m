@@ -82,7 +82,7 @@ if ~leda2.intern.batchmode
     leda2.gui.deconv.edit_tau2 = uicontrol('Style','edit','Units','normalized','Position',[.18 .04 .05 .03],'String',leda2.analysis0.tau(2));  %tmp_tau2
     %leda2.gui.deconv.edit_dist0 = uicontrol('Style','edit','Units','normalized','Position',[.26 .04 .05 .03],'String',leda2.analysis0.dist0);  %tmp_dist0
 
-    leda2.gui.deconv.text_smoothWinSize = uicontrol('Style','text','Units','normalized','Position',[.34 .065 .05 .02],'String','Smooth-Win','BackgroundColor',get(gcf,'Color'));
+    leda2.gui.deconv.text_smoothWinSize = uicontrol('Style','text','Units','normalized','Position',[.34 .065 .05 .02],'String','Smooth-Win (8 SD of Gauss) [sec]','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.text_gridsize = uicontrol('Style','text','Units','normalized','Position',[.34 .035 .05 .02],'String','Grid-Size','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.text_sigPeak = uicontrol('Style','text','Units','normalized','Position',[.34 .005 .05 .02],'String','Sig-Peak','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.edit_smoothWinSize = uicontrol('Style','edit','Units','normalized','Position',[.4 .07 .05 .02],'String',leda2.analysis0.smoothwin);
@@ -177,7 +177,7 @@ plot(t, driver, 'Color', 'b');
 plot([t(1),t(end)],[0 0],'--','Color',[.3 .3 .3])
 set(gca,'XLim',[t(1),t(end)], 'YLim',[min(driver)-.1, max(1, max(driver) *1.1)])
 
-legend(sprintf('Fit RMSE = %5.4f', leda2.analysis0.error.RMSE), sprintf('Driver discreteness = %4.3f', leda2.analysis0.error.discreteness(1)), sprintf('Driver negativity = %4.3f', leda2.analysis0.error.negativity(1)), 'Location','NorthEast');
+legend(sprintf('Driver discreteness = %4.3f', leda2.analysis0.error.discreteness(1)), sprintf('Driver negativity = %4.3f', leda2.analysis0.error.negativity(1)), 'Location','NorthEast');  %sprintf('Fit RMSE = %5.4f', leda2.analysis0.error.RMSE), 
 
 subplot(5,1,5);
 cla; hold on;
@@ -218,18 +218,12 @@ function deconv_apply(scr, event)
 global leda2
 
 %Prepare target data for full resolution analysis
-% if leda2.set.tonicIsConst
-%     leda2.analysis0.target.tonicData = leda2.analysis0.target.groundlevel * ones(size(leda2.data.time.data));
-% else
-%     leda2.analysis0.target.tonicData = ppval(leda2.analysis0.target.tonic_poly, leda2.data.time.data);
-% end
+leda2.analysis0.target.tonicDriver = ppval(leda2.analysis0.target.poly, leda2.data.time.data);
 leda2.analysis0.target.t = leda2.data.time.data;
 leda2.analysis0.target.d = leda2.data.conductance.data;
-%leda2.analysis0.target.phasicData = leda2.analysis0.target.d - leda2.analysis0.tonicData;
 leda2.analysis0.target.sr = leda2.data.samplingrate;
 
-%leda2.set.sigPeak = .003;
-sdeconv_analysis([leda2.analysis0.tau]);
+sdeconv_analysis(leda2.analysis0.tau, 0);
 
 % leda2.analysis0.tonicDriver = leda2.analysis0.target.tonicDriver;
 % leda2.analysis0.tonic_poly = leda2.analysis0.target.tonic_poly;
@@ -242,7 +236,6 @@ leda2.analysis = leda2.analysis0;
 leda2.analysis.method = 'sdeco';
 leda2 = rmfield(leda2, 'analysis0');
 
-%trough2peak_analysis;
 
 add2log(1,'Robust decomposition analysis.',1,1,1)
 leda2.file.version = leda2.intern.version; %work around indicating analysis version of current fit
@@ -261,28 +254,3 @@ file_changed(1);
 refresh_fitinfo;
 refresh_fitoverview;
 showfit;
-
-
-%function trough2peak_analysis
-% global leda2
-%
-% ds = leda2.data.conductance.smoothData;  %smooth(leda2.data.conductance.data, round(leda2.data.samplingrate / 2), 'gauss');
-% t = leda2.data.time.data;
-% [minL, maxL] = get_peaks(ds, 1);
-% dmm = ds(maxL)-ds(minL(1:end-1));
-% tau1 = leda2.analysis.tau(1);
-% tau2 = leda2.analysis.tau(2);
-% if tau1 ~= 0
-%     maxx = tau1 * tau2 * log(tau1/tau2) / (tau1 - tau2);
-%     maxamp = abs(exp(-maxx/tau2) - exp(-maxx/tau1));
-% else
-%     maxamp =  1;
-% end
-% sigc = maxamp/((tau2-tau1)*leda2.data.samplingrate)*leda2.set.sigPeak;
-% minL = minL(dmm >= sigc);
-% maxL = maxL(dmm >= sigc);
-% leda2.analysis.trough2peak.onset = t(minL);
-% leda2.analysis.trough2peak.peaktime = t(maxL);
-% leda2.analysis.trough2peak.onset_idx = minL;
-% leda2.analysis.trough2peak.peaktime_idx = maxL;
-% leda2.analysis.trough2peak.amp = ds(maxL) - ds(minL);

@@ -9,7 +9,7 @@ end
 if strcmp(method, 'nndeco')
     xList = {x0, [.75 40 x0(end)], [.75 60 x0(end)], [.75 2 x0(end)]};
 else
-    xList = {x0, [.75 4], [.75 8], [.75 12]};
+    xList = {x0, [.75 4], [.75 6], [1.5 2], [1.5 4], [1.5 6]};
 end
 
 

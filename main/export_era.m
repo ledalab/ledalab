@@ -65,7 +65,7 @@ leda2.gui.export.text_scrAmplitudeMin = uicontrol('Style','text','Units','normal
 leda2.gui.export.edit_scrAmplitudeMin = uicontrol('Style','edit','Units','normalized','Position',[.5 .5 .1 dy],'BackgroundColor',[1 1 1],'String',num2str(leda2.set.export.SCRmin,'%1.2f'));
 
 leda2.gui.export.butt_savePeaks = uicontrol('Units','normalized','Position',[.1 .2 .3 dy],'String','Export','Callback','export_era(''take_settings'')');
-leda2.gui.export.popm_type = uicontrol('Style','popupmenu','Units','normalized','Position',[.5 .2 .3 dy],'String',{'Matlab-File';'Text-File';'Matlab & Text-File'},'Value',leda2.set.export.savetype);
+leda2.gui.export.popm_type = uicontrol('Style','popupmenu','Units','normalized','Position',[.5 .2 .3 dy],'String',{'Matlab-File';'Text-File'},'Value',leda2.set.export.savetype);
 
 
 
@@ -191,13 +191,13 @@ end %iEvent
 savefname = [leda2.file.filename(1:end-4), '_era'];
 
 %-Matlab Export
-if any(leda2.set.export.savetype == [1,3])
+if leda2.set.export.savetype == 1
     results = era;
     save(savefname,'results');
 end
 
 %-Text Export
-if any(leda2.set.export.savetype == [2,3])
+if leda2.set.export.savetype == 2
     fid = fopen([savefname,'.txt'],'wt');
 
     if isempty(leda2.analysis)

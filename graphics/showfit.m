@@ -69,14 +69,14 @@ if strcmp(leda2.analysis.method,'nndeco')
     kids = get(leda2.gui.rangeview.ax, 'Children');
     fitcomps = kids(1:(leda2.pref.showOvershoot+1)*nPhasics + 1);
     set(fitcomps,'Tag','FitComp');
-    set(leda2.gui.rangeview.ax, 'Children',[kids((length(fitcomps)):end); fitcomps(end:-1:1)]);
+    set(leda2.gui.rangeview.ax, 'Children',[kids((length(fitcomps)+1):end); fitcomps(end:-1:1)]);
 
 else %sdeco
 
     y_phasic = [analysis.phasicData(t_idx) 0 0];
     y_tonic = [analysis.tonicData(t_idx) 0 0];
     
-    leda2.gui.rangeview.phaisc_component = fill(x, y_tonic+y_phasic, [.4 .6 .8], 'linestyle', 'none');
+    leda2.gui.rangeview.phasic_component = fill(x, y_tonic+y_phasic, [.4 .6 .8], 'linestyle', 'none');
     leda2.gui.rangeview.tonic_component = fill(x, y_tonic, [.5 .5 .5], 'linestyle', 'none');
 
     kids = get(leda2.gui.rangeview.ax, 'Children');

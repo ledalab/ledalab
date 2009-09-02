@@ -5,13 +5,14 @@ t = leda2.analysis0.target.t;
 d = leda2.analysis0.target.d;
 sr = leda2.analysis0.target.sr;
 tonicGridSize = leda2.set.tonicGridSize_sdeco;
+nKernel = length(kernel);
 
 
 %Get inter-impulse data index
 iif_idx = [];
 if length(maxL) > 2
-    for i = 2: length(maxL)-1
-        gap_idx = minL(i,2)+1:minL(i+1,1); %+1: removed otherwise no inter-impulse points may be available at highly smoothed data
+    for i = 1: length(maxL)-1
+        gap_idx = minL(i,2):minL(i+1,1); %+1: removed otherwise no inter-impulse points may be available at highly smoothed data
         iif_idx = [iif_idx, gap_idx];
     end
     iif_idx = [minL(2,1), iif_idx, minL(end,2):length(driver)-sr];
@@ -41,7 +42,7 @@ for i = 1:length(groundtime)
     end
     %Estimate groundlevel at groundtime
     if length(find(t_idx)) > 2
-        groundlevel(i) = min(median(iif_data(t_idx)),  d(time_idx(t, groundtime(i))));
+        groundlevel(i) = min(mean(iif_data(t_idx)),  d(time_idx(t, groundtime(i))));
     else  %if no inter-impulses data is available ...
         groundlevel(i) = min(median(driver(grid_idx)),  d(time_idx(t, groundtime(i))));
     end
@@ -52,7 +53,6 @@ groundtime_pre = groundtime;
 groundlevel_pre = groundlevel;
 tonicDriver_pre = tonicDriver;
 
-nKernel = length(kernel);
 tonicData = conv([tonicDriver(1)*ones(1,nKernel), tonicDriver], kernel);
 tonicData = tonicData(nKernel:length(tonicData)-nKernel);
 tonicData_pre = tonicData;

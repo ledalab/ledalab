@@ -18,7 +18,8 @@ t = leda2.data.time.data;
 %Plot
 set(leda2.gui.driver.ax,'Visible','on')
 axes(leda2.gui.driver.ax)
-delete(get(leda2.gui.driver.ax,'Children'));
+ch = get(leda2.gui.driver.ax,'Children');
+delete(ch(strcmp(get(ch,'Tag'),'DriverComp')));
 hold on;
 
 if strcmp(leda2.analysis.method,'nndeco')
@@ -57,6 +58,11 @@ if strcmp(leda2.analysis.method,'nndeco')
 
         end
     end
+    
+     kids = get(leda2.gui.driver.ax, 'Children');
+     drivercomps = kids(1:length(idx)*3+1);
+     set(drivercomps,'Tag','DriverComp');
+%     set(leda2.gui.driver.ax, 'Children',[kids((length(drivercomps)):end); drivercomps(end:-1:1)]);
 
 else
 
@@ -68,6 +74,11 @@ else
     ndriver(ndriver > 0) = 0;
     fill([ts, ts(end) ts(1)], [pdriver,0,0],[.4 .6 .8])
     fill([ts, ts(end) ts(1)], [ndriver,0,0],[1 .8 .8])
+    
+    kids = get(leda2.gui.driver.ax, 'Children');
+    drivercomps = kids(1:2);
+    set(drivercomps,'Tag','DriverComp');
+    %set(leda2.gui.driver.ax, 'Children',[kids((length(drivercomps)+1):end); drivercomps(end:-1:1)]);
 
 end
 

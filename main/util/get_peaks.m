@@ -19,8 +19,9 @@ for i = start_idx+1:length(ccd)
     if sign(ccd(i)) ~= csi
 
         if (isempty(cccri) && csi == 1)   %if first extrema = maximum, insert minimum before
-            [mn, idx] = min(data(1:i-1));
-            cccri =  idx;
+            predataidx = start_idx:i-1;
+            [mn, idx] = min(data(predataidx));
+            cccri =  predataidx(idx);
         end
 
         cccri = [cccri, i];

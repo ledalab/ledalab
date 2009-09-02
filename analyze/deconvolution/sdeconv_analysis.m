@@ -1,8 +1,8 @@
-function [err, x] = sdeconv_analysis(x)
+function [err, x] = sdeconv_analysis(x, estim_tonic)
 global leda2
 
 if nargin < 2
-    tonic_flag = 1;
+    estim_tonic = 1;
 end
 
 %Check Limits
@@ -11,8 +11,8 @@ x(2) = withinlimits(x(2), leda2.set.tauMin, 20);
 if x(2) < x(1)   %tau1 < tau2
     x(1:2) = fliplr(x(1:2));
 end
-if x(1) == x(2)
-    x(2) = x(2) + 10*eps;
+if abs(x(1)-x(2)) < .01
+    %x(2) = x(2) + 10*eps;
     err = 10^10;
     return;
 end
@@ -53,22 +53,29 @@ kernelaftermx = kernel(midx+1:end);
 kernel = [kernel(1:midx), kernelaftermx(kernelaftermx > 10^-5)];
 kernel = kernel / sum(kernel); %normalize to sum = 1
 
-sigc = max(.01, leda2.set.sigPeak/max(kernel)*3);  %threshold for burst peak
+sigc = max(.1, leda2.set.sigPeak/max(kernel)*10);  %threshold for burst peak
 
 %ESTIMATE TONIC
 [driverSC, remainderSC] = deconv([d_ext, d_ext(end)*ones(1,length(kernel)-1)], kernel);
-driverSC_smooth = smooth(driverSC, swin, 'gauss'); 
+driverSC_smooth = smooth(driverSC, swin, 'gauss');
 %Shorten to data range
 driverSC = driverSC(n_prefix+1:end);
 driverSC_smooth = driverSC_smooth(n_prefix+1:end);
 remainderSC = remainderSC(n_prefix+1:length(d)+n_prefix);
 %Inter-impulse fit
-[onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(driverSC_smooth, zeros(size(driverSC_smooth)), 1, sigc*10, round(sr * leda2.set.segmWidth));  %Segmentation of non-extended data!
-[tonicDriver, tonicData] = sdeco_interimpulsefit(driverSC_smooth, kernel, impMin, impMax);
+[onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(driverSC_smooth, zeros(size(driverSC_smooth)), 1, sigc, round(sr * leda2.set.segmWidth));  %Segmentation of non-extended data!
+if estim_tonic
+    [tonicDriver, tonicData] = sdeco_interimpulsefit(driverSC_smooth, kernel, impMin, impMax);
+else
+    tonicDriver = leda2.analysis0.target.tonicDriver;
+    nKernel = length(kernel);
+    tonicData = conv([tonicDriver(1)*ones(1,nKernel), tonicDriver], kernel);
+    tonicData = tonicData(nKernel:length(tonicData) - nKernel);
+end
 
 %Build tonic and phasic data
 phasicData = d - tonicData;
-phasicData(phasicData < 0) = 0;
+%phasicData(phasicData < 0) = 0;
 phasicDriverRaw = driverSC - tonicDriver;
 phasicDriver = smooth(phasicDriverRaw, swin, 'gauss');  %%%
 
@@ -78,13 +85,19 @@ err_MSE = fiterror(data, tonicData+phasicData, 0, 'MSE');
 err_RMSE = sqrt(err_MSE);
 err_chi2 = err_RMSE / leda2.data.conductance.error;
 err1d = deverror(phasicDriver, [0, .2]);
-err1s = succnz(phasicDriver, max(.01, max(phasicDriver)/20), 2);
-err_negativity = sqrt(sum(phasicDriver(phasicDriver < 0).^2)) / length(phasicDriver)*10^3;
+err1s = succnz(phasicDriver, max(.01, max(phasicDriver)/20), 2, sr);
+phasicDriverNeg = phasicDriver;
+phasicDriverNeg(phasicDriverNeg > 0) = 0;
+err_negativity = sqrt(mean(phasicDriverNeg.^2));
 %err1s = mean((diff(impMin')/sr).^2);
 %nSCR_per_min = length(onset_idx)/t_ext(end)*60;
 
 %CRITERION
-err = (1+ err_RMSE) * (1 + err_negativity) * (1 + err1s) - 1;  %compound err criterion to be optimized
+alpha = 1;
+%err = (1 + err_negativity * alpha) * (1 + err1s) - 1;  %compound err criterion to be optimized
+err = err_negativity * alpha + err1s;
+
+%(1+ err_RMSE) *
 
 %SAVE VARS
 leda2.analysis0.tau = tau;

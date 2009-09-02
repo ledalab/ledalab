@@ -92,6 +92,15 @@ set(leda2.gui.rangeview.ax, 'XLim', [rg_start, rg_end], 'Color',[.95 .95 1]); %,
 set(get(leda2.gui.rangeview.ax,'XLabel'),'String','Time [sec]')
 set(get(leda2.gui.rangeview.ax,'YLabel'),'String','Skin Conductance [\muS]')
 
+%Driver
+axes(leda2.gui.driver.ax)
+cla; hold on;
+for ev = 1:events.N
+    ev_x = events.event(ev).time;
+    leda2.gui.driver.markerL(ev) = plot([ev_x ev_x], [-100,100], '-','Color',[1 0 .3],'ButtonDownFcn','leda_click(2)');
+end
+
+
 refresh_fitinfo;
 change_range;
 %refresh_progressinfo;
