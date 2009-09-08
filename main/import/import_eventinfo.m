@@ -4,7 +4,7 @@ global leda2
 
 [filename, pathname] = uigetfile({'*.txt';'*.dat'},'Choose a Eventinfo-file');
 
-if all(filename == 0) | all(pathname == 0) %Cancel
+if all(filename == 0) || all(pathname == 0) %Cancel
     return
 end
 
@@ -38,7 +38,7 @@ if ~isempty(event)
 
     %plot updated event-names
     for ev = 1:N
-        set(leda2.gui.rangeview.eventtxt(ev),'String',sprintf('%.1f:  %s %s',leda2.data.events.event(ev).time ,num2str(leda2.data.events.event(ev).nid), leda2.data.events.event(ev).name));
+        set(leda2.gui.rangeview.eventtxt(ev),'String',sprintf('%.1f:  %s (%s)',leda2.data.events.event(ev).time, leda2.data.events.event(ev).name), num2str(leda2.data.events.event(ev).nid));
     end
 
 end

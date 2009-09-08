@@ -82,7 +82,7 @@ if ~leda2.intern.batchmode
     leda2.gui.deconv.edit_tau2 = uicontrol('Style','edit','Units','normalized','Position',[.18 .04 .05 .03],'String',leda2.analysis0.tau(2));  %tmp_tau2
     %leda2.gui.deconv.edit_dist0 = uicontrol('Style','edit','Units','normalized','Position',[.26 .04 .05 .03],'String',leda2.analysis0.dist0);  %tmp_dist0
 
-    leda2.gui.deconv.text_smoothWinSize = uicontrol('Style','text','Units','normalized','Position',[.34 .065 .05 .02],'String','Smooth-Win (8 SD of Gauss) [sec]','BackgroundColor',get(gcf,'Color'));
+    leda2.gui.deconv.text_smoothWinSize = uicontrol('Style','text','Units','normalized','Position',[.31 .065 .08 .025],'String','Smooth-Win [sec]  (SD of Gauss)','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.text_gridsize = uicontrol('Style','text','Units','normalized','Position',[.34 .035 .05 .02],'String','Grid-Size','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.text_sigPeak = uicontrol('Style','text','Units','normalized','Position',[.34 .005 .05 .02],'String','Sig-Peak','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.edit_smoothWinSize = uicontrol('Style','edit','Units','normalized','Position',[.4 .07 .05 .02],'String',leda2.analysis0.smoothwin);

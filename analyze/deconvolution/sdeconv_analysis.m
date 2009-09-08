@@ -24,7 +24,7 @@ tau(2) = x(2);
 data = leda2.analysis0.target.d; %leda2.data.conductance.data;
 t = leda2.analysis0.target.t;  %leda2.data.time.data;
 sr = leda2.analysis0.target.sr;  %leda2.data.samplingrate;
-smoothwin = leda2.analysis0.smoothwin;  %%%
+smoothwin = leda2.analysis0.smoothwin * 8;  %%% Gauss 8 SD
 dt = 1/sr;
 winwidth_max = 3; %sec
 swin = round(min(smoothwin, winwidth_max) * sr);
@@ -94,8 +94,8 @@ err_negativity = sqrt(mean(phasicDriverNeg.^2));
 
 %CRITERION
 alpha = 1;
-%err = (1 + err_negativity * alpha) * (1 + err1s) - 1;  %compound err criterion to be optimized
-err = err_negativity * alpha + err1s;
+err = (1 + err_negativity * alpha) * (1 + err1s) - 1;  %compound err criterion to be optimized
+%err = err_negativity * alpha + err1s;
 
 %(1+ err_RMSE) *
 

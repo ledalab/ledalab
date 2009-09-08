@@ -77,7 +77,7 @@ if ~leda2.intern.batchmode
     leda2.gui.deconv.edit_tau2 = uicontrol('Style','edit','Units','normalized','Position',[.18 .04 .05 .03],'String',leda2.analysis0.tau(2));  %tmp_tau2
     leda2.gui.deconv.edit_dist0 = uicontrol('Style','edit','Units','normalized','Position',[.26 .04 .05 .03],'String',leda2.analysis0.dist0);  %tmp_dist0
     
-    leda2.gui.deconv.text_smoothWinSize = uicontrol('Style','text','Units','normalized','Position',[.34 .065 .05 .02],'String','Smooth-Win','BackgroundColor',get(gcf,'Color'));
+    leda2.gui.deconv.text_smoothWinSize = uicontrol('Style','text','Units','normalized','Position',[.325 .065 .08 .025],'String','Smooth-Win [sec]  (SD of Gauss)','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.text_gridsize = uicontrol('Style','text','Units','normalized','Position',[.34 .035 .05 .02],'String','Grid-Size','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.text_sigPeak = uicontrol('Style','text','Units','normalized','Position',[.34 .005 .05 .02],'String','Sig-Peak','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.edit_smoothWinSize = uicontrol('Style','edit','Units','normalized','Position',[.4 .07 .05 .02],'String',leda2.analysis0.smoothwin);
@@ -97,9 +97,11 @@ if ~leda2.intern.batchmode
 else
 
     [err, x] = deconv_analysis([leda2.analysis0.tau, leda2.analysis0.dist0]);  %set dist0
-    [leda2.analysis0.tau, leda2.analysis0.dist0, leda2.analysis0.opt_history] = deconv_optimize(x, nr_iv,'nndeco');
+    [xopt, leda2.analysis0.opt_history] = deconv_optimize(x, nr_iv, 'nndeco');
+    leda2.analysis0.tau = xopt(1:2);
+    leda2.analysis0.dist0 = xopt(3);
     deconv_apply;
-
+    
 end
 
 
@@ -272,8 +274,6 @@ leda2.analysis0 = rmfield(leda2.analysis0, 'target');
 leda2.analysis = leda2.analysis0;
 leda2.analysis.method = 'nndeco';
 leda2 = rmfield(leda2, 'analysis0');
-
-%trough2peak_analysis;
 
 add2log(1,'Decomposition analysis.',1,1,1)
 leda2.file.version = leda2.intern.version;

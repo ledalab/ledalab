@@ -63,6 +63,8 @@ if strcmp(leda2.analysis.method,'nndeco')
      drivercomps = kids(1:length(idx)*3+1);
      set(drivercomps,'Tag','DriverComp');
 %     set(leda2.gui.driver.ax, 'Children',[kids((length(drivercomps)):end); drivercomps(end:-1:1)]);
+set(get(leda2.gui.driver.ax,'YLabel'),'String','Driver / Overshoot [ \muS]')
+
 
 else
 
@@ -79,6 +81,7 @@ else
     drivercomps = kids(1:2);
     set(drivercomps,'Tag','DriverComp');
     %set(leda2.gui.driver.ax, 'Children',[kids((length(drivercomps)+1):end); drivercomps(end:-1:1)]);
+    set(get(leda2.gui.driver.ax,'YLabel'),'String','Phasic Driver [\muS]')
 
 end
 

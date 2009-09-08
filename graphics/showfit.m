@@ -49,7 +49,7 @@ if strcmp(leda2.analysis.method,'nndeco')
             overshoot(ons_idx:ons_idx + length(ovs)-1) = ovs;
             overshoot = overshoot(N_ext-N+1:end);
 
-            y_phasic_ovs = analysis.phasicRemainder{iPhasic+2} + analysis.phasicComponent{iPhasic+2};
+            y_phasic_ovs = analysis.phasicRemainder{iPhasic} + analysis.phasicComponent{iPhasic};
             y_phasic = y_phasic_ovs - overshoot;
 
             y_phasic_ovs = [y_phasic_ovs(t_idx) 0 0];
@@ -58,7 +58,7 @@ if strcmp(leda2.analysis.method,'nndeco')
             fill(x, y_tonic + y_phasic_ovs, col2, 'linestyle', 'none');
 
         else
-            y_phasic = analysis.phasicRemainder{iPhasic+2} + analysis.phasicComponent{iPhasic+2};
+            y_phasic = analysis.phasicRemainder{iPhasic} + analysis.phasicComponent{iPhasic};
             y_phasic = [y_phasic(t_idx) 0 0];
             fill(x, y_tonic + y_phasic, col, 'linestyle', 'none');
 

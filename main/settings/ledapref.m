@@ -16,15 +16,11 @@ leda2.gui.set.text_showSmoothData = uicontrol('Style','text','Units','normalized
 leda2.gui.set.chbx_showSmoothData = uicontrol('Style','checkbox','Units','normalized','Position',[dw(2) ds-(dy+dy2)*1 .026 dy],'Value', leda2.pref.showSmoothData,'FontUnits','normalized','FontSize',fs(1));
 leda2.gui.set.text_showMinMax = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*2 .5 dy],'String','Show Min/Max:','FontUnits','normalized','FontSize',fs(1),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
 leda2.gui.set.chbx_showMinMax = uicontrol('Style','checkbox','Units','normalized','Position',[dw(2) ds-(dy+dy2)*2 .026 dy],'Value', leda2.pref.showMinMax,'FontUnits','normalized','FontSize',fs(1));
+leda2.gui.set.text_showOvershoot = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*3 .5 dy],'String','Show Overshoot (PO) in data recomposition:','FontUnits','normalized','FontSize',fs(1),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
+leda2.gui.set.chbx_showOvershoot = uicontrol('Style','checkbox','Units','normalized','Position',[dw(2) ds-(dy+dy2)*3 .026 dy],'Value', leda2.pref.showOvershoot,'FontUnits','normalized','FontSize',fs(1));
 % leda2.gui.set.text_eventWindow = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*3 .5 dy],'String','Event window (time before/after event) [sec]:','FontUnits','normalized','FontSize',fs(1),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
 % leda2.gui.set.edit_eventWindow1 = uicontrol('Style','edit','Units','normalized','Position',[dw(2) ds-(dy+dy2)*3 dx dy],'String', leda2.pref.eventWindow(1),'FontUnits','normalized','FontSize',fs(1));
 % leda2.gui.set.edit_eventWindow2 = uicontrol('Style','edit','Units','normalized','Position',[dw(3) ds-(dy+dy2)*3 dx dy],'String', leda2.pref.eventWindow(2),'FontUnits','normalized','FontSize',fs(1));
-
-% leda2.gui.set.text_updateOptimize = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*5 .5 dy],'String','Optimization Graphics','FontUnits','normalized','FontSize',fs(2),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'),'FontWeight','bold');
-% leda2.gui.set.text_showEpochfringe = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*6 .5 dy],'String','Show extended error section:','FontUnits','normalized','FontSize',fs(1),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
-% leda2.gui.set.chbx_showEpochfringe = uicontrol('Style','checkbox','Units','normalized','Position',[dw(2) ds-(dy+dy2)*6 .026 dy],'Value', leda2.pref.showEpochFringe,'FontUnits','normalized','FontSize',fs(1));
-% leda2.gui.set.text_updateFit = uicontrol('Style','text','Units','normalized','Position',[dw(1) ds-(dy+dy2)*7 .5 dy],'String','Refresh fit:','FontUnits','normalized','FontSize',fs(1),'HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
-% leda2.gui.set.popm_updateFit = uicontrol('Style','popupmenu','Units','normalized','Position',[dw(2) ds-(dy+dy2)*7 dx*2+.03 dy],'String', {'Never';'Every Epoch';'Every improvement'},'Value',leda2.pref.updateFit,'FontUnits','normalized','FontSize',fs(1));
 
 leda2.gui.set.butt_apply = uicontrol('Style','pushbutton','Units','normalized','Position',[.75 .05 .15 .06],'String', 'Apply','Callback',@apply,'FontUnits','normalized');
 
@@ -37,10 +33,7 @@ global leda2
 %get initial values
 leda2.pref.showSmoothData = get(leda2.gui.set.chbx_showSmoothData,'Value');
 leda2.pref.showMinMax = get(leda2.gui.set.chbx_showMinMax,'Value');
-% leda2.pref.eventWindow(1) = str2double(get(leda2.gui.set.edit_eventWindow1,'String'));
-% leda2.pref.eventWindow(2) = str2double(get(leda2.gui.set.edit_eventWindow2,'String'));
-% leda2.pref.showEpochFringe = get(leda2.gui.set.chbx_showEpochfringe,'Value');
-% leda2.pref.updateFit = get(leda2.gui.set.popm_updateFit,'Value');
+leda2.pref.showOvershoot = get(leda2.gui.set.chbx_showOvershoot,'Value');
 
 close(leda2.gui.set.fig)
 

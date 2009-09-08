@@ -27,7 +27,7 @@ leda2.analysis = [];
 %LEDASET
 %NNDECO
 leda2.set.template = 2;
-leda2.set.smoothwin = 1.6;
+leda2.set.smoothwin = .2;
 leda2.set.tonicGridSize = 60;
 leda2.set.sigPeak = .001;
 leda2.set.d0Autoupdate = 1;
@@ -39,7 +39,7 @@ leda2.set.tau0 = [.75 20];
 leda2.set.tonicGridSize_sdeco = 10;
 leda2.set.tau0_sdeco = [.75 2];
 leda2.set.d0Autoupdate_sdeco = 0;
-leda2.set.smoothwin_sdeco = 1.6;
+leda2.set.smoothwin_sdeco = .2;
 
 
 % get peaks
@@ -62,7 +62,7 @@ leda2.set.export.savetype = 1;
 %Ledapref
 leda2.pref.showSmoothData = 0;
 leda2.pref.showMinMax = 0;
-leda2.pref.showOvershoot = 0;
+leda2.pref.showOvershoot = 1;
 %not settable inside of Ledalab
 leda2.pref.eventWindow = [5, 15];
 leda2.pref.oldfile_maxn = 5;

@@ -60,7 +60,7 @@ leda2.gui.menu.menu_3b  = uimenu(leda2.gui.menu.menu_3,'Label','Visual settings'
 %-Analyze
 leda2.gui.menu.menu_4  = uimenu(leda2.gui.fig_main,'Label','Analysis');
 leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Decomposition Analysis (Nonnegative decovolution)','Callback','nndeco');
-leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Continuous Decomposition Analysis (Standard deconvolution) - beta version -','Callback','sdeco');
+leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Continuous Decomposition Analysis (Standard deconvolution)','Callback','sdeco');
 leda2.gui.menu.menu_4f = uimenu(leda2.gui.menu.menu_4,'Label','Delete analysis','Callback','delete_fit(1)','Separator','on');
 
 %-Tools
