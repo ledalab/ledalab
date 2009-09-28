@@ -15,5 +15,6 @@ conductance = conductance(1:min(n1, n2));
 for i = 1:length(file.Markers)
     event(i).time = file.Markers(i).Position / file.SampleRate;
     event(i).name = file.Markers(i).Type;
-    event(i).nid = str2double(file.Markers(i).Description);
+    num = regexp(file.Markers(i).Description, '[0-9]');   % By Christoph Berger
+    event(i).nid = str2double(file.Markers(i).Description(num));   
 end

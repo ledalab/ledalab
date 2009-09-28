@@ -40,7 +40,7 @@ if leda2.file.version <= 3.11
     leda2.analysis.method = 'nndeco';
 
 
-else %V3.1.2+
+else %V3.2.0+
 
     if strcmp(leda2.analysis.method,'nndeco')
 
@@ -73,8 +73,8 @@ else %V3.1.2+
             phasicRemainder(i+1) = {phasicRemainder{i} + impResp};
         end
 
-        leda2.analysis.phasicComponent = phasicComponent;
-        leda2.analysis.phasicRemainder = phasicRemainder;
+        leda2.analysis.phasicComponent = phasicComponent(length(leda2.analysis.prefix.onset_idx)+1:end);
+        leda2.analysis.phasicRemainder = phasicRemainder(length(leda2.analysis.prefix.onset_idx)+1:end);
 
     else %method = sdeco
     %nothing to do

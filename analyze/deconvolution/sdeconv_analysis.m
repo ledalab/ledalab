@@ -11,10 +11,8 @@ x(2) = withinlimits(x(2), leda2.set.tauMin, 20);
 if x(2) < x(1)   %tau1 < tau2
     x(1:2) = fliplr(x(1:2));
 end
-if abs(x(1)-x(2)) < .01
-    %x(2) = x(2) + 10*eps;
-    err = 10^10;
-    return;
+if abs(x(1)-x(2)) < leda2.set.tauMinDiff
+    x(2) = x(2) + leda2.set.tauMinDiff;
 end
 
 tau(1) = x(1);

@@ -46,9 +46,9 @@ leda2.set.smoothwin_sdeco = .2;
 leda2.set.initVal.hannWinWidth = .5;
 leda2.set.initVal.signHeight = .01;
 leda2.set.initVal.groundInterp = 'spline'; %'pchip' keeps only S(x)' continuous
-leda2.set.tauMin = 0; %.1
+leda2.set.tauMin = .001; %.1
 leda2.set.tauMax = 100;
-leda2.set.tauMinDiff = .001;
+leda2.set.tauMinDiff = .01;
 leda2.set.dist0_min = .001;
 % %leda2.set.downsampleType
 % %Export (ERA)

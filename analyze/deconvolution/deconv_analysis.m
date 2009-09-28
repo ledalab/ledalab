@@ -8,10 +8,8 @@ x(3) = withinlimits(x(3), leda2.set.dist0_min, leda2.data.conductance.min);
 if x(2) < x(1)   %tau1 < tau2
     x(1:2) = fliplr(x(1:2));
 end
-if x(1) == x(2)
-    x(2) = x(2) + 10*eps;
-    err = 10^10;
-    return;
+if abs(x(1)-x(2)) < leda2.set.tauMinDiff
+    x(2) = x(2) + leda2.set.tauMinDiff;
 end
 
 tau(1) = x(1);
@@ -45,6 +43,7 @@ t_ext = [fliplr(t_ext), t];
 tb = t_ext - t_ext(1) + dt;
 kernel = bateman_gauss(tb, 0, 0, tau(1), tau(2), 0);
 kernel = kernel / sum(kernel); %normalize to sum = 1
+kernel(kernel == 0) = 10*eps;
 
 sigc = max(.01, 2*leda2.set.sigPeak/max(bg));  %threshold for burst peak
 %sigc = max(.01, leda2.set.sigPeak/(5*max(kernel)));  %replaced because max(kernel) is dependent of sr
