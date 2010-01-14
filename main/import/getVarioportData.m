@@ -50,13 +50,15 @@ eventIdx = find(vario.marker.data > 0 & diff([0;vario.marker.data]) & diff([vari
 
 %allocating
 event= struct('time', {}, 'nid', {},'name', {});
-event(length(eventIdx)).nid=0;
-%events
-for iEvent = 1:length(eventIdx)
-    iEventIdx = eventIdx(iEvent);
-    event(iEvent).time = vario.marker.time(iEventIdx);
-    event(iEvent).nid = vario.marker.data(iEventIdx);
-    event(iEvent).name = num2str(vario.marker.data(iEventIdx));
+if ~isempty(eventIdx)
+    event(length(eventIdx)).nid=0;
+    %events
+    for iEvent = 1:length(eventIdx)
+        iEventIdx = eventIdx(iEvent);
+        event(iEvent).time = vario.marker.time(iEventIdx);
+        event(iEvent).nid = vario.marker.data(iEventIdx);
+        event(iEvent).name = num2str(vario.marker.data(iEventIdx));
+    end
 end
 
 clear vario;

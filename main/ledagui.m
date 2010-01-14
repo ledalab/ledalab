@@ -5,8 +5,8 @@ global leda2
 %-File
 leda2.gui.fig_main = figure('Units','normalized','Position',[.00 .03 1 .92],'Name',[leda2.intern.name,' ',leda2.intern.versiontxt],'KeyPressFcn','leda_keypress',...
     'MenuBar','none','NumberTitle','off','Color',leda2.gui.col.fig,'CloseRequestFcn','exit_leda');
-if ispc
-    maximize(leda2.gui.fig_main); %not compatible with Mac
+if isequal(computer, 'PCWIN')
+   maximize(leda2.gui.fig_main); %not compatible with Mac and 64 bits systems
 end
 leda2.gui.menu.menu_1  = uimenu(leda2.gui.fig_main,'Label','File');
 leda2.gui.menu.menu_1a = uimenu(leda2.gui.menu.menu_1,'Label','Open','Callback','open_ledafile;','Accelerator','o');   %
@@ -59,8 +59,8 @@ leda2.gui.menu.menu_3b  = uimenu(leda2.gui.menu.menu_3,'Label','Visual settings'
 
 %-Analyze
 leda2.gui.menu.menu_4  = uimenu(leda2.gui.fig_main,'Label','Analysis');
-leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Decomposition Analysis (Nonnegative decovolution)','Callback','nndeco');
-leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Continuous Decomposition Analysis (Standard deconvolution)','Callback','sdeco');
+leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Discrete Decomposition Analysis  (Extraction of Discrete Phasic/Tonic Components based on Nonnegative decovolution)','Callback','nndeco');
+leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Continuous Decomposition Analysis  (Extraction of Continuous Phasic/Tonic Activity based on Standard deconvolution)','Callback','sdeco');
 leda2.gui.menu.menu_4f = uimenu(leda2.gui.menu.menu_4,'Label','Delete analysis','Callback','delete_fit(1)','Separator','on');
 
 %-Tools

@@ -86,14 +86,15 @@ err1d = deverror(phasicDriver, [0, .2]);
 err1s = succnz(phasicDriver, max(.01, max(phasicDriver)/20), 2, sr);
 phasicDriverNeg = phasicDriver;
 phasicDriverNeg(phasicDriverNeg > 0) = 0;
+err_discreteness = err1s;
 err_negativity = sqrt(mean(phasicDriverNeg.^2));
 %err1s = mean((diff(impMin')/sr).^2);
 %nSCR_per_min = length(onset_idx)/t_ext(end)*60;
 
 %CRITERION
-alpha = 1;
-err = (1 + err_negativity * alpha) * (1 + err1s) - 1;  %compound err criterion to be optimized
-%err = err_negativity * alpha + err1s;
+alpha = 5;
+%err = (err_discreteness + 1)*(err_negativity * alpha + 1) - 1;  %compound err criterion to be optimized
+err = err_discreteness + err_negativity * alpha;
 
 %(1+ err_RMSE) *
 
@@ -113,6 +114,6 @@ leda2.analysis0.error.MSE = err_MSE;
 leda2.analysis0.error.RMSE = err_RMSE;
 leda2.analysis0.error.chi2 = err_chi2;
 leda2.analysis0.error.deviation = [err1d, 0];
-leda2.analysis0.error.discreteness = [err1s, 0];
+leda2.analysis0.error.discreteness = [err_discreteness, 0];
 leda2.analysis0.error.negativity = err_negativity;
 leda2.analysis0.error.compound = err;

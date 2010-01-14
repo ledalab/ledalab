@@ -4,7 +4,7 @@ global leda2
 %parse batch-mode arguments and check thei validity
 [pathname, open_datatype, downsample_factor, do_fit, do_optimize, export_era_settings, do_save_overview] = parse_arguments(varargin{:});
 
-if ~(downsample_factor > 1 | do_fit | do_optimize | any(export_era_settings) | do_save_overview)
+if ~(downsample_factor > 1 || do_fit || do_optimize || any(export_era_settings) || do_save_overview)
     disp('No valid operations for Batch-mode defined.')
     return;
 end
@@ -16,6 +16,15 @@ nFile = length(dirL);
 add2log(1,['Starting Ledalab batch for ',pathname,' (',num2str(nFile),' file/s)'],1,0,0,1)
 pathname = fileparts(pathname);
 leda2.current.batchmode.file = [];
+leda2.current.batchmode.command.pathname = pathname;
+leda2.current.batchmode.command.method = do_fit;
+leda2.current.batchmode.command.optimize = export_era_settings;
+leda2.current.batchmode.command.overview = do_save_overview;
+leda2.current.batchmode.command.export_era = do_fit;
+leda2.current.batchmode.start = datestr(now, 21);
+leda2.current.batchmode.version = leda2.intern.version;
+leda2.current.batchmode.settings = leda2.set;
+tic
 
 for iFile = 1:nFile
     filename = dirL(iFile).name;
@@ -47,7 +56,8 @@ for iFile = 1:nFile
             elseif do_fit == 2
                 sdeco(do_optimize);
             end
-            leda2.current.batchmode.file(iFile).error = leda2.analysis.error;
+            leda2.current.batchmode.file(iFile).tau = leda2.analysis.tau;
+            leda2.current.batchmode.file(iFile).error = leda2.analysis.error;            
         end
 
         %Export
@@ -74,8 +84,14 @@ for iFile = 1:nFile
         add2log(1,'ERROR !!!',1,0,0,1)
     end
 
-
 end
+
+leda2.current.batchmode.processing_time = toc;
+protocol = leda2.current.batchmode;
+save([pathname,'\','batchmode_protocol'],'protocol');
+
+
+
 
 
 
