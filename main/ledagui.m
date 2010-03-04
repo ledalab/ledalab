@@ -4,10 +4,8 @@ global leda2
 %Menu
 %-File
 leda2.gui.fig_main = figure('Units','normalized','Position',[.00 .03 1 .92],'Name',[leda2.intern.name,' ',leda2.intern.versiontxt],'KeyPressFcn','leda_keypress',...
-    'MenuBar','none','NumberTitle','off','Color',leda2.gui.col.fig,'CloseRequestFcn','exit_leda');
-if isequal(computer, 'PCWIN')
-   maximize(leda2.gui.fig_main); %not compatible with Mac and 64 bits systems
-end
+    'MenuBar','none','NumberTitle','off','Color',leda2.gui.col.fig,'CloseRequestFcn','exit_leda');  %,'outerposition',[0 0 1 1]
+
 leda2.gui.menu.menu_1  = uimenu(leda2.gui.fig_main,'Label','File');
 leda2.gui.menu.menu_1a = uimenu(leda2.gui.menu.menu_1,'Label','Open','Callback','open_ledafile;','Accelerator','o');   %
 leda2.gui.menu.menu_1b = uimenu(leda2.gui.menu.menu_1,'Label','Import Data...'); %,'Accelerator','i'
@@ -110,7 +108,7 @@ leda2.gui.driver.ax = axes('Units','normalized','Position',[x1 .02 x2-x1 y7-y8],
 set(get(leda2.gui.driver.ax,'YLabel'),'String','Phasic Driver [\muS]')
 
 %Overview-Info (= Data Info Display)
-dy = .40; 
+dy = .40;
 x3a = x3 + .04; x3b = x3 + .13;
 leda2.gui.frame = uicontrol('Units','normalized','Style','frame','Position',[x3 dy x4-x3 .3],'String','Frame Ov','BackgroundColor',leda2.gui.col.frame1);
 leda2.gui.text_title = uicontrol('Units','normalized','Style','text','Position',[x3a+.01 dy+.03*8 .08 .012],'String','DATA ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1,'FontWeight','bold');
@@ -147,3 +145,9 @@ leda2.gui.eventinfo.txt_niduserdata  = uicontrol('Units','normalized','Style','t
 
 %Session History Display
 leda2.gui.infobox = uicontrol('Units','normalized','Style','listbox','Position',[x3 y8 x4-x3 y7-y8],'Max',2,'String','','HorizontalAlignment','left','FontSize',7);
+
+%Maximize Figure (Version 7.4+ only)
+m_version = version;
+if str2double(m_version(1:3)) > 7.4
+    maxfig(leda2.gui.fig_main,1);
+end

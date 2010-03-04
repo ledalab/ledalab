@@ -1,5 +1,6 @@
 function [time, conductance, event] = getVarioportData(filename)
 %Import Varioport data
+%Contributed by Christoph Berger
 
 %open file
 fid = fopen(filename,'r','b'); %big-endian byte ordering
