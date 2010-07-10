@@ -120,7 +120,7 @@ for iEvent = 1:leda2.data.events.N
     era(iEvent).nndeconv.scr_latency = NaN;
     era(iEvent).nndeconv.tonic = NaN;  %average tonic level
     %Measures yielded by (robust) standard deconvolution
-    era(iEvent).sdeconv.phasic_area = NaN;  %phasic driver area (integral over response window)
+    era(iEvent).sdeconv.ISCR = NaN;  %phasic driver area (time integral over response window)
     era(iEvent).sdeconv.phasic_max = NaN;   %Driver maximum within response window
     era(iEvent).sdeconv.phasic_amp = NaN;   %SCR amp resulting from phasic segment re-convoluted with driver impulse
     era(iEvent).sdeconv.tonic = NaN;   %average tonic level
@@ -169,7 +169,8 @@ for iEvent = 1:leda2.data.events.N
 
         elseif strcmp(leda2.analysis.method,'sdeco')
             %SDECO
-            era(iEvent).sdeconv.phasic_area = max(0, sum(leda2.analysis.driver(idx_respwin))/sr);  %  mean() == sum()/(sr*winsize)  would result in real muS/sec
+            era(iEvent).sdeconv.ISCR = max(0, sum(leda2.analysis.driver(idx_respwin))/sr);  % ISCR = phasic_area  [muS*sec]
+            %  mean() == sum()/(sr*winsize)  [muS]
             era(iEvent).sdeconv.phasic_max = max(0, max(leda2.analysis.driver(idx_respwin)));
             sc_reconv = conv(leda2.analysis.driver(idx_respwin), leda2.analysis.kernel);
             if max(sc_reconv) >= scrAmplitudeMin
@@ -216,10 +217,10 @@ if leda2.set.export.savetype == 2
             end
 
         elseif strcmp(leda2.analysis.method,'sdeco')
-            fprintf(fid,'EvNr\tPhasicArea\tPhasicMax\tPhasicAmp\tTonic\tnSCR_ttp\tAmpSum_ttp\tOnset1_ttp\tMean\tMaxDeflection\tEventNId\tEventName\n');
+            fprintf(fid,'EvNr\tISCR\tPhasicMax\tPhasicAmp\tTonic\tnSCR_ttp\tAmpSum_ttp\tOnset1_ttp\tMean\tMaxDeflection\tEventNId\tEventName\n');
             for i = 1:leda2.data.events.N
                 fprintf(fid,'%3.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\n',...
-                    i, era(i).sdeconv.phasic_area, era(i).sdeconv.phasic_max, era(i).sdeconv.phasic_amp, era(i).sdeconv.tonic, era(i).ttp.scr_nr, era(i).ttp.scr_ampsum, era(i).ttp.scr_latency, era(i).global.mean, era(i).global.max_deflection, era(i).event_nid, era(i).event_name);
+                    i, era(i).sdeconv.ISCR, era(i).sdeconv.phasic_max, era(i).sdeconv.phasic_amp, era(i).sdeconv.tonic, era(i).ttp.scr_nr, era(i).ttp.scr_ampsum, era(i).ttp.scr_latency, era(i).global.mean, era(i).global.max_deflection, era(i).event_nid, era(i).event_name);
             end
 
         end

@@ -4,6 +4,7 @@ leda2.current.fileopen_ok = 0;
 
 switch datatype
     case 'biotrace', ext = {'*.txt'};
+    case 'biopac', ext = {'*.acq'};
     case 'cassylab', ext = {'*.lab'};
     case 'varioport', ext = {'*.vpd'};
     case 'visionanalyzer', ext = {'*.mat'};
@@ -48,6 +49,9 @@ try
             
         case 'biotrace'
             [time, conductance, event] = getBiotraceData(file);
+            
+        case 'biopac'
+            [time, conductance, event] = getBiopacData(file);
 
         case 'cassylab',
             [time, conductance, event] = getcassydata(file);

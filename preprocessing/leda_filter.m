@@ -4,8 +4,8 @@ global leda2
 if nargin == 0 %batchmode
 
     fig = figure('Units','normalized','Position',[.3 .3 .3 .1],'Menubar','None','Name','Filter','Numbertitle','Off','Resize','Off');
-    uicontrol('Units','normalized','Style','Text','Position',[.1 .6 .2 .15],'String','Window width:','HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
-    edit_lowercuttoff = uicontrol('Units','normalized','Style','edit','Position',[.3 .6 .1 .2],'String', 0);
+    uicontrol('Units','normalized','Style','Text','Position',[.1 .6 .2 .15],'String','Lower/Upper cutoff frequency:','HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
+    edit_lowercuttoff = uicontrol('Units','normalized','Style','edit','Position',[.3 .6 .1 .2],'String', 1);
     edit_uppercuttoff = uicontrol('Units','normalized','Style','edit','Position',[.5 .6 .1 .2],'String', round(leda2.data.samplingrate/2));
     filterTypeL = {'butterworth'};
     uicontrol('Units','normalized','Style','Text','Position',[.1 .2 .2 .25],'String','Type:','HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));

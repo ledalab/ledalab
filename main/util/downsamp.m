@@ -1,6 +1,6 @@
 function [t, data] = downsamp(t, data, fac, type)
 
-N = length(data); %#samples
+N = length(data); % #samples
 if strcmp(type,'step')
     t = t(1:fac:end);
     data = data(1:fac:end);

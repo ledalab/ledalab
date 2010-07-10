@@ -31,20 +31,9 @@ else
     cond_rg.min = min(leda2.analysis.tonicData(subrange_idx(time.data, rgview.start, rgview.start + rgview.range)));
 end
 cond_rg.max = max(cond_rg.data);
-cond_rg.height_diff = cond_rg.max - cond_rg.min;
-scale_border = .25;
-cond_rg.yrange = max(leda2.pref.scalewidth_min, cond_rg.height_diff + 2 * scale_border);
-%if (cond_rg.height_diff+2*scale_border) < leda2.pref.scalewidth_min
-%    scale_border = (leda2.pref.scalewidth_min - cond_rg.height_diff)/2;
-%end
-
-if isempty(leda2.analysis)
-    rg_bottom = max(0, cond_rg.min - scale_border);
-else
-    rg_bottom = max(cond_rg.min - scale_border, 0);
-end
-%rg_top = cond_rg.max + scale_border;
-rg_top = rg_bottom + cond_rg.yrange;
+cond_rg.yrange = (cond_rg.max - cond_rg.min)*1.2;  %+20%
+rg_bottom = (cond_rg.max + cond_rg.min)/2 - cond_rg.yrange/2;
+rg_top = (cond_rg.max + cond_rg.min)/2 + cond_rg.yrange/2;
 rgview.bottom = rg_bottom;
 rgview.top = rg_top;
 rg_start = rgview.start;
@@ -102,6 +91,10 @@ if leda2.data.events.N > 0
     end
 end
 leda2.gui.eventinfo.showEvent = 0;
+
+%Driver
+set(leda2.gui.driver.ax, 'XLim', [rg_start, rg_end], 'Ylim', [rg_bottom, rg_top]);
+
 
 %%%%
 %%%%

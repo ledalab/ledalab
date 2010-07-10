@@ -7,9 +7,9 @@ if nr_iv == 0
 end
 
 if strcmp(method, 'nndeco')
-    xList = {x0, [.75 40 x0(end)], [.75 60 x0(end)], [.75 2 x0(end)]};
+    xList = {x0, [.5 20 x0(end)], [.5 40 x0(end)], [.5 60 x0(end)], [.5 2 x0(end)], [.75 20 x0(end)], [.75 40 x0(end)], [.75 60 x0(end)], [.75 2 x0(end)]};
 else
-    xList = {x0, [.75 4], [.75 6], [1.5 2], [1.5 4], [1.5 6]};
+    xList = {x0, [1 2], [1 6], [1 8], [.5 2], [.5 4], [.5 6], [.5 8]};
 end
 
 
@@ -31,4 +31,4 @@ end
 [mn, idx] = min(err_opt);
 
 xopt = x_opt{idx};
-add2log(0, ['Optimized parameter: ',sprintf(' %5.2f\t',xopt),sprintf(' Error: %6.3f',mn)], 0,1,1,1,0)
+add2log(0, ['Final optimized parameter: ',sprintf(' %5.2f\t',xopt),sprintf(' Error: %6.3f',mn)], 0,1,1,1,0)

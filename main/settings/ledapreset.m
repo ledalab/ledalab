@@ -33,11 +33,11 @@ leda2.set.sigPeak = .001;
 leda2.set.d0Autoupdate = 1;
 leda2.set.tonicIsConst = 0;
 leda2.set.tonicSlowIncrease = 0;
-leda2.set.tau0 = [.75 20];
+leda2.set.tau0 = [.50 30];     %see Benedek & Kaernbach, 2010, Psychophysiology
 
 %SDECO
 leda2.set.tonicGridSize_sdeco = 10;
-leda2.set.tau0_sdeco = [.75 2];
+leda2.set.tau0_sdeco = [1 3.75];  %see Benedek & Kaernbach, 2010, J Neurosc Meth
 leda2.set.d0Autoupdate_sdeco = 0;
 leda2.set.smoothwin_sdeco = .2;
 
@@ -53,8 +53,8 @@ leda2.set.dist0_min = .001;
 % %leda2.set.downsampleType
 % %Export (ERA)
 leda2.set.export.SCRstart = 1.00; %sec
-leda2.set.export.SCRend   = 3.00; %sec
-leda2.set.export.SCRmin   = .02; %muS
+leda2.set.export.SCRend   = 4.00; %sec
+leda2.set.export.SCRmin   = .01; %muS
 leda2.set.export.savetype = 1;
 % %Artifact
 % leda2.set.artifact.ckk_thresh = .25;

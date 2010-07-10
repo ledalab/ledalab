@@ -1,4 +1,6 @@
 function add2log(includetime, newinfo, ledalog, sessionlog, filelog, display, replaceline, showmsgbox)
+%add2log(includetime, newinfo, ledalog, sessionlog, filelog, display, replaceline, showmsgbox)
+
 global leda2
 
 if nargin < 8

@@ -39,8 +39,10 @@ if isempty(leda2.gui.overview.driver) %setup
     x = [time time(end) time(1)];
 
     %overshoot
+    if strcmp(leda2.analysis.method,'nndeco')
     overshoot_sc = leda2.gui.overview.min + remainder / max(.1,max(remainder)) * (leda2.gui.overview.max-leda2.gui.overview.min)/15;
     leda2.gui.overview.overshoot = fill(x, [overshoot_sc, 0, 0], [.8 .4 .4], 'linestyle', 'none','ButtonDownFcn','leda_click(1)');
+    end
 
     %driver
     driver_sc = leda2.gui.overview.min + driver / max(1,max(driver)) * (leda2.gui.overview.max-leda2.gui.overview.min)/2;

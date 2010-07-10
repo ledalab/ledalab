@@ -9,17 +9,18 @@ leda2.gui.fig_main = figure('Units','normalized','Position',[.00 .03 1 .92],'Nam
 leda2.gui.menu.menu_1  = uimenu(leda2.gui.fig_main,'Label','File');
 leda2.gui.menu.menu_1a = uimenu(leda2.gui.menu.menu_1,'Label','Open','Callback','open_ledafile;','Accelerator','o');   %
 leda2.gui.menu.menu_1b = uimenu(leda2.gui.menu.menu_1,'Label','Import Data...'); %,'Accelerator','i'
-leda2.gui.menu.menu_1b4 = uimenu(leda2.gui.menu.menu_1b,'Label','BioTrace (Text Export)','Callback','import_data(''biotrace'');');
+leda2.gui.menu.menu_1b1 = uimenu(leda2.gui.menu.menu_1b,'Label','BioTrace (Text Export)','Callback','import_data(''biotrace'');');
+leda2.gui.menu.menu_1b2 = uimenu(leda2.gui.menu.menu_1b,'Label','BioPac (*.acq)','Callback','import_data(''biopac'');');
 leda2.gui.menu.menu_1b3 = uimenu(leda2.gui.menu.menu_1b,'Label','Cassy Lab (.lab)','Callback','import_data(''cassylab'');');
-leda2.gui.menu.menu_1b6 = uimenu(leda2.gui.menu.menu_1b,'Label','PortiLab (Text Export)','Callback','import_data(''portilab'');');
-leda2.gui.menu.menu_1b6 = uimenu(leda2.gui.menu.menu_1b,'Label','PsychLab (Text Export)','Callback','import_data(''psychlab'');');
-leda2.gui.menu.menu_1b7 = uimenu(leda2.gui.menu.menu_1b,'Label','VarioPort (.vpd)','Callback','import_data(''varioport'');');
-leda2.gui.menu.menu_1b5 = uimenu(leda2.gui.menu.menu_1b,'Label','Vision Analyzer (Matlab Export)','Callback','import_data(''visionanalyzer'');');
-leda2.gui.menu.menu_1b7 = uimenu(leda2.gui.menu.menu_1b,'Label','VitaPort (Text Export)','Callback','import_data(''vitaport'');');
-leda2.gui.menu.menu_1b1 = uimenu(leda2.gui.menu.menu_1b,'Label','Matlab File','Callback','import_data(''mat'');','Separator','on');
-leda2.gui.menu.menu_1b2 = uimenu(leda2.gui.menu.menu_1b,'Label','Text File [Time SC (Marker)]','Callback','import_data(''text'');');
-leda2.gui.menu.menu_1b2 = uimenu(leda2.gui.menu.menu_1b,'Label','Text File [Samples SC (Marker)]','Callback','import_data(''text2'');');
-leda2.gui.menu.menu_1b8 = uimenu(leda2.gui.menu.menu_1b,'Label','User-defined Data','Callback','import_data(''userdef'');','Enable','off');
+leda2.gui.menu.menu_1b4 = uimenu(leda2.gui.menu.menu_1b,'Label','PortiLab (Text Export)','Callback','import_data(''portilab'');');
+leda2.gui.menu.menu_1b5 = uimenu(leda2.gui.menu.menu_1b,'Label','PsychLab (Text Export)','Callback','import_data(''psychlab'');');
+leda2.gui.menu.menu_1b6 = uimenu(leda2.gui.menu.menu_1b,'Label','VarioPort (.vpd)','Callback','import_data(''varioport'');');
+leda2.gui.menu.menu_1b7 = uimenu(leda2.gui.menu.menu_1b,'Label','Vision Analyzer (Matlab Export)','Callback','import_data(''visionanalyzer'');');
+leda2.gui.menu.menu_1b8 = uimenu(leda2.gui.menu.menu_1b,'Label','VitaPort (Text Export)','Callback','import_data(''vitaport'');');
+leda2.gui.menu.menu_1b9 = uimenu(leda2.gui.menu.menu_1b,'Label','Matlab File','Callback','import_data(''mat'');','Separator','on');
+leda2.gui.menu.menu_1b10 = uimenu(leda2.gui.menu.menu_1b,'Label','Text File [Time SC (Marker)]','Callback','import_data(''text'');');
+leda2.gui.menu.menu_1b11 = uimenu(leda2.gui.menu.menu_1b,'Label','Text File [Samples SC (Marker)]','Callback','import_data(''text2'');');
+leda2.gui.menu.menu_1b12 = uimenu(leda2.gui.menu.menu_1b,'Label','User-defined Data','Callback','import_data(''userdef'');','Enable','off');
 
 leda2.gui.menu.menu_1c = uimenu(leda2.gui.menu.menu_1,'Label','Import Event-Info...'); %,'Accelerator','i'
 leda2.gui.menu.menu_1c1 = uimenu(leda2.gui.menu.menu_1c,'Label','User-defined Event-Info','Callback','import_eventinfo(''userdef'')');
@@ -57,9 +58,9 @@ leda2.gui.menu.menu_3b  = uimenu(leda2.gui.menu.menu_3,'Label','Visual settings'
 
 %-Analyze
 leda2.gui.menu.menu_4  = uimenu(leda2.gui.fig_main,'Label','Analysis');
-leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Discrete Decomposition Analysis  (Extraction of Discrete Phasic/Tonic Components based on Nonnegative decovolution)','Callback','nndeco');
-leda2.gui.menu.menu_4g = uimenu(leda2.gui.menu.menu_4,'Label','Continuous Decomposition Analysis  (Extraction of Continuous Phasic/Tonic Activity based on Standard deconvolution)','Callback','sdeco');
-leda2.gui.menu.menu_4f = uimenu(leda2.gui.menu.menu_4,'Label','Delete analysis','Callback','delete_fit(1)','Separator','on');
+leda2.gui.menu.menu_4a = uimenu(leda2.gui.menu.menu_4,'Label','Continuous Decomposition Analysis  (Extraction of Continuous Phasic/Tonic Activity)','Callback','sdeco');
+leda2.gui.menu.menu_4b = uimenu(leda2.gui.menu.menu_4,'Label','Discrete Decomposition Analysis  (Extraction of Discrete Phasic/Tonic Components based on Nonnegative decovolution)','Callback','nndeco');
+leda2.gui.menu.menu_4c = uimenu(leda2.gui.menu.menu_4,'Label','Delete analysis','Callback','delete_fit(1)','Separator','on');
 
 %-Tools
 leda2.gui.menu.menu_5  = uimenu(leda2.gui.fig_main,'Label','Tools');
