@@ -84,7 +84,7 @@ end
 ledamem.prevfile = leda2.intern.prevfile;
 ledamem.set.default = leda2.set;
 ledamem.pref.default = leda2.pref;
-save(fullfile(leda2.intern.install_dir,'main\settings\ledamem'), 'ledamem','-v6')
+save(fullfile(leda2.intern.install_dir,'main\settings\ledamem'), 'ledamem') %,'-v6'
 
 
 %Apply custom settings if available

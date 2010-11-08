@@ -23,7 +23,7 @@ iif_t = t(iif_idx);
 iif_data = driver(iif_idx);
 
 
-groundtime = [0:tonicGridSize:t(end), t(end)];
+groundtime = [0:tonicGridSize:t(end-1), t(end)];
 
 if tonicGridSize < 30
     tonicGridSize = tonicGridSize*2;

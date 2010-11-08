@@ -2,9 +2,9 @@ function leda_batchanalysis(varargin)
 global leda2
 
 %parse batch-mode arguments and check thei validity
-[pathname, open_datatype, downsample_factor, do_fit, do_optimize, export_era_settings, do_save_overview] = parse_arguments(varargin{:});
+[valid_options, pathname, open_datatype, downsample_factor, smooth_settings, analysis_method, do_optimize, export_era_settings, do_save_overview] = parse_arguments(varargin{:});
 
-if ~(downsample_factor > 1 || do_fit || do_optimize || any(export_era_settings) || do_save_overview)
+if ~valid_options || ~(downsample_factor > 1 || analysis_method || do_optimize || any(export_era_settings) || do_save_overview) %invalid option or no option
     disp('No valid operations for Batch-mode defined.')
     return;
 end
@@ -17,10 +17,13 @@ add2log(1,['Starting Ledalab batch for ',pathname,' (',num2str(nFile),' file/s)'
 pathname = fileparts(pathname);
 leda2.current.batchmode.file = [];
 leda2.current.batchmode.command.pathname = pathname;
-leda2.current.batchmode.command.method = do_fit;
-leda2.current.batchmode.command.optimize = export_era_settings;
+leda2.current.batchmode.command.datatype = open_datatype;
+leda2.current.batchmode.command.downsample = downsample_factor;
+leda2.current.batchmode.command.smooth = smooth_settings;
+leda2.current.batchmode.command.method = analysis_method;
+leda2.current.batchmode.command.optimize = do_optimize;
 leda2.current.batchmode.command.overview = do_save_overview;
-leda2.current.batchmode.command.export_era = do_fit;
+leda2.current.batchmode.command.export_era = export_era_settings;
 leda2.current.batchmode.start = datestr(now, 21);
 leda2.current.batchmode.version = leda2.intern.version;
 leda2.current.batchmode.settings = leda2.set;
@@ -30,8 +33,8 @@ for iFile = 1:nFile
     filename = dirL(iFile).name;
     leda2.current.batchmode.file(iFile).name = filename;
     disp(' '); add2log(1,['Batch-Analyzing ',filename],1,0,0,1)
-
-    %try
+    
+    try
         %Open
         if strcmp(open_datatype,'leda')
             open_ledafile(0, pathname, filename);
@@ -42,24 +45,33 @@ for iFile = 1:nFile
             disp('Unable to open file!');
             continue;
         end
-
+        
         %Downsample
         if downsample_factor > 1
             downsample(downsample_factor, 'mean');
         end
-
+        
+        %Smooth
+        if iscell(smooth_settings)
+            if strcmpi(smooth_settings{1},'adapt')
+                adaptive_smoothing;
+            else
+                smooth_data(smooth_settings{2}, smooth_settings{1})
+            end       
+        end
+        
         %Analysis
-        if do_fit > 0
+        if analysis_method > 0
             delete_fit;
-            if do_fit == 1
-                nndeco(do_optimize);
-            elseif do_fit == 2
+            if analysis_method == 1
                 sdeco(do_optimize);
+            elseif analysis_method == 2
+                nndeco(do_optimize);
             end
             leda2.current.batchmode.file(iFile).tau = leda2.analysis.tau;
-            leda2.current.batchmode.file(iFile).error = leda2.analysis.error;            
+            leda2.current.batchmode.file(iFile).error = leda2.analysis.error;
         end
-
+        
         %Export
         if any(export_era_settings)
             leda2.set.export.SCRstart = export_era_settings(1);
@@ -70,20 +82,20 @@ for iFile = 1:nFile
             end
             export_era('savePeaks')
         end
-
+        
         %Save
         if do_save_overview
             analysis_overview;
         end
-
-        if downsample_factor > 0 || do_fit
+        
+        if downsample_factor > 0 || analysis_method  || iscell(smooth_settings)
             save_ledafile(0);
         end
-
-%     catch
-%         add2log(1,'ERROR !!!',1,0,0,1)
-%     end
-
+        
+    catch
+        add2log(1,'ERROR !!!',1,0,0,1)
+    end
+    
 end
 
 leda2.current.batchmode.processing_time = toc;
@@ -95,7 +107,7 @@ save([pathname,'\','batchmode_protocol'],'protocol');
 
 
 
-function [wdir, open_datatype, downsample_factor, do_fit, do_optimize, export_era_settings, do_save_overview] = parse_arguments(varargin)
+function [valid_options, wdir, open_datatype, downsample_factor, smooth_settings, analysis_method, do_optimize, export_era_settings, do_save_overview] = parse_arguments(varargin)
 
 wdir = varargin{1};
 if ~strcmp(wdir(end),'\') && ~strcmp(wdir(end),'/') && ~strcmp(wdir(end-4:end-3),'*.')
@@ -103,10 +115,12 @@ if ~strcmp(wdir(end),'\') && ~strcmp(wdir(end),'/') && ~strcmp(wdir(end-4:end-3)
 end
 wdir = [wdir, '*.mat'];
 
+valid_options = 1;
 %default options
 open_datatype = 'leda'; %open
 downsample_factor = 0;
-do_fit = 0;
+smooth_settings = 0;
+analysis_method = 0;
 do_optimize = 2;
 %do_export_scr = 0;
 export_era_settings = [0 0 0 0];
@@ -117,14 +131,14 @@ do_save_overview = 0;
 
 if nargin > 1
     vars = varargin(2:end);
-
+    
     while length(vars) >= 2
         thisvar = vars(1:2);
         vars = vars(3:end);
-
+        
         option_name = thisvar{1};
         option_arg = thisvar{2};
-
+        
         switch option_name
             case 'open',
                 %if ischar(option_arg) && any(strcmp(option_arg, valid_datatypeL))
@@ -135,54 +149,69 @@ if nargin > 1
                 %    disp(['Unknown datatype: ',option_arg])
                 %    return;
                 %end
-
+                
             case 'downsample'
                 if isnumeric(option_arg)
                     downsample_factor = option_arg;
                 else
+                    valid_options = 0;
                     disp('Downsample option requires numeric argument (downsample factor)')
                     return;
                 end
-
-            case 'analyze'
-                if isnumeric(option_arg)
-                    do_fit = option_arg;
+                
+            case 'smooth'       %by Christoph Berger
+                if iscell(option_arg) && any(strcmpi(option_arg{1},{'hann','mean','gauss','adapt'}))
+                    smooth_settings = option_arg;
                 else
-                    disp('Fit option requires numeric argument (1 = yes, 0 = no)')
+                    valid_options = 0;
+                    disp('Smooth option requires cell; first argument is ''hann'', ''mean'', ''gauss'', or ''adapt'', second argument is width')
+                    return;                    
+                end
+                
+            case 'analyze'
+                if any(strcmpi(option_arg,{'CDA','DDA'}))
+                    analysis_method = find(strcmpi(option_arg, {'CDA','DDA'}));  % 1 = CDA, 2 = DDA
+                else
+                    valid_options = 0;
+                    disp('Method option should either bei ''CDA'' or ''DDA''.')
                     return;
                 end
-
+                
             case 'optimize'
                 if isnumeric(option_arg)
                     do_optimize = option_arg;
                 else
+                    valid_options = 0;
                     disp('Optimize option requires numeric argument (# of initial values for optimization)')
                     return;
                 end
-
+                
             case 'export_era'
-                if isnumeric(option_arg) && any(option_arg) && length(option_arg) >= 3
+                if isnumeric(option_arg) && any(option_arg) && length(option_arg) == 4
                     export_era_settings = option_arg;
                 else
+                    valid_options = 0;
                     disp('Export requires numeric argument (respwin_start respwin_end amp_min [filetype]) ')
                     return;
                 end
-
+                
             case 'overview'
                 if isnumeric(option_arg)
                     do_save_overview = option_arg;
                 else
+                    valid_options = 0;
                     disp('Overview option requires numeric argument (1 = yes, 0 = no)')
                     return;
                 end
-
+                
             otherwise
+                valid_options = 0;
                 disp(['Could not parse batch-mode option: ',option_name])
-
+                
         end %switch
-
+        
     end %while
-
+    
 end %if nargin > 1
 
 
@@ -238,7 +267,7 @@ set(gca,'YLim',yl)
 if strcmp(analysis.method,'nndeco')
     l = legend('SC Data','Decomposition Fit','Tonic Data', sprintf('tau = %4.2f, %4.2f,  dist0 = %4.4f',analysis.tau, analysis.dist0), sprintf('RMSE = %4.2f', analysis.error.RMSE));
 else
-    l  =legend('SC Data','Decomposition Fit','Tonic Data', sprintf('tau = %4.2f, %4.2f',analysis.tau), sprintf('RMSE = %4.2f', analysis.error.RMSE));
+    l = legend('SC Data','Decomposition Fit','Tonic Data', sprintf('tau = %4.2f, %4.2f',analysis.tau), sprintf('RMSE = %4.2f', analysis.error.RMSE));
 end
 set(l, 'FontSize',8,'Location','NorthEast');
 xlabel('Time [s]'); ylabel('[\muS]')

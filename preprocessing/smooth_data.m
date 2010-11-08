@@ -1,12 +1,12 @@
 function smooth_data(width, type)
 global leda2
 
-if nargin == 0 %batchmode
+smoothWinL = {'hann window','moving average','gauss window'};
+if nargin == 0 %non-batchmode
 
     fig = figure('Units','normalized','Position',[.3 .3 .3 .1],'Menubar','None','Name','Smoothing','Numbertitle','Off','Resize','Off');
     uicontrol('Units','normalized','Style','Text','Position',[.1 .6 .2 .15],'String','Window width:','HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
     edit_winwidth = uicontrol('Units','normalized','Style','edit','Position',[.3 .6 .1 .2],'String', 8);
-    smoothWinL = {'hann window','moving average','gauss window'};
     uicontrol('Units','normalized','Style','Text','Position',[.1 .2 .2 .25],'String','Type:','HorizontalAlignment','left','BackgroundColor',get(gcf,'Color'));
     popm = uicontrol('Units','normalized','Style','popupmenu','Position',[.3 .2 .3 .3],'String',smoothWinL,'Value',3);
     uicontrol('Style','pushbutton','Units','normalized','Position',[.7 .1 .2 .2],'String','OK','Callback','uiresume(gcbf)','FontUnits','normalized');
@@ -39,6 +39,11 @@ scs = smooth(leda2.data.conductance.data, width, type);
 leda2.data.conductance.data = scs(:)';
 
 delete_fit(0);
-refresh_data(1);
+refresh_data(~leda2.intern.batchmode);
 file_changed(1);
+
+if leda2.intern.batchmode    
+    typenr = find(strcmpi({'hann', 'mean', 'gauss'}, type));
+end;
+
 add2log(1,['Data smoothed with ',  smoothWinL{typenr},' (',num2str(width), ' samples width)'],1,1,1);

@@ -202,7 +202,7 @@ tau(2) = str2double(get(leda2.gui.deconv.edit_tau2,'String'));
 %leda2.set.d0Autoupdate = get(leda2.gui.deconv.chbx_d0Autoupdate,'Value');
 leda2.set.tonicIsConst = get(leda2.gui.deconv.chbx_tonicIsConst,'Value');
 
-[x, history] = cgd(tau, @sdeconv_analysis, [.3 20], .01, 20, .05);
+[x, history] = cgd(tau, @sdeconv_analysis, [.3 2], .01, 20, .05);
 leda2.analysis0.tau = x(1:2);
 %leda2.analysis0.dist0 = x(3);
 leda2.analysis0.opt_history = history;
@@ -237,7 +237,7 @@ leda2.analysis.method = 'sdeco';
 leda2 = rmfield(leda2, 'analysis0');
 
 
-add2log(1,'Robust decomposition analysis.',1,1,1)
+add2log(1,'Continuous Decomposition Analysis.',1,1,1)
 leda2.file.version = leda2.intern.version; %work around indicating analysis version of current fit
 
 if leda2.intern.batchmode

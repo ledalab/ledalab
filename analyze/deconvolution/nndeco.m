@@ -275,7 +275,7 @@ leda2.analysis = leda2.analysis0;
 leda2.analysis.method = 'nndeco';
 leda2 = rmfield(leda2, 'analysis0');
 
-add2log(1,'Decomposition analysis.',1,1,1)
+add2log(1,'Discrete Decomposition Analysis.',1,1,1)
 leda2.file.version = leda2.intern.version;
 
 if leda2.intern.batchmode

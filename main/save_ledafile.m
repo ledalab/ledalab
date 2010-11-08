@@ -53,7 +53,7 @@ end
 
 try
     save(file, savevars{:}); %, '-v6'
-    add2log(1,[' Save ',file,' in V',num2str(leda2.intern.version,'%1.2f')],1,1,1);
+    add2log(1,[' Saved ',file,' in V',num2str(leda2.intern.version,'%1.2f')],1,1,1);
     fileinfo.log = leda2.file.log; %if it there is no error, save again with updated filelog
     save(file, savevars{:});  %, '-v6
 
