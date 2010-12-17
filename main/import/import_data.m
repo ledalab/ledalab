@@ -75,10 +75,16 @@ try
             [time, conductance, event] = getuserdefdata(file);
 
     end
+    
 catch
-   add2log(0,['Unable to import ',file,': No valid ',datatype,' data-file or corrupt file.'],1,1,0,1,0,1)
+   add2log(0,['Unable to import ',file,'.'],1,1,0,1,0,1)
    return
 end
+
+if isempty(conductance)
+    return;
+end
+
 
 time = time(:)'; %force data in row
 conductance = conductance(:)';

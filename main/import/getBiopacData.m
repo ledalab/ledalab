@@ -5,10 +5,9 @@ function [time, conductance, event] = getBiopacData(filename)
 
 
 %%Check if BioSig is installed
-try
-    v = biosigVersion;
-catch
-    add2log(0,'Import failed. BioPac import requires BioSig toolbox. BioSig not properly installed - see http://biosig.sourceforge.net/. ',1,1,0,0,0,1);
+if exist('biosigVersion','file') ~= 2
+    add2log(0,'Import failed. BioSig not found on Matlab search path. BioPac import requires BioSig toolbox (see http://biosig.sourceforge.net/). ',1,1,0,0,0,1);
+    time = []; conductance = []; event = [];
     return;
 end
 
