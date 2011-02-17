@@ -39,6 +39,10 @@ if sessionlog && ~leda2.intern.batchmode
     %drawnow;
 end
 
+if ~isfield(leda2.file,'log')
+    leda2.file.log = {};
+end
+
 if filelog
     leda2.file.log = [leda2.file.log; {newinfo}];
 end

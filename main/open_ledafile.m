@@ -93,15 +93,15 @@ end
 %Fileinfo
 leda2.file.version = 0;
 leda2.file.date = 0;
+leda2.file.log = {};
 if any(strcmp(ledafile_vars,'ledalab')) %version 1.x
     try
         leda2.file.version = ledafile.ledalab.version;
-        leda2.file.date = ledafile.ledalab.date;
+        leda2.file.date = ledafile.ledalab.date;        
     catch
         disp('Could not load File-Info properly!');
-    end
-    leda2.file.log = {};
-elseif any(strcmp(ledafile_vars,'fileinfo')) %version 2.x
+    end    
+elseif any(strcmp(ledafile_vars,'fileinfo')) %version 2.x or higher
     try
         leda2.file.version = ledafile.fileinfo.version;
         leda2.file.date = ledafile.fileinfo.date;

@@ -1,5 +1,5 @@
 function export_era(action)
-% postleda: Saving results of ledafit-file into textfile (*_results.txt)
+% Saving results into Matlab/textfile/or Excel (*_results.mat/txt/xls)
 %
 %  - Choose SCR-Window times relative to event
 %  - Choose minimum deflection for SCR
@@ -100,9 +100,10 @@ for iEvent = 1:leda2.data.events.N
     era.DDA.scr_latency(iEvent) = NaN;
     era.DDA.tonic(iEvent) = NaN;  %average tonic level
     %Measures yielded by Continuous Decomposition Analysis (CDA)
-    era.CDA.ISCR(iEvent) = NaN;  %phasic driver area (time integral over response window)
+    era.CDA.SCR(iEvent) = NaN;  %phasic driver area (time integral over response window)
+    era.CDA.ISCR(iEvent) = NaN;  %average phasic driver activity (time integral over response window by size of responsewindow)
     era.CDA.phasic_max(iEvent) = NaN;   %Driver maximum within response window
-    era.CDA.phasic_amp(iEvent) = NaN;   %SCR amp resulting from phasic segment re-convoluted with driver impulse
+    era.CDA.SCR_ITTP(iEvent) = NaN;   %SCR amp resulting from phasic segment re-convoluted with driver impulse
     era.CDA.tonic(iEvent) = NaN;   %average tonic level
     %Measures yielded by Trough-To-Peak Analysis
     era.TTP.scr_nr(iEvent) = NaN;
@@ -149,14 +150,14 @@ for iEvent = 1:leda2.data.events.N
             
         elseif strcmp(leda2.analysis.method,'sdeco')
             %CDA
+            era.CDA.SCR(iEvent) = max(0, sum(leda2.analysis.driver(idx_respwin))/(sr*(scrWindow_t2-scrWindow_t1)));  % ISCR = average phasic driver activity  [muS]            
             era.CDA.ISCR(iEvent) = max(0, sum(leda2.analysis.driver(idx_respwin))/sr);  % ISCR = phasic_area  [muS*sec]
-            %  mean() == sum()/(sr*winsize)  [muS]
             era.CDA.phasic_max(iEvent) = max(0, max(leda2.analysis.driver(idx_respwin)));
             sc_reconv = conv(leda2.analysis.driver(idx_respwin), leda2.analysis.kernel);
             if max(sc_reconv) >= scrAmplitudeMin
-                era.CDA.phasic_amp(iEvent) = max(sc_reconv);
+                era.CDA.SCR_ITTP(iEvent) = max(sc_reconv);
             else
-                era.CDA.phasic_amp(iEvent) = 0;
+                era.CDA.SCR_ITTP(iEvent) = 0;
             end
             era.CDA.tonic(iEvent) = mean(leda2.analysis.tonicData(idx_respwin));
             
@@ -191,10 +192,10 @@ if leda2.set.export.savetype == 2
     else
         
         if strcmp(leda2.analysis.method,'sdeco')
-            fprintf(fid,'EvNr\tISCR\tPhasicMax\tPhasicAmp\tTonic\tnSCR_ttp\tAmpSum_ttp\tOnset1_ttp\tMean\tMaxDeflection\tEventNId\tEventName\n');
+            fprintf(fid,'EvNr\tSCR\tISCR\tPhasicMax\tSCR_ITTP\tTonic\tnSCR_ttp\tAmpSum_ttp\tOnset1_ttp\tMean\tMaxDeflection\tEventNId\tEventName\n');
             for i = 1:leda2.data.events.N
-                fprintf(fid,'%3.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\n',...
-                    i, era.CDA.ISCR(i), era.CDA.phasic_max(i), era.CDA.phasic_amp(i), era.CDA.tonic(i), era.TTP.scr_nr(i), era.TTP.scr_ampsum(i), era.TTP.scr_latency(i), era.global.mean(i), era.global.max_deflection(i), era.event.nid(i), era.event.name{i});
+                fprintf(fid,'%3.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\n',...
+                    i, era.CDA.SCR(i), era.CDA.ISCR(i), era.CDA.phasic_max(i), era.CDA.SCR_ITTP(i), era.CDA.tonic(i), era.TTP.scr_nr(i), era.TTP.scr_ampsum(i), era.TTP.scr_latency(i), era.global.mean(i), era.global.max_deflection(i), era.event.nid(i), era.event.name{i});
             end
             
         elseif strcmp(leda2.analysis.method,'nndeco')
@@ -220,8 +221,8 @@ if leda2.set.export.savetype == 3
         
     else        
         if strcmp(leda2.analysis.method,'sdeco')
-            xlswrite(savefname, {'Event-Nr','Event-NId','Event-Name','ISCR [muSxs]','PhasicMax [muS]','PhasicAmp [muS]','Tonic [muS]','nSCR_ttp','AmpSum_ttp [muS] ','Onset1_ttp [s]','Mean [muS]','MaxDeflection [muS]'}, 'CDA', 'A1');
-            xlswrite(savefname, [(1:leda2.data.events.N)', era.event.nid', nan(leda2.data.events.N,1), era.CDA.ISCR', era.CDA.phasic_max', era.CDA.phasic_amp', era.CDA.tonic', era.TTP.scr_nr', era.TTP.scr_ampsum', era.TTP.scr_latency', era.global.mean', era.global.max_deflection'], 'CDA', 'A2');
+            xlswrite(savefname, {'Event-Nr','Event-NId','Event-Name','SCR [muS]','ISCR [muSxs]','PhasicMax [muS]','SCR_ITTP [muS]','Tonic [muS]','nSCR_ttp','AmpSum_ttp [muS] ','Onset1_ttp [s]','Mean [muS]','MaxDeflection [muS]'}, 'CDA', 'A1');
+            xlswrite(savefname, [(1:leda2.data.events.N)', era.event.nid', nan(leda2.data.events.N,1), era.CDA.SCR', era.CDA.ISCR', era.CDA.phasic_max', era.CDA.SCR_ITTP', era.CDA.tonic', era.TTP.scr_nr', era.TTP.scr_ampsum', era.TTP.scr_latency', era.global.mean', era.global.max_deflection'], 'CDA', 'A2');
             xlswrite(savefname, era.event.name', 'CDA', 'C2');
             
         elseif strcmp(leda2.analysis.method,'nndeco')

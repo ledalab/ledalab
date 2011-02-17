@@ -135,7 +135,7 @@ leda2.intern.current_dir = leda2.file.pathname;
 cd(pathname);
 leda2.file.open = 1;
 file_changed(1);
-add2log(1,[' Imported ',file,' successfully.'],1,1,1);
+add2log(1,[' Imported ',datatype,'-file ',file,' successfully.'],1,1,1);
 
 %Data statistics
 refresh_data(0); %leda2.data.N = length(leda2.data.conductance.data);

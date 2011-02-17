@@ -1,7 +1,7 @@
 function [time, conductance, event] = getBiopacData(filename)
 % Import BioPac File via BioSig Toolbox
 % EDA Channel must labelled EDA
-% Marker Channel must be labelled T0-T9
+% Marker Channel must be labeled T0-T9
 
 
 %%Check if BioSig is installed
