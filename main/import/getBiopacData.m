@@ -19,13 +19,18 @@ warning on
 %HDR.Label'
 
 %%Get EDA data
-EDA_channel_idx = find(strncmpi(HDR.Label,'EDA',3));
+EDA_channel_idx = find(strncmpi(HDR.Label,'EDA',3) | strncmpi(HDR.Label,'GSR',3));
 conductance = s(:,EDA_channel_idx);
 
 sr = HDR.SampleRate;
 time = (0:HDR.NRec-1)/sr;
 
-
+if length(conductance) < 10 || length(time) < 10
+    add2log(0,'Import failed. Valid data could not be identified.',1,1,0,0,0,1);
+    time = []; conductance = []; event = [];
+    return;
+end
+    
 %%Get events
 %get event channels
 eventChannel_idx = [];

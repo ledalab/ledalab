@@ -1,4 +1,5 @@
 function leda_batchanalysis(varargin)
+
 global leda2
 
 %parse batch-mode arguments and check thei validity
@@ -126,7 +127,7 @@ do_optimize = 2;
 export_era_settings = [0 0 0 0];
 do_save_overview = 0;
 
-%valid_datatypeL = {'leda','mat','text','cassylab','biotrace','visionanalyzer','userdef'};
+%valid_datatypeL = {'leda','mat','text','cassylab','biopac','biopacmat','biotrace','visionanalyzer','userdef'};
 %datatype_extL = {'*.mat','*.mat','*.txt','*.txt','*.txt','',''};
 
 if nargin > 1

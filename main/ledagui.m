@@ -1,4 +1,5 @@
 function ledagui
+
 global leda2
 
 %Menu
@@ -11,6 +12,7 @@ leda2.gui.menu.menu_1a = uimenu(leda2.gui.menu.menu_1,'Label','Open','Callback',
 leda2.gui.menu.menu_1b = uimenu(leda2.gui.menu.menu_1,'Label','Import Data...'); %,'Accelerator','i'
 leda2.gui.menu.menu_1b1 = uimenu(leda2.gui.menu.menu_1b,'Label','BioTrace (Text Export)','Callback','import_data(''biotrace'');');
 leda2.gui.menu.menu_1b2 = uimenu(leda2.gui.menu.menu_1b,'Label','BioPac (*.acq)','Callback','import_data(''biopac'');');
+leda2.gui.menu.menu_1b2 = uimenu(leda2.gui.menu.menu_1b,'Label','BioPac (Matlab-Export) (*.mat)','Callback','import_data(''biopacmat'');');
 leda2.gui.menu.menu_1b3 = uimenu(leda2.gui.menu.menu_1b,'Label','Cassy Lab (.lab)','Callback','import_data(''cassylab'');');
 leda2.gui.menu.menu_1b4 = uimenu(leda2.gui.menu.menu_1b,'Label','PortiLab (Text Export)','Callback','import_data(''portilab'');');
 leda2.gui.menu.menu_1b5 = uimenu(leda2.gui.menu.menu_1b,'Label','PsychLab (Text Export)','Callback','import_data(''psychlab'');');

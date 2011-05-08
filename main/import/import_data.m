@@ -1,10 +1,12 @@
 function import_data(datatype, pathname, filename)
+
 global leda2
 leda2.current.fileopen_ok = 0;
 
 switch datatype
     case 'biotrace', ext = {'*.txt'};
     case 'biopac', ext = {'*.acq'};
+    case 'biopacmat', ext = {'*.mat'};
     case 'cassylab', ext = {'*.lab'};
     case 'varioport', ext = {'*.vpd'};
     case 'visionanalyzer', ext = {'*.mat'};
@@ -52,6 +54,9 @@ try
             
         case 'biopac'
             [time, conductance, event] = getBiopacData(file);
+            
+        case 'biopacmat'
+            [time, conductance, event] = getBiopacMatData(file);
 
         case 'cassylab',
             [time, conductance, event] = getcassydata(file);
