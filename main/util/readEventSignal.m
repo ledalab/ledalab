@@ -2,8 +2,13 @@ function [onsetL, durationL, eventTypeL] = readEventSignal(ev_s, sr)
 
 % Convert continuous event-signal to discrete event data 
 
+ev_s = round(ev_s);     % only integer event-ids accepted
 
-val = unique(ev_s);  %possible values in event-signal
+val = unique(ev_s);     % different unique values in event-signal
+
+if length(val) > 128
+    error('Too many different event-types detected')  % event-types probably not correctly identified 
+end
 baseline_val = val(1);
 event_val = val(2:end);
 
@@ -28,6 +33,10 @@ for iEv = 1:length(event_val)
     durationL = [durationL; duration];
     eventTypeL = [eventTypeL; ones(length(ons),1)*event_val(iEv)];
 
+end
+
+if length(onsetL) > 1000
+    error('Too many events detected (> 1000)')  % event-types probably not correctly identified
 end
 
 [onsetL, sidx] = sort(onsetL);
