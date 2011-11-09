@@ -2,7 +2,7 @@ function leda_batchanalysis(varargin)
 
 global leda2
 
-%parse batch-mode arguments and check thei validity
+%parse batch-mode arguments and check their validity
 [valid_options, pathname, open_datatype, downsample_factor, smooth_settings, analysis_method, do_optimize, export_era_settings, do_save_overview] = parse_arguments(varargin{:});
 
 if ~valid_options || ~(downsample_factor > 1 || analysis_method || do_optimize || any(export_era_settings) || do_save_overview) %invalid option or no option
@@ -101,18 +101,15 @@ end
 
 leda2.current.batchmode.processing_time = toc;
 protocol = leda2.current.batchmode;
-save([pathname,'\','batchmode_protocol'],'protocol');
-
-
-
+save([pathname,filesep,'batchmode_protocol'],'protocol');
 
 
 
 function [valid_options, wdir, open_datatype, downsample_factor, smooth_settings, analysis_method, do_optimize, export_era_settings, do_save_overview] = parse_arguments(varargin)
 
 wdir = varargin{1};
-if ~strcmp(wdir(end),'\') && ~strcmp(wdir(end),'/') && ~strcmp(wdir(end-4:end-3),'*.')
-    wdir = [wdir,'\'];
+if ~strcmp(wdir(end),filesep) && ~strcmp(wdir(end-4:end-3),'*.')
+    wdir = [wdir,filesep];
 end
 wdir = [wdir, '*.mat'];
 

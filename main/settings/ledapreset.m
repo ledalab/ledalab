@@ -74,7 +74,7 @@ leda2.gui.col.frame1 = [.85 .85 .85];
 %Save defaults
 % load ledamem to workspace
 try
-    load(fullfile(leda2.intern.install_dir,'main\settings\ledamem.mat'));
+    load(fullfile(leda2.intern.install_dir,'main','settings','ledamem.mat'));
     leda2.intern.prevfile = ledamem.prevfile; %#ok<NODEF>
 catch
     add2log(0,'No ledamem available',1)
@@ -84,7 +84,7 @@ end
 ledamem.prevfile = leda2.intern.prevfile;
 ledamem.set.default = leda2.set;
 ledamem.pref.default = leda2.pref;
-save(fullfile(leda2.intern.install_dir,'main\settings\ledamem'), 'ledamem') %,'-v6'
+save(fullfile(leda2.intern.install_dir,'main','settings','ledamem'), 'ledamem') %,'-v6'
 
 
 %Apply custom settings if available
