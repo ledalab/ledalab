@@ -86,7 +86,7 @@ for iEvent = 1:leda2.data.events.N
     %Set event data
     event = leda2.data.events.event(iEvent);
     era.event.time(iEvent) = event.time;
-    era.event.nid(iEvent) = event.nid;
+    era.event.nid{iEvent} = event.nid;
     era.event.name{iEvent} = event.name;
     era.event.ud{iEvent} = event.userdata;
     
@@ -100,8 +100,8 @@ for iEvent = 1:leda2.data.events.N
     era.DDA.scr_latency(iEvent) = NaN;
     era.DDA.tonic(iEvent) = NaN;  %average tonic level
     %Measures yielded by Continuous Decomposition Analysis (CDA)
-    era.CDA.SCR(iEvent) = NaN;  %phasic driver area (time integral over response window)
-    era.CDA.ISCR(iEvent) = NaN;  %average phasic driver activity (time integral over response window by size of responsewindow)
+    era.CDA.SCR(iEvent) = NaN;  %average phasic driver activity (time integral over response window by size of responsewindow)
+    era.CDA.ISCR(iEvent) = NaN;  %phasic driver area (time integral over response window)
     era.CDA.phasic_max(iEvent) = NaN;   %Driver maximum within response window
     era.CDA.SCR_ITTP(iEvent) = NaN;   %SCR amp resulting from phasic segment re-convoluted with driver impulse
     era.CDA.tonic(iEvent) = NaN;   %average tonic level

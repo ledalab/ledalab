@@ -114,21 +114,21 @@ set(get(leda2.gui.driver.ax,'YLabel'),'String','Phasic Driver [\muS]')
 dy = .40;
 x3a = x3 + .04; x3b = x3 + .13;
 leda2.gui.frame = uicontrol('Units','normalized','Style','frame','Position',[x3 dy x4-x3 .3],'String','Frame Ov','BackgroundColor',leda2.gui.col.frame1);
-leda2.gui.text_title = uicontrol('Units','normalized','Style','text','Position',[x3a+.01 dy+.03*8 .08 .012],'String','DATA ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1,'FontWeight','bold');
-leda2.gui.text_N = uicontrol('Units','normalized','Style','text','Position',[x3a dy+.03*7 .08 .012],'String','N: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-leda2.gui.text_time = uicontrol('Units','normalized','Style','text','Position',[x3a dy+.03*6 .08 .012],'String','Time: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-leda2.gui.text_smplrate = uicontrol('Units','normalized','Style','text','Position',[x3a dy+.03*5 .08 .012],'String','Freq: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-leda2.gui.text_conderr = uicontrol('Units','normalized','Style','text','Position',[x3a dy+.03*4 .08 .012],'String','Error: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-leda2.gui.text_Nevents = uicontrol('Units','normalized','Style','text','Position',[x3a dy+.03*3 .08 .012],'String','Events: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-leda2.gui.text_title2 = uicontrol('Units','normalized','Style','text','Position',[x3b+.01 dy+.03*8 .08 .012],'String','DECOMPOSITION ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1,'FontWeight','bold');
-leda2.gui.text_method = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*7 .09 .012],'String','Method: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-leda2.gui.text_tau = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*6 .08 .012],'String','Tau: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-%leda2.gui.text_adjR2 = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*6 .08 .012],'String','Adj. R2: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-%leda2.gui.text_mse = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*6 .08 .012],'String','MSE: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-leda2.gui.text_rmse = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*5 .08 .012],'String','RMSE: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-leda2.gui.text_nPhasic = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*4 .08 .012],'String','SCRs: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-leda2.gui.text_nTonic = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*3 .08 .012],'String','TPs: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
-%leda2.gui.text_df = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*1 .06 .012],'String','DF: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1,'Visible','off');
+leda2.gui.text_title = uicontrol('Units','normalized','Style','text','Position',[x3a+.01 dy+.03*8 .08 .02],'String','DATA ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1,'FontWeight','bold');
+leda2.gui.text_N = uicontrol('Units','normalized','Style','text','Position',[x3a dy+.03*7 .08 .02],'String','N: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+leda2.gui.text_time = uicontrol('Units','normalized','Style','text','Position',[x3a dy+.03*6 .08 .02],'String','Time: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+leda2.gui.text_smplrate = uicontrol('Units','normalized','Style','text','Position',[x3a dy+.03*5 .08 .02],'String','Freq: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+leda2.gui.text_conderr = uicontrol('Units','normalized','Style','text','Position',[x3a dy+.03*4 .08 .02],'String','Error: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+leda2.gui.text_Nevents = uicontrol('Units','normalized','Style','text','Position',[x3a dy+.03*3 .08 .02],'String','Events: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+leda2.gui.text_title2 = uicontrol('Units','normalized','Style','text','Position',[x3b+.01 dy+.03*8 .08 .02],'String','DECOMPOSITION ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1,'FontWeight','bold');
+leda2.gui.text_method = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*7 .09 .02],'String','Method: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+leda2.gui.text_tau = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*6 .08 .02],'String','Tau: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+%leda2.gui.text_adjR2 = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*6 .08 .02],'String','Adj. R2: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+%leda2.gui.text_mse = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*6 .08 .02],'String','MSE: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+leda2.gui.text_rmse = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*5 .08 .02],'String','RMSE: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+leda2.gui.text_nPhasic = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*4 .08 .02],'String','SCRs: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+leda2.gui.text_nTonic = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*3 .08 .02],'String','TPs: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1);
+%leda2.gui.text_df = uicontrol('Units','normalized','Style','text','Position',[x3b dy+.03*1 .06 .02],'String','DF: ','HorizontalAlignment','left','BackgroundColor',leda2.gui.col.frame1,'Visible','off');
 
 %Event Info Display
 dx1 = .75; dx2 = dx1+ .03; dx3 = dx2 + .08;

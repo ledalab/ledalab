@@ -142,12 +142,15 @@ leda2.file.open = 1;
 file_changed(1);
 add2log(1,[' Imported ',datatype,'-file ',file,' successfully.'],1,1,1);
 
-%Data statistics
-refresh_data(0); %leda2.data.N = length(leda2.data.conductance.data);
-%leda2.data.samplingrate = (leda2.data.N - 1) / (leda2.data.time.data(end) - leda2.data.time.data(1));
-%leda2.data.conductance.min = min(leda2.data.conductance.data);
-%leda2.data.conductance.max = max(leda2.data.conductance.data);
-%leda2.data.conductance.error = conductanceerror;
+refresh_data(0);    %Data statistics
+
+%Positive SC values?
+if leda2.data.conductance.min < 0 && ~leda2.intern.batchmode
+    cmd = questdlg('Data shows negative values. This will complicate the analysis. Do you wish to correct this issue by adding a constant value?','Warning','Yes','No','Yes');
+    if strcmp(cmd, 'Yes')
+        leda2.data.conductance.data = leda2.data.conductance.data - leda2.data.conductance.min + 1;
+    end
+end
 
 %Downsample?
 if (leda2.data.samplingrate > 32 || leda2.data.N > 36000) && ~leda2.intern.batchmode
@@ -157,9 +160,11 @@ if (leda2.data.samplingrate > 32 || leda2.data.N > 36000) && ~leda2.intern.batch
     end
 end
 
+refresh_data(0);    %Data statistics
+
 leda2.current.fileopen_ok = 1;
 if leda2.intern.batchmode
     return;
 end
 
-plot_data;
+plot_data; 

@@ -86,4 +86,4 @@ else
     
 end
 
-set(leda2.gui.driver.ax, 'XLim', [start, ende], 'YLim',[min(driver(round(sr):length(driver)-round(sr)))-.05, max(1, max(driver(round(sr):length(driver)-round(sr)))*1.1)]);
+set(leda2.gui.driver.ax, 'XLim', [start, ende], 'YLim',[min(driver(2*round(sr):length(driver)-2*round(sr)))-.02, max(1, max(driver(2*round(sr):length(driver)-2*round(sr)))*1.02)]);

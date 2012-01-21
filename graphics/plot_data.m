@@ -3,11 +3,6 @@ global leda2
 
 %Data statistics
 refresh_data(0);
-% leda2.data.N = length(leda2.data.conductance.data);
-% leda2.data.samplingrate = (leda2.data.N - 1) / (leda2.data.time.data(end) - leda2.data.time.data(1));
-% leda2.data.conductance.min = min(leda2.data.conductance.data);
-% leda2.data.conductance.max = max(leda2.data.conductance.data);
-% leda2.data.conductance.error = sqrt(mean(diff(leda2.data.conductance.data).^2)/2);
 
 leda2.gui.rangeview.start = 0;
 
@@ -77,7 +72,8 @@ leda2.gui.rangeview.eventtxt = [];
 for ev = 1:events.N
     ev_x = events.event(ev).time;
     leda2.gui.rangeview.markerL(ev) = plot([ev_x ev_x], [leda2.gui.overview.min*(1-.2*sign(leda2.gui.overview.min)), leda2.gui.overview.max*(1+.2*sign(leda2.gui.overview.max))], '-','Color',[1 0 .3],'ButtonDownFcn','leda_click(2)');
-    leda2.gui.rangeview.eventtxt(ev) = text(ev_x, cond.max, sprintf('%.1f:  %s (%s)', ev_x, events.event(ev).name, num2str(events.event(ev).nid)),'rotation',90,'verticalalignment','baseline','Color',[1 0 .3],'ButtonDownFcn','leda_click(2)');
+    %leda2.gui.rangeview.eventtxt(ev) = text(ev_x, cond.max, sprintf('%.1f %s (%s)', ev_x, events.event(ev).name, num2str(events.event(ev).nid)),'rotation',90,'verticalalignment','baseline','Color',[1 0 .3],'ButtonDownFcn','leda_click(2)'); %cond.max caused error in specific file!?
+    leda2.gui.rangeview.eventtxt(ev) = text(ev_x, 2, sprintf('%.1f:  %s (%s)', ev_x, events.event(ev).name, num2str(events.event(ev).nid)),'rotation',90,'verticalalignment','baseline','Color',[1 0 .3],'ButtonDownFcn','leda_click(2)');
 end
 
 set(leda2.gui.rangeview.ax, 'XLim', [rg_start, rg_end], 'Color',[.95 .95 1]); %, 'Ylim', [0,cond.max+.25]
