@@ -86,7 +86,7 @@ for iEvent = 1:leda2.data.events.N
     %Set event data
     event = leda2.data.events.event(iEvent);
     era.event.time(iEvent) = event.time;
-    era.event.nid{iEvent} = event.nid;
+    era.event.nid(iEvent) = event.nid;
     era.event.name{iEvent} = event.name;
     era.event.ud{iEvent} = event.userdata;
     
