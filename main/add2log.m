@@ -25,7 +25,7 @@ end
 
 if ledalog
     fid_ll = fopen(fullfile(leda2.intern.install_dir,'ledalog.txt'),'a');
-    fprintf(fid_ll,'%s\n', newinfo);
+    fprintf(fid_ll,'%s\r\n', newinfo);
     fclose(fid_ll);
 end
 

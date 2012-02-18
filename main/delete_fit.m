@@ -14,6 +14,7 @@ delete(ch(strcmp(get(ch,'Tag'),'FitComp')));
 leda2.gui.overview.driver = [];
 leda2.gui.overview.tonic_component = [];
 leda2.gui.overview.phasic = [];
+leda2.gui.overview.overshoot = [];
 
 %Delete rangeview components
 ch = get(leda2.gui.rangeview.ax,'Children');

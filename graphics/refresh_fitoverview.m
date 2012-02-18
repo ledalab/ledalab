@@ -77,6 +77,7 @@ else %refresh
     if strcmp(leda2.analysis.method,'nndeco')
         overshoot_sc = leda2.gui.overview.min + remainder / max(.1,max(remainder)) * (leda2.gui.overview.max-leda2.gui.overview.min)/10;
         set(leda2.gui.overview.overshoot, 'YData', [overshoot_sc, 0, 0]);
+        %leda2.gui.overview.overshoot = fill([time time(end) time(1)], [overshoot_sc, 0, 0], [.8 .4 .4], 'linestyle', 'none','ButtonDownFcn','leda_click(1)');
     end
     
 end

@@ -25,7 +25,7 @@ leda2.gui.menu.menu_1b12 = uimenu(leda2.gui.menu.menu_1b,'Label','Text File [Sam
 leda2.gui.menu.menu_1b13 = uimenu(leda2.gui.menu.menu_1b,'Label','User-defined Data','Callback','import_data(''userdef'');','Enable','off');
 
 leda2.gui.menu.menu_1c = uimenu(leda2.gui.menu.menu_1,'Label','Import Events...'); %,'Accelerator','i'
-leda2.gui.menu.menu_1c1 = uimenu(leda2.gui.menu.menu_1c,'Label','Event-Data (Time Marker)','Callback','import_eventdata(''userdef'')');
+leda2.gui.menu.menu_1c1 = uimenu(leda2.gui.menu.menu_1c,'Label','Event-Data [Time Marker]','Callback','import_eventdata(''userdef'')');
 leda2.gui.menu.menu_1c2 = uimenu(leda2.gui.menu.menu_1c,'Label','User-defined Event-Labels','Callback','import_eventinfo(''userdef'')');
 leda2.gui.menu.menu_1d = uimenu(leda2.gui.menu.menu_1,'Label','Export Data...');
 leda2.gui.menu.menu_1d1 = uimenu(leda2.gui.menu.menu_1d,'Label','ASCII File','Callback','exportTextData');
@@ -71,8 +71,8 @@ leda2.gui.menu.menu_5a = uimenu(leda2.gui.menu.menu_5,'Label','FFT','Callback','
 
 %-Results
 leda2.gui.menu.menu_6  = uimenu(leda2.gui.fig_main,'Label','Results');
-%leda2.gui.menu.menu_6a = uimenu(leda2.gui.menu.menu_6,'Label','Export SCR-List','Callback','export_scrlist');
-leda2.gui.menu.menu_6b = uimenu(leda2.gui.menu.menu_6,'Label','Export Event-Related Activation','Callback','export_era','Accelerator','e');
+leda2.gui.menu.menu_6a = uimenu(leda2.gui.menu.menu_6,'Label','Export Event-Related Activation','Callback','export_era','Accelerator','e');
+leda2.gui.menu.menu_6b = uimenu(leda2.gui.menu.menu_6,'Label','Export SCR-List','Callback','export_scrlist');
 
 %-Info
 leda2.gui.menu.menu_7 =  uimenu(leda2.gui.fig_main,'Label','Info');

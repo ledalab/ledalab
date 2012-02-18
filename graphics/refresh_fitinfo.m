@@ -31,13 +31,13 @@ if strcmp(leda2.analysis.method,'nndeco')
     nTonic = length(leda2.analysis.groundlevel);
     nPhasic = length(leda2.analysis.onset);
 
-    set(leda2.gui.text_method,'String','Method: NN-Deconv');
+    set(leda2.gui.text_method,'String','Method: DDA (NN-Deconv)');
     set(leda2.gui.text_nPhasic,'String',['SCRs: ', num2str(nPhasic)]);
     set(leda2.gui.text_nTonic,'String',['TPs: ', num2str(nTonic)]);
 
 else
 
-    set(leda2.gui.text_method,'String','Method: S-Deconv');
+    set(leda2.gui.text_method,'String','Method: CDA (S-Deconv)');
     set(leda2.gui.text_nPhasic,'String','');
     set(leda2.gui.text_nTonic,'String','');
 

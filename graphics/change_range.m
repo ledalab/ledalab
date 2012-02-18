@@ -31,7 +31,7 @@ else
     cond_rg.min = min(leda2.analysis.tonicData(subrange_idx(time.data, rgview.start, rgview.start + rgview.range)));
 end
 cond_rg.max = max(cond_rg.data);
-cond_rg.yrange = (cond_rg.max - cond_rg.min)*1.2;  %+20%
+cond_rg.yrange = max(.5, (cond_rg.max - cond_rg.min)*1.2); %%%
 rg_bottom = (cond_rg.max + cond_rg.min)/2 - cond_rg.yrange/2;
 rg_top = (cond_rg.max + cond_rg.min)/2 + cond_rg.yrange/2;
 rgview.bottom = rg_bottom;

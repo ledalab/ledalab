@@ -270,6 +270,7 @@ leda2.analysis0.tonic_poly.coefs(:,end) = leda2.analysis0.tonic_poly.coefs(:,end
 leda2.analysis0.groundtime = leda2.analysis0.target.groundtime;
 leda2.analysis0.groundlevel = leda2.analysis0.target.groundlevel0 - leda2.analysis0.dist0;
 
+delete_fit(0);
 leda2.analysis0 = rmfield(leda2.analysis0, 'target');
 leda2.analysis = leda2.analysis0;
 leda2.analysis.method = 'nndeco';

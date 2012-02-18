@@ -159,6 +159,7 @@ leda2.analysis0.driver_rawdata = driver_rawdata;
 leda2.analysis0.onset = onset(tidx);
 leda2.analysis0.amp = amp(tidx);
 leda2.analysis0.area = area(tidx);
+leda2.analysis0.impulseOnset = t_ext(impMin(tidx));
 leda2.analysis0.impulsePeakTime = t_ext(impMax(tidx));
 leda2.analysis0.scrPeakTime = t_ext(peaktime_idx(tidx));
 leda2.analysis0.onset_idx = onset_idx(tidx) - n_offset;

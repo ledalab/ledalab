@@ -1,8 +1,8 @@
 function export_era(action)
-% Saving results into Matlab/textfile/or Excel (*_results.mat/txt/xls)
+% Saving results into Matlab/textfile/or Excel (*_era.mat/txt/xls)
 %
 %  - Choose SCR-Window times relative to event
-%  - Choose minimum deflection for SCR
+%  - Choose minimum amplitude threshold for SCR
 
 
 if nargin < 1,
@@ -23,19 +23,19 @@ dy = .13;
 
 if ~leda2.file.open
     if leda2.intern.prompt
-        msgbox('No open File!','Export Fit','error')
+        msgbox('No open File!','Export Event-Related Activation','error')
     end
     return
 end
 if leda2.data.events.N < 1
     if leda2.intern.prompt
-        msgbox('File has no Events!','Export Fit','error')
+        msgbox('File has no Events!','Export Event-Related Activation','error')
     end
     return
 end
 
 
-leda2.gui.export.fig_pl = figure('Units','normalized','Position',[.2 .5 .6 .2],'Name','Export Fit','MenuBar','none','NumberTitle','off');
+leda2.gui.export.fig_pl = figure('Units','normalized','Position',[.2 .5 .6 .2],'Name','Export Event-Related Activation','MenuBar','none','NumberTitle','off');
 
 leda2.gui.export.text_scrWindowLimits = uicontrol('Style','text','Units','normalized','Position',[.1 .75 .35 dy],'BackgroundColor',[.8 .8 .8],'String','SCR window relative to event (start - end) [sec]:','HorizontalAlignment','left');
 leda2.gui.export.edit_scrWindowStart = uicontrol('Style','edit','Units','normalized','Position',[.5 .75 .1 dy],'BackgroundColor',[1 1 1],'String',num2str(leda2.set.export.SCRstart,'%1.2f'));
@@ -77,6 +77,23 @@ if ~isempty(leda2.analysis)
     if strcmp(leda2.analysis.method,'nndeco')
         onset_nndeco = leda2.analysis.impulsePeakTime;
         amp_nndeco = leda2.analysis.amp;
+        
+    else %sdeco
+        if leda2.intern.version <= 3.34  %see sdeco lines ~235+
+            t = leda2.data.time.data;
+            driver = leda2.analysis.driver;
+            [minL, maxL] = get_peaks(driver, 1);
+            minL = [minL(1:length(maxL)), length(t)];
+            leda2.analysis.impulseOnset = t(minL(1:end-1));
+            leda2.analysis.impulsePeakTime = t(maxL);   % = effective peak-latency
+            for iPeak = 1:length(maxL)
+                sc_reconv = conv(leda2.analysis.driver(minL(iPeak):minL(iPeak+1)), leda2.analysis.kernel);
+                leda2.analysis.amp(iPeak) = max(sc_reconv);
+            end
+        end
+        onset_sdeco = leda2.analysis.impulsePeakTime; %impulse peak-time = peak-latency
+        amp_sdeco = leda2.analysis.amp;
+        
     end
 end
 
@@ -85,33 +102,43 @@ for iEvent = 1:leda2.data.events.N
     
     %Set event data
     event = leda2.data.events.event(iEvent);
-    era.event.time(iEvent) = event.time;
-    era.event.nid(iEvent) = event.nid;
-    era.event.name{iEvent} = event.name;
-    era.event.ud{iEvent} = event.userdata;
+    era.Event.time(iEvent) = event.time;
+    era.Event.nid(iEvent) = event.nid;
+    era.Event.name{iEvent} = event.name;
+    era.Event.ud{iEvent} = event.userdata;
     
     [t_respwin, cs_respwin, idx_respwin] = subrange(event.time + scrWindow_t1, event.time + scrWindow_t2);  %data of response window
     
-    %Reset all measures
-    %Measures yielded by Discrete Decomposition Analysis (DDA)
-    era.DDA.scr_nr(iEvent) = NaN;
-    era.DDA.scr_ampsum(iEvent) = NaN;
-    era.DDA.scr_areasum(iEvent) = NaN;
-    era.DDA.scr_latency(iEvent) = NaN;
-    era.DDA.tonic(iEvent) = NaN;  %average tonic level
-    %Measures yielded by Continuous Decomposition Analysis (CDA)
-    era.CDA.SCR(iEvent) = NaN;  %average phasic driver activity (time integral over response window by size of responsewindow)
-    era.CDA.ISCR(iEvent) = NaN;  %phasic driver area (time integral over response window)
-    era.CDA.phasic_max(iEvent) = NaN;   %Driver maximum within response window
-    era.CDA.SCR_ITTP(iEvent) = NaN;   %SCR amp resulting from phasic segment re-convoluted with driver impulse
-    era.CDA.tonic(iEvent) = NaN;   %average tonic level
-    %Measures yielded by Trough-To-Peak Analysis
-    era.TTP.scr_nr(iEvent) = NaN;
-    era.TTP.scr_ampsum(iEvent) = NaN;
-    era.TTP.scr_latency(iEvent) = NaN;
-    %Measures based on raw SC data
-    era.global.mean(iEvent) = NaN;
-    era.global.max_deflection(iEvent) = NaN;
+    % RESET ALL MEASURES
+    % Measures yielded by Continuous Decomposition Analysis (CDA)
+    if ~isempty(leda2.analysis)
+        if strcmp(leda2.analysis.method,'sdeco')
+            era.CDA.nSCR(iEvent) = NaN;       % Number of significant (= above threshold) SCRs within response window
+            era.CDA.Latency(iEvent) = NaN;  % Latency of first sign SCR within response window (= time of corresponding impulse-peak)
+            era.CDA.AmpSum(iEvent) = NaN;   % Amplitude-Sum of sign SCRs (reconvolved from phasic driver-peaks)
+            era.CDA.SCR(iEvent) = NaN;          % Average phasic driver activity (time integral over response window by size of responsewindow)
+            era.CDA.ISCR(iEvent) = NaN;         % Phasic driver area (time integral over response window)
+            %era.CDA.SCR_ITTP(iEvent) = NaN;    % Max SCR Amplitude after reconvolution from phasic segment in response window
+            %era.CDA.phasic_max(iEvent) = NaN;  % Driver maximum within response window
+            era.CDA.Tonic(iEvent) = NaN;        % Average level of (decomposed) Tonic component
+            
+        elseif strcmp(leda2.analysis.method,'nndeco')
+            % Measures yielded by Discrete Decomposition Analysis (DDA)
+            era.DDA.nSCR(iEvent) = NaN;       % Number of significant (= above threshold) SCRs within response window
+            era.DDA.Latency(iEvent) = NaN;  % Latency of first sign SCR within response window (= time of corresponding impulse-peak)
+            era.DDA.AmpSum(iEvent) = NaN;   % Amplitude-Sum of sign SCRs within response window
+            era.DDA.AreaSum(iEvent) = NaN;  % Area of SCRs within response window
+            era.DDA.Tonic(iEvent) = NaN;        % Average level of (decomposed) Tonic component
+        end
+    end
+    % Measures yielded by Trough-To-Peak Analysis
+    era.TTP.nSCR(iEvent) = NaN;       % Number of significant (= above threshold) SCRs within response window
+    era.TTP.Latency(iEvent) = NaN;  % Latency of first sign SCR within response window
+    era.TTP.AmpSum(iEvent) = NaN;   % Amplitude-Sum of sign SCRs (EDA-Max - EDA-Min)
+    
+    % Measures based on raw SC data
+    era.Global.Mean(iEvent) = NaN;
+    era.Global.MaxDeflection(iEvent) = NaN;
     
     
     %Set Measures
@@ -119,47 +146,54 @@ for iEvent = 1:leda2.data.events.N
     scr_idx = find(onset_ttp >= (event.time + scrWindow_t1) & onset_ttp <= (event.time + scrWindow_t2) & amp_ttp >= scrAmplitudeMin);
     nPeaks = length(scr_idx);
     
-    era.TTP.scr_nr(iEvent) = nPeaks;
-    era.TTP.scr_ampsum(iEvent) = sum(amp_ttp(scr_idx));
+    era.TTP.nSCR(iEvent) = nPeaks;
+    era.TTP.AmpSum(iEvent) = sum(amp_ttp(scr_idx));
     if nPeaks > 0
-        era.TTP.scr_latency(iEvent) = onset_ttp(scr_idx(1)) - event.time;
+        era.TTP.Latency(iEvent) = onset_ttp(scr_idx(1)) - event.time;
     end
     
     %Global measures
-    era.global.mean(iEvent) = mean(leda2.data.conductance.data(idx_respwin));       %simple mean of data within response window
+    era.Global.Mean(iEvent) = mean(leda2.data.conductance.data(idx_respwin));       %simple Mean of data within response window
     diff = 0;
     for i = 1:length(cs_respwin)-1
         diff(i) = max(cs_respwin(i+1:end)) - cs_respwin(i);
     end
-    era.global.max_deflection(iEvent) = max([diff, 0]);
+    era.Global.MaxDeflection(iEvent) = max([diff, 0]);
     
     %Decomposition measures
     if ~isempty(leda2.analysis)
-        if strcmp(leda2.analysis.method,'nndeco')
-            %DDA
+        
+        if strcmp(leda2.analysis.method,'sdeco') %CDA
+            scr_idx = find(onset_sdeco >= (event.time + scrWindow_t1) & onset_sdeco <= (event.time + scrWindow_t2) & amp_sdeco >= scrAmplitudeMin);
+            nPeaks = length(scr_idx);
+            
+            era.CDA.nSCR(iEvent) = nPeaks;
+            if nPeaks > 0
+                era.CDA.Latency(iEvent) = onset_sdeco(scr_idx(1)) - event.time;
+            end
+            era.CDA.AmpSum(iEvent) = sum(amp_sdeco(scr_idx));
+            era.CDA.SCR(iEvent) = max(0, sum(leda2.analysis.driver(idx_respwin))/(sr*(scrWindow_t2-scrWindow_t1)));  % ISCR = average phasic driver activity  [muS]
+            era.CDA.ISCR(iEvent) = max(0, sum(leda2.analysis.driver(idx_respwin))/sr);  % ISCR = phasic_area  [muS*sec]
+            %             era.CDA.phasic_max(iEvent) = max(0, max(leda2.analysis.driver(idx_respwin)));
+            %             sc_reconv = conv(leda2.analysis.driver(idx_respwin), leda2.analysis.kernel);
+            %             if max(sc_reconv) >= scrAmplitudeMin
+            %                 era.CDA.SCR_ITTP(iEvent) = max(sc_reconv);
+            %             else
+            %                 era.CDA.SCR_ITTP(iEvent) = 0;
+            %             end
+            era.CDA.Tonic(iEvent) = mean(leda2.analysis.tonicData(idx_respwin));
+            
+        elseif strcmp(leda2.analysis.method,'nndeco') %DDA
             scr_idx = find(onset_nndeco >= (event.time + scrWindow_t1) & onset_nndeco <= (event.time + scrWindow_t2) & amp_nndeco >= scrAmplitudeMin);
             nPeaks = length(scr_idx);
             
-            era.DDA.scr_nr(iEvent) = nPeaks;
-            era.DDA.scr_ampsum(iEvent) = sum(amp_nndeco(scr_idx));
-            era.DDA.scr_areasum(iEvent) = sum(leda2.analysis.area(scr_idx)); % / (scrWindow_t2 - scrWindow_t1) would result in real muS/sec
+            era.DDA.nSCR(iEvent) = nPeaks;
             if nPeaks > 0
-                era.DDA.scr_latency(iEvent) = onset_nndeco(scr_idx(1)) - event.time;
+                era.DDA.Latency(iEvent) = onset_nndeco(scr_idx(1)) - event.time;
             end
-            era.DDA.tonic(iEvent) = mean(leda2.analysis.tonicData(idx_respwin));
-            
-        elseif strcmp(leda2.analysis.method,'sdeco')
-            %CDA
-            era.CDA.SCR(iEvent) = max(0, sum(leda2.analysis.driver(idx_respwin))/(sr*(scrWindow_t2-scrWindow_t1)));  % ISCR = average phasic driver activity  [muS]            
-            era.CDA.ISCR(iEvent) = max(0, sum(leda2.analysis.driver(idx_respwin))/sr);  % ISCR = phasic_area  [muS*sec]
-            era.CDA.phasic_max(iEvent) = max(0, max(leda2.analysis.driver(idx_respwin)));
-            sc_reconv = conv(leda2.analysis.driver(idx_respwin), leda2.analysis.kernel);
-            if max(sc_reconv) >= scrAmplitudeMin
-                era.CDA.SCR_ITTP(iEvent) = max(sc_reconv);
-            else
-                era.CDA.SCR_ITTP(iEvent) = 0;
-            end
-            era.CDA.tonic(iEvent) = mean(leda2.analysis.tonicData(idx_respwin));
+            era.DDA.AmpSum(iEvent) = sum(amp_nndeco(scr_idx));
+            era.DDA.AreaSum(iEvent) = sum(leda2.analysis.area(scr_idx)); % / (scrWindow_t2 - scrWindow_t1) would result in real muS/sec
+            era.DDA.Tonic(iEvent) = mean(leda2.analysis.tonicData(idx_respwin));
             
         end
         
@@ -175,34 +209,35 @@ savefname = [leda2.file.filename(1:end-4), '_era'];
 %-Matlab Export
 if leda2.set.export.savetype == 1
     results = era;
+    savefname = [savefname,'.mat'];
     save(savefname,'results');
 end
 
 %-Text Export
 if leda2.set.export.savetype == 2
-    fid = fopen([savefname,'.txt'],'wt');
+    savefname = [savefname,'.txt'];
+    fid = fopen(savefname,'wt');
     
     if isempty(leda2.analysis)
-        fprintf(fid,'EvNr\tnSCR_ttp\tAmpSum_ttp\tOnset1_ttp\tMean\tMaxDeflection\tEventNId\tEventName\n');
+        fprintf(fid,'Event.Nr\tTTP.nSCR\tTTP.Latency\tTTP.AmpSum\tGlobal.Mean\tGlobal.MaxDeflection\tEvent.NID\tEvent.Name\r\n');
         for i = 1:leda2.data.events.N
-            fprintf(fid,'%3.0f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\n', ...
-                i, era.TTP.scr_nr(i), era.TTP.scr_ampsum(i), era.TTP.scr_latency(i), era.global.mean(i), era.global.max_deflection(i), era.event.nid(i), era.event.name{i});
+            fprintf(fid,'%3.0f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\r\n', ...
+                i, era.TTP.nSCR(i), era.TTP.Latency(i), era.TTP.AmpSum(i), era.Global.Mean(i), era.Global.MaxDeflection(i), era.Event.nid(i), era.Event.name{i});
         end
         
     else
-        
         if strcmp(leda2.analysis.method,'sdeco')
-            fprintf(fid,'EvNr\tSCR\tISCR\tPhasicMax\tSCR_ITTP\tTonic\tnSCR_ttp\tAmpSum_ttp\tOnset1_ttp\tMean\tMaxDeflection\tEventNId\tEventName\n');
+            fprintf(fid,'Event.Nr\tCDA.nSCR\tCDA.Latency\tCDA.AmpSum\tCDA.SCR\tCDA.ISCR\tCDA.Tonic\tTTP.nSCR\tTTP.Latency\tTTP.AmpSum\tGlobal.Mean\tGlobal.MaxDeflection\tEvent.NID\tEvent.Name\r\n');
             for i = 1:leda2.data.events.N
-                fprintf(fid,'%3.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\n',...
-                    i, era.CDA.SCR(i), era.CDA.ISCR(i), era.CDA.phasic_max(i), era.CDA.SCR_ITTP(i), era.CDA.tonic(i), era.TTP.scr_nr(i), era.TTP.scr_ampsum(i), era.TTP.scr_latency(i), era.global.mean(i), era.global.max_deflection(i), era.event.nid(i), era.event.name{i});
+                fprintf(fid,'%3.0f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\r\n',...
+                    i, era.CDA.nSCR(i), era.CDA.Latency(i), era.CDA.AmpSum(i), era.CDA.SCR(i), era.CDA.ISCR(i), era.CDA.Tonic(i), era.TTP.nSCR(i), era.TTP.Latency(i), era.TTP.AmpSum(i), era.Global.Mean(i), era.Global.MaxDeflection(i), era.Event.nid(i), era.Event.name{i});
             end
             
         elseif strcmp(leda2.analysis.method,'nndeco')
-            fprintf(fid,'EvNr\tnSCR\tAmpSum\tAreaSum\tOnset1\tTonic\tnSCR_ttp\tAmpSum_ttp\tOnset1_ttp\tMean\tMaxDeflection\tEventNId\tEventName\n');
+            fprintf(fid,'Event.Nr\tDDA.nSCR\tDDA.Latency\tDDA.AmpSum\tDDA.AreaSum\tDDA.Tonic\tTTP.nSCR\tTTP.Latency\tTTP.AmpSum\tGlobal.Mean\tGlobal.MaxDeflection\tEvent.NID\tEvent.Name\r\n');
             for i = 1:leda2.data.events.N
-                fprintf(fid,'%3.0f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\n',...
-                    i, era.DDA.scr_nr(i), era.DDA.scr_ampsum(i), era.DDA.scr_areasum(i), era.DDA.scr_latency(i), era.DDA.tonic(i), era.TTP.scr_nr(i), era.TTP.scr_ampsum(i), era.TTP.scr_latency(i), era.global.mean(i), era.global.max_deflection(i), era.event.nid(i), era.event.name{i});
+                fprintf(fid,'%3.0f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%2.0f\t%6.4f\t%6.4f\t%6.4f\t%6.4f\t%3.0f\t"%s"\r\n',...
+                    i, era.DDA.nSCR(i), era.DDA.Latency(i), era.DDA.AmpSum(i), era.DDA.AreaSum(i), era.DDA.Tonic(i), era.TTP.nSCR(i), era.TTP.Latency(i), era.TTP.AmpSum(i), era.Global.Mean(i), era.Global.MaxDeflection(i), era.Event.nid(i), era.Event.name{i});
             end
             
         end
@@ -213,22 +248,23 @@ end
 
 %-Excel Export
 if leda2.set.export.savetype == 3
+    savefname = [savefname,'.xls'];
     
     if isempty(leda2.analysis)
-        xlswrite(savefname, {'Event-Nr','Event-NId','Event-Name','nSCR_ttp','AmpSum_ttp [muS]','Onset1_ttp [s]','SC_Mean [muS]','MaxDeflection [muS]'}, 'TTP', 'A1')
-        xlswrite(savefname, [(1:leda2.data.events.N)', era.event.nid', nan(leda2.data.events.N,1), era.TTP.scr_nr', era.TTP.scr_ampsum', era.TTP.scr_latency', era.global.mean', era.global.max_deflection'], 'TTP', 'A2');
-        xlswrite(savefname, era.event.name', 'TTP', 'C2');
+        xlswrite(savefname, {'Event.Nr', 'Event.NID', 'Event.Name','TTP.nSCR','TTP.Latency [s]','TTP.AmpSum [muS]','Global.Mean [muS]','Global.MaxDeflection [muS]'}, 'TTP', 'A1')
+        xlswrite(savefname, [(1:leda2.data.events.N)', era.Event.nid', nan(leda2.data.events.N,1), era.TTP.nSCR', era.TTP.Latency', era.TTP.AmpSum', era.Global.Mean', era.Global.MaxDeflection'], 'TTP', 'A2');
+        xlswrite(savefname, era.Event.name', 'TTP', 'C2');
         
-    else        
+    else
         if strcmp(leda2.analysis.method,'sdeco')
-            xlswrite(savefname, {'Event-Nr','Event-NId','Event-Name','SCR [muS]','ISCR [muSxs]','PhasicMax [muS]','SCR_ITTP [muS]','Tonic [muS]','nSCR_ttp','AmpSum_ttp [muS] ','Onset1_ttp [s]','Mean [muS]','MaxDeflection [muS]'}, 'CDA', 'A1');
-            xlswrite(savefname, [(1:leda2.data.events.N)', era.event.nid', nan(leda2.data.events.N,1), era.CDA.SCR', era.CDA.ISCR', era.CDA.phasic_max', era.CDA.SCR_ITTP', era.CDA.tonic', era.TTP.scr_nr', era.TTP.scr_ampsum', era.TTP.scr_latency', era.global.mean', era.global.max_deflection'], 'CDA', 'A2');
-            xlswrite(savefname, era.event.name', 'CDA', 'C2');
+            xlswrite(savefname, {'Event.Nr', 'Event.NID', 'Event.Name', 'CDA.nSCR', 'CDA.Latency [s]', 'CDA.AmpSum [muS]', 'CDA.SCR [muS]', 'CDA.ISCR [muSxs]', 'CDA.Tonic [muS]', 'TTP.nSCR', 'TTP.Latency [s]', 'TTP.AmpSum [muS]', 'Global.Mean [muS]', 'Global.MaxDeflection [muS]'}, 'CDA', 'A1');
+            xlswrite(savefname, [(1:leda2.data.events.N)', era.Event.nid', nan(leda2.data.events.N,1), era.CDA.nSCR', era.CDA.Latency', era.CDA.AmpSum', era.CDA.SCR', era.CDA.ISCR', era.CDA.Tonic', era.TTP.nSCR', era.TTP.Latency', era.TTP.AmpSum', era.Global.Mean', era.Global.MaxDeflection'], 'CDA', 'A2');
+            xlswrite(savefname, era.Event.name', 'CDA', 'C2');
             
         elseif strcmp(leda2.analysis.method,'nndeco')
-            xlswrite(savefname, {'Event-Nr','Event-NId','Event-Name','nSCR','AmpSum [muS]','AreaSum [muSxs]','Onset1 [s]','Tonic [muS]','nSCR_ttp','AmpSum_ttp [muS]','Onset1_ttp [s]','Mean [muS]','MaxDeflection [muS]'}, 'DDA', 'A1');
-            xlswrite(savefname, [(1:leda2.data.events.N)', era.event.nid', nan(leda2.data.events.N,1), era.DDA.scr_nr', era.DDA.scr_ampsum', era.DDA.scr_areasum', era.DDA.scr_latency', era.DDA.tonic', era.TTP.scr_nr', era.TTP.scr_ampsum', era.TTP.scr_latency', era.global.mean', era.global.max_deflection'], 'DDA', 'A2');
-            xlswrite(savefname, era.event.name', 'DDA', 'C2');
+            xlswrite(savefname, {'Event.Nr', 'Event.NID', 'Event.Name', 'DDA.nSCR', 'DDA.Latency [s]', 'DDA.AmpSum [muS]', 'DDA.AreaSum [muSxs]', 'DDA.Tonic [muS]', 'TTP.nSCR', 'TTP.Latency [s]', 'TTP.AmpSum [muS]', 'Global.Mean [muS]', 'Global.MaxDeflection [muS]'}, 'DDA', 'A1');
+            xlswrite(savefname, [(1:leda2.data.events.N)', era.Event.nid', nan(leda2.data.events.N,1), era.DDA.nSCR', era.DDA.Latency', era.DDA.AmpSum', era.DDA.AreaSum', era.DDA.Tonic', era.TTP.nSCR', era.TTP.Latency', era.TTP.AmpSum', era.Global.Mean', era.Global.MaxDeflection'], 'DDA', 'A2');
+            xlswrite(savefname, era.Event.name', 'DDA', 'C2');
             
         end
         
