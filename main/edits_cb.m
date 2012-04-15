@@ -37,6 +37,7 @@ switch flag
     case 6,
         if leda2.gui.eventinfo.current_event
             eventnr = leda2.gui.eventinfo.current_event - 1;
+            eventnr = max(1, eventnr);
         else
             eventnr = find([leda2.data.events.event.time] < leda2.gui.rangeview.start);
             if ~isempty(eventnr)
@@ -49,6 +50,7 @@ switch flag
     case 7,
         if leda2.gui.eventinfo.current_event
             eventnr = leda2.gui.eventinfo.current_event + 1;
+            eventnr = min(leda2.data.events.N, eventnr);
         else
             eventnr = find([leda2.data.events.event.time] > leda2.gui.rangeview.start);
             if ~isempty(eventnr)

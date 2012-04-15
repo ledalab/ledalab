@@ -92,11 +92,7 @@ if leda2.data.events.N > 0
 end
 leda2.gui.eventinfo.showEvent = 0;
 
-%Driver
-set(leda2.gui.driver.ax, 'XLim', [rg_start, rg_end], 'Ylim', [rg_bottom, rg_top]);
 
-
-%%%%
 %%%%
 leda2.gui.rangeview = rgview;
 showfit;%(rgview.start, rgview.start + rgview.range); %%%%

@@ -32,16 +32,9 @@ data.conductance = leda2.data.conductance.data;
 data.time = leda2.data.time.data;
 data.timeoff = leda2.data.time.timeoff;
 data.event = leda2.data.events.event;
-%data.artifact = leda2.data.artifact;
 
 savevars = {'fileinfo','data'};
 
-% fit = [];
-% if ~isempty(leda2.analyze.fit)
-%     initvals = leda2.analyze.initialvalues;
-%     fit = leda2.analyze.fit;
-%     fit = rmfield(fit, 'data');
-% end
 if ~isempty(leda2.analysis)
     analysis = leda2.analysis;
     if strcmp(leda2.analysis.method,'nndeco')

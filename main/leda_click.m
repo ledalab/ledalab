@@ -15,10 +15,11 @@ if ax_flag == 1 %overview display
     pt2 = max(point1, point2); %right-top (x,y)
 
     if (pt1(1) > 0-leda2.data.samplingrate*10) && (pt1(1) < leda2.data.N+leda2.data.samplingrate*10) && (pt1(2) > 0) && (pt1(2) < leda2.data.conductance.max+1) %Hit within overview-axes
-        pt1(1) = withinlimits(pt1(1), 0, leda2.data.N);
+        pt1(1) = withinlimits(pt1(1), 0, leda2.data.time.data(end));
         leda2.gui.rangeview.start = pt1(1);
 
         if norm(pt2-pt1) > 2 && (pt2(1) > 0) && (pt2(1) < leda2.data.N) && (pt2(2) > 0) && (pt2(2) < leda2.data.conductance.max+1)
+            pt2(1) = withinlimits(pt2(1), 0, leda2.data.time.data(end));
             leda2.gui.rangeview.range = pt2(1) - pt1(1);
         end
         change_range;

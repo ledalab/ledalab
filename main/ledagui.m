@@ -68,6 +68,7 @@ leda2.gui.menu.menu_4c = uimenu(leda2.gui.menu.menu_4,'Label','Delete analysis',
 %-Tools
 leda2.gui.menu.menu_5  = uimenu(leda2.gui.fig_main,'Label','Tools');
 leda2.gui.menu.menu_5a = uimenu(leda2.gui.menu.menu_5,'Label','FFT','Callback','leda_fft');
+leda2.gui.menu.menu_5b = uimenu(leda2.gui.menu.menu_5,'Label','Plot event-related data per condition (split and average)','Callback','leda_split');
 
 %-Results
 leda2.gui.menu.menu_6  = uimenu(leda2.gui.fig_main,'Label','Results');

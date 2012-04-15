@@ -22,6 +22,19 @@ leda2.gui.overview.phasic = [];
 
 leda2.analysis = [];
 
+% define structure for GUI of leda_split.m
+leda2.gui.split = [];
+
+% define structure used by leda_split.m
+% leda2.data.split.name = '';
+% leda2.data.split.data = [];
+% leda2.data.split.mean = [];
+% leda2.data.split.time = [];
+% leda2.data.split.stderr = [];
+% leda2.data.split.start = [];
+% leda2.data.split.end = [];
+
+
 %Default Setting:
 
 %LEDASET
@@ -56,8 +69,20 @@ leda2.set.export.SCRstart = 1.00; %sec
 leda2.set.export.SCRend   = 4.00; %sec
 leda2.set.export.SCRmin   = .01; %muS
 leda2.set.export.savetype = 1;
-% %Artifact
-% leda2.set.artifact.ckk_thresh = .25;
+
+
+
+% settings for leda_split.m
+leda2.set.split.start = -1;   % sec
+leda2.set.split.end = 5;        % sec
+leda2.set.split.variables = {'driver','phasicData'}; % possible variables, 2012-03-13 only one by now.
+leda2.set.split.var = 1;        % index for VARIABLES
+leda2.set.split.stderr = 0;
+%leda2.set.split.variable = 'phasicData';
+%leda2.set.split.selectedconditions = [];
+%leda2.set.split.plot = 1;
+
+
 
 %Ledapref
 leda2.pref.showSmoothData = 0;
@@ -80,7 +105,7 @@ catch
     add2log(0,'No ledamem available',1)
 end
 
-%saving the default settings may replace an unavailble ledamem, if necessary
+%saving the default settings may replace an unavailable ledamem, if necessary
 ledamem.prevfile = leda2.intern.prevfile;
 ledamem.set.default = leda2.set;
 ledamem.pref.default = leda2.pref;
