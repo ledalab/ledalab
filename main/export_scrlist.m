@@ -26,12 +26,6 @@ if ~leda2.file.open
     end
     return
 end
-if leda2.data.events.N < 1
-    if leda2.intern.prompt
-        msgbox('File has no Events!','Export SCR-List','error')
-    end
-    return
-end
 
 
 leda2.gui.export.fig_pl = figure('Units','normalized','Position',[.2 .5 .6 .2],'Name','Export SCR-List','MenuBar','none','NumberTitle','off');
@@ -154,10 +148,14 @@ if leda2.set.export.savetype == 3
         if strcmp(leda2.analysis.method,'sdeco')
             xlswrite(savefname, {'CDA.SCR-Onset','CDA.SCR-Amplitude'}, 'CDA', 'A1');
             xlswrite(savefname, [scrList.CDA.onset', scrList.CDA.amp'], 'CDA', 'A2');
+            xlswrite(savefname, {'TTP.SCR-Onset','TTP.SCR-Amplitude'}, 'TTP', 'A1')
+            xlswrite(savefname, [scrList.TTP.onset', scrList.TTP.amp'], 'TTP', 'A2');
             
         elseif strcmp(leda2.analysis.method,'nndeco')
             xlswrite(savefname, {'DDA.SCR-Onset','DDA.SCR-Amplitude'}, 'DDA', 'A1');
             xlswrite(savefname, [scrList.DDA.onset', scrList.DDA.amp'], 'DDA', 'A2');
+            xlswrite(savefname, {'TTP.SCR-Onset','TTP.SCR-Amplitude'}, 'TTP', 'A1')
+            xlswrite(savefname, [scrList.TTP.onset', scrList.TTP.amp'], 'TTP', 'A2');
             
         end
         

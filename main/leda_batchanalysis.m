@@ -3,9 +3,10 @@ function leda_batchanalysis(varargin)
 global leda2
 
 %parse batch-mode arguments and check their validity
-[valid_options, pathname, open_datatype, downsample_factor, smooth_settings, analysis_method, do_optimize, export_era_settings, do_save_overview] = parse_arguments(varargin{:});
+[valid_options, pathname, open_datatype, downsample_factor, smooth_settings, analysis_method, do_optimize, ...
+    export_era_settings, export_scrlist_settings, do_save_overview] = parse_arguments(varargin{:});
 
-if ~valid_options || ~(downsample_factor > 1 || analysis_method || do_optimize || any(export_era_settings) || do_save_overview) %invalid option or no option
+if ~valid_options || ~(downsample_factor > 1 || analysis_method || do_optimize || any(export_era_settings) || any(export_scrlist_settings) || do_save_overview) %invalid option or no option
     disp('No valid operations for Batch-mode defined.')
     return;
 end
@@ -25,6 +26,7 @@ leda2.current.batchmode.command.method = analysis_method;
 leda2.current.batchmode.command.optimize = do_optimize;
 leda2.current.batchmode.command.overview = do_save_overview;
 leda2.current.batchmode.command.export_era = export_era_settings;
+leda2.current.batchmode.command.export_scrlist = export_scrlist_settings;
 leda2.current.batchmode.start = datestr(now, 21);
 leda2.current.batchmode.version = leda2.intern.version;
 leda2.current.batchmode.settings = leda2.set;
@@ -58,7 +60,7 @@ for iFile = 1:nFile
                 adaptive_smoothing;
             else
                 smooth_data(smooth_settings{2}, smooth_settings{1})
-            end       
+            end
         end
         
         %Analysis
@@ -73,15 +75,28 @@ for iFile = 1:nFile
             leda2.current.batchmode.file(iFile).error = leda2.analysis.error;
         end
         
-        %Export
+        %Export ERA
         if any(export_era_settings)
             leda2.set.export.SCRstart = export_era_settings(1);
             leda2.set.export.SCRend = export_era_settings(2);
             leda2.set.export.SCRmin = export_era_settings(3);
             if length(export_era_settings) > 3
                 leda2.set.export.savetype = export_era_settings(4);
+            else
+                leda2.set.export.savetype = 1;
             end
             export_era('savePeaks')
+        end
+        
+        %Export Scrlist
+        if any(export_scrlist_settings)
+            leda2.set.export.SCRmin = export_scrlist_settings(1);
+            if length(export_scrlist_settings) > 1
+                leda2.set.export.savetype = export_scrlist_settings(2);
+            else
+                leda2.set.export.savetype = 1;
+            end
+            export_scrlist('saveList')
         end
         
         %Save
@@ -105,7 +120,8 @@ save([pathname,filesep,'batchmode_protocol'],'protocol');
 
 
 
-function [valid_options, wdir, open_datatype, downsample_factor, smooth_settings, analysis_method, do_optimize, export_era_settings, do_save_overview] = parse_arguments(varargin)
+function [valid_options, wdir, open_datatype, downsample_factor, smooth_settings, analysis_method, do_optimize, ...
+    export_era_settings, export_scrlist_settings, do_save_overview] = parse_arguments(varargin)
 
 wdir = varargin{1};
 if ~strcmp(wdir(end),filesep) && ~strcmp(wdir(end-4:end-3),'*.')
@@ -122,6 +138,7 @@ analysis_method = 0;
 do_optimize = 2;
 %do_export_scr = 0;
 export_era_settings = [0 0 0 0];
+export_scrlist_settings = [0 0];
 do_save_overview = 0;
 
 %valid_datatypeL = {'leda','mat','text','cassylab','biopac','biopacmat','biotrace','visionanalyzer','userdef'};
@@ -163,7 +180,7 @@ if nargin > 1
                 else
                     valid_options = 0;
                     disp('Smooth option requires cell; first argument is ''hann'', ''mean'', ''gauss'', or ''adapt'', second argument is width')
-                    return;                    
+                    return;
                 end
                 
             case 'analyze'
@@ -185,11 +202,20 @@ if nargin > 1
                 end
                 
             case 'export_era'
-                if isnumeric(option_arg) && any(option_arg) && length(option_arg) == 4
+                if isnumeric(option_arg) && any(option_arg) && length(option_arg) >= 3
                     export_era_settings = option_arg;
                 else
                     valid_options = 0;
-                    disp('Export requires numeric argument (respwin_start respwin_end amp_min [filetype]) ')
+                    disp('Export requires numeric argument (respwin_start respwin_end amp_threshold [filetype]) ')
+                    return;
+                end
+                
+            case 'export_scrlist'
+                if isnumeric(option_arg) && any(option_arg) && length(option_arg) >= 1
+                    export_scrlist_settings = option_arg;
+                else
+                    valid_options = 0;
+                    disp('Export requires numeric argument (amp_threshold [filetype]) ')
                     return;
                 end
                 
