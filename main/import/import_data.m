@@ -17,6 +17,7 @@ switch datatype
     case 'mat', ext = {'*.mat'};
     case 'text', ext = {'*.txt'};
     case 'text2', ext = {'*.txt'};
+    case 'text3', ext = {'*.txt'};
 
     otherwise
         if leda2.intern.prompt
@@ -48,6 +49,8 @@ try
         case 'text2'
             [time, conductance, event] = gettext2data(file);
 
+        case 'text3'
+            [time, conductance, event] = gettext3data(file);
             
         case 'biotrace'
             [time, conductance, event] = getBiotraceData(file);

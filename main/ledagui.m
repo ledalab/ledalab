@@ -19,10 +19,11 @@ leda2.gui.menu.menu_1b6 = uimenu(leda2.gui.menu.menu_1b,'Label','PsychLab (Text 
 leda2.gui.menu.menu_1b7 = uimenu(leda2.gui.menu.menu_1b,'Label','VarioPort (.vpd)','Callback','import_data(''varioport'');');
 leda2.gui.menu.menu_1b8 = uimenu(leda2.gui.menu.menu_1b,'Label','Vision Analyzer (Matlab Export)','Callback','import_data(''visionanalyzer'');');
 leda2.gui.menu.menu_1b9 = uimenu(leda2.gui.menu.menu_1b,'Label','VitaPort (Text Export)','Callback','import_data(''vitaport'');');
-leda2.gui.menu.menu_1b10 = uimenu(leda2.gui.menu.menu_1b,'Label','Matlab File','Callback','import_data(''mat'');','Separator','on');
-leda2.gui.menu.menu_1b11 = uimenu(leda2.gui.menu.menu_1b,'Label','Text File [Time SC (Marker)]','Callback','import_data(''text'');');
-leda2.gui.menu.menu_1b12 = uimenu(leda2.gui.menu.menu_1b,'Label','Text File [Samples SC (Marker)]','Callback','import_data(''text2'');');
-leda2.gui.menu.menu_1b13 = uimenu(leda2.gui.menu.menu_1b,'Label','User-defined Data','Callback','import_data(''userdef'');','Enable','off');
+leda2.gui.menu.menu_1b10 = uimenu(leda2.gui.menu.menu_1b,'Label','Matlab File (*.mat)','Callback','import_data(''mat'');','Separator','on');
+leda2.gui.menu.menu_1b11 = uimenu(leda2.gui.menu.menu_1b,'Label','Text Type 1 [Time SC (Marker)]','Callback','import_data(''text'');');
+leda2.gui.menu.menu_1b12 = uimenu(leda2.gui.menu.menu_1b,'Label','Text Type 2 [SC (Marker)]','Callback','import_data(''text2'');');
+leda2.gui.menu.menu_1b13 = uimenu(leda2.gui.menu.menu_1b,'Label','Text Type 3 (Manual definition)','Callback','import_data(''text3'');');
+leda2.gui.menu.menu_1b14 = uimenu(leda2.gui.menu.menu_1b,'Label','User-defined Data','Callback','import_data(''userdef'');','Enable','off');
 
 leda2.gui.menu.menu_1c = uimenu(leda2.gui.menu.menu_1,'Label','Import Events...'); %,'Accelerator','i'
 leda2.gui.menu.menu_1c1 = uimenu(leda2.gui.menu.menu_1c,'Label','Event-Data [Time Marker]','Callback','import_eventdata(''userdef'')');

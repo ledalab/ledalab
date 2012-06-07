@@ -240,11 +240,17 @@ minL = [minL(1:length(maxL)), length(t)];
 
 leda2.analysis.impulseOnset = t(minL(1:end-1));
 leda2.analysis.impulsePeakTime = t(maxL);   % = effective peak-latency
+leda2.analysis.impulseAmp = driver(maxL);
+
 for iPeak = 1:length(maxL)
     sc_reconv = conv(leda2.analysis.driver(minL(iPeak):minL(iPeak+1)), leda2.analysis.kernel);
     leda2.analysis.amp(iPeak) = max(sc_reconv);
 end
-
+negamp_idx = find(leda2.analysis.amp <= 0);
+leda2.analysis.impulseOnset(negamp_idx) = [];
+leda2.analysis.impulsePeakTime(negamp_idx) = [];
+leda2.analysis.impulseAmp(negamp_idx) = [];
+leda2.analysis.amp(negamp_idx) = [];
 
 add2log(1,'Continuous Decomposition Analysis.',1,1,1)
 leda2.file.version = leda2.intern.version; %work around indicating analysis version of current fit

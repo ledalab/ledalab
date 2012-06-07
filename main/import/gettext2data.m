@@ -1,28 +1,14 @@
 function [time, conductance, event] = gettext2data(fullpathname)
 
-% Matlab V7.x+
-% fid = fopen(fullpathname);
-% data = textscan(fid, '%f %f','headerlines',0);
-% fclose(fid);
-%
-% time = data{1}';
-% conductance = data{2}';
-% event = {};
-
-%V213
-%[time, conductance] = textread(fullpathname,'%f\t%f','headerlines',0);
-%event = {};
-
 M = dlmread(fullpathname);
 
-%samples = M(:,1);
-conductance = M(:,2);
+conductance = M(:,1);
 answer = inputdlg('Enter Sampling Frequency:');
 sr = str2double(answer);
 time = (0:length(conductance)-1) / sr;
 
-if size(M,2) > 2
-    eventCol = 3;
+if size(M,2) > 1
+    eventCol = 2;
     eventIdx = find(M(:,eventCol));
     for iEvent = 1:length(eventIdx)
         iEventIdx = eventIdx(iEvent);
