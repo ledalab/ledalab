@@ -51,7 +51,7 @@ for iFile = 1:nFile
         
         %Downsample
         if downsample_factor > 1
-            downsample(downsample_factor, 'mean');
+            leda_downsample(downsample_factor, 'mean');  %MB 11.06.2013
         end
         
         %Smooth
@@ -109,7 +109,7 @@ for iFile = 1:nFile
         end
         
     catch
-        add2log(1,'ERROR !!!',1,0,0,1)
+        add2log(1,'ERROR (in leda_batchanalysis) !!!',1,0,0,1)
     end
     
 end

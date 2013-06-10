@@ -14,7 +14,7 @@ if length(maxL) > 2
         gap_idx = minL(i,2)+1:minL(i+1,1);  %+1: removed otherwise no inter-impulse points may be available at highly smoothed data
         iif_idx = [iif_idx, gap_idx];
     end
-    iif_idx = [minL(2,1), iif_idx, minL(end,2):length(driver)-sr];
+    iif_idx = [minL(2,1), iif_idx, minL(end,2):length(driver)-round(sr)]; %JG 26.10.2012: round() added
 
 else  %no peaks (exept for pre-peak and may last peak) so data represents tonic only, so ise all data for tonic estimation
     iif_idx = find(t_ext > 0);

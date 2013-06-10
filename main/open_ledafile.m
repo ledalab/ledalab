@@ -35,6 +35,16 @@ if any(strcmp(ledafile_vars,'epocharray')) %V1.x
     return;
 end
 
+if (~any(strcmp(ledafile_vars,'fileinfo'))) && (~any(strcmp(ledafile_vars,'ledalab'))) %JG 01.11.2012
+    if leda2.intern.batchmode
+            add2log(0,['Unable to open ',file,': This is not a native Ledalab-file. Please use batch mode parameter settings ''open'',''mat'' instead of ''open'',''leda''!'],1,1,0,1,0,1);        
+    else
+            add2log(0,['Unable to open ',file,': This is not a native Ledalab-file. Please use "Import Data"->"Matlab File" instead of "Open"!'],1,1,0,1,0,1);
+    end
+    return;
+end
+    
+
 if any(strcmp(ledafile_vars,'data'))
     try
         cond_tmp = ledafile.data.conductance;

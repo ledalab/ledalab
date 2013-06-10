@@ -20,6 +20,7 @@ end
 
 
 if ~isempty(event)
+    leda2.data.events.event = [];
     
     N = length(event);
     event_fields = fieldnames(event);

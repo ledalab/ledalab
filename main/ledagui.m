@@ -26,7 +26,7 @@ leda2.gui.menu.menu_1b13 = uimenu(leda2.gui.menu.menu_1b,'Label','Text Type 3 (M
 leda2.gui.menu.menu_1b14 = uimenu(leda2.gui.menu.menu_1b,'Label','User-defined Data','Callback','import_data(''userdef'');','Enable','off');
 
 leda2.gui.menu.menu_1c = uimenu(leda2.gui.menu.menu_1,'Label','Import Events...'); %,'Accelerator','i'
-leda2.gui.menu.menu_1c1 = uimenu(leda2.gui.menu.menu_1c,'Label','Event-Data [Time Marker]','Callback','import_eventdata(''userdef'')');
+leda2.gui.menu.menu_1c1 = uimenu(leda2.gui.menu.menu_1c,'Label','Event-Data [Time (Marker)]','Callback','import_eventdata(''userdef'')');
 leda2.gui.menu.menu_1c2 = uimenu(leda2.gui.menu.menu_1c,'Label','User-defined Event-Labels','Callback','import_eventinfo(''userdef'')');
 leda2.gui.menu.menu_1d = uimenu(leda2.gui.menu.menu_1,'Label','Export Data...');
 leda2.gui.menu.menu_1d1 = uimenu(leda2.gui.menu.menu_1d,'Label','ASCII File','Callback','exportTextData');
@@ -48,7 +48,7 @@ end
 %-Preprocessing
 leda2.gui.menu.menu_2  = uimenu(leda2.gui.fig_main,'Label','Preprocessing');
 leda2.gui.menu.menu_2a  = uimenu(leda2.gui.menu.menu_2,'Label','Cut data (keep selection)','Callback','cut_ledafile'); %,'Enable','off'
-leda2.gui.menu.menu_2b  = uimenu(leda2.gui.menu.menu_2,'Label','Downsampling','Callback','downsample');
+leda2.gui.menu.menu_2b  = uimenu(leda2.gui.menu.menu_2,'Label','Downsampling','Callback','leda_downsample');  %MB 11.06.2013
 leda2.gui.menu.menu_2c  = uimenu(leda2.gui.menu.menu_2,'Label','Manual Smoothing','Callback','smooth_data','Separator','on');
 leda2.gui.menu.menu_2d  = uimenu(leda2.gui.menu.menu_2,'Label','Adaptive smoothing','Callback','adaptive_smoothing');
 leda2.gui.menu.menu_2e  = uimenu(leda2.gui.menu.menu_2,'Label','Apply Filter','Callback','leda_filter');

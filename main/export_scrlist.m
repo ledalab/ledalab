@@ -83,6 +83,13 @@ amp_ttp = leda2.trough2peakAnalysis.amp;
 
 if ~isempty(leda2.analysis)
     scr_idx = find(onset >= 0 & amp >= scrAmplitudeMin);
+    if isempty(scr_idx)   %JG17.09.2012 Warnung eingefügt, Zusammenhang siehe andere Änderungen JG17.09.2012 bei Excel-Export
+        if strcmp(leda2.analysis.method,'sdeco')
+            add2log(1,['SCR-List export for ',leda2.file.filename,': No SCRs detected (method CDA)!'], 1,1,1,1,0,1);
+        else
+            add2log(1,['SCR-List export for ',leda2.file.filename,': No SCRs detected (method DDA)!'], 1,1,1,1,0,1);
+        end
+    end
     if strcmp(leda2.analysis.method,'sdeco')
         scrList.CDA.onset = onset(scr_idx);
         scrList.CDA.amp = amp(scr_idx);
@@ -90,10 +97,12 @@ if ~isempty(leda2.analysis)
         scrList.DDA.onset = onset(scr_idx);
         scrList.DDA.amp = amp(scr_idx);
     end
-    
 end
 
 scr_ttpidx = find(onset_ttp >= 0 & amp_ttp >= scrAmplitudeMin);
+if isempty(scr_ttpidx)   %JG17.09.2012 Warnung eingefügt, Zusammenhang siehe andere Änderungen JG17.09.2012 bei Excel-Export
+    add2log(1,['SCR-List export for ',leda2.file.filename,': No SCRs detected (method TTP)!'], 1,1,1,1,0,1);
+end
 scrList.TTP.onset = onset_ttp(scr_ttpidx);
 scrList.TTP.amp = amp_ttp(scr_ttpidx);
 
@@ -142,20 +151,29 @@ if leda2.set.export.savetype == 3
     
     if isempty(leda2.analysis)
         xlswrite(savefname, {'TTP.SCR-Onset','TTP.SCR-Amplitude'}, 'TTP', 'A1')
-        xlswrite(savefname, [scrList.TTP.onset', scrList.TTP.amp'], 'TTP', 'A2');
-        
+        if ~isempty(scr_ttpidx)   %JG17.09.2012 eingefügt, damit xlswrite nicht aufgrund von empty data mit Fehler abbricht, was zu Meldung "ERROR!" im Batchmode führte
+            xlswrite(savefname, [scrList.TTP.onset', scrList.TTP.amp'], 'TTP', 'A2');
+        end
     else
         if strcmp(leda2.analysis.method,'sdeco')
             xlswrite(savefname, {'CDA.SCR-Onset','CDA.SCR-Amplitude'}, 'CDA', 'A1');
-            xlswrite(savefname, [scrList.CDA.onset', scrList.CDA.amp'], 'CDA', 'A2');
+            if ~isempty(scr_idx)   %JG17.09.2012 eingefügt, damit xlswrite nicht aufgrund von empty data mit Fehler abbricht, was zu Meldung "ERROR!" im Batchmode führte
+                xlswrite(savefname, [scrList.CDA.onset', scrList.CDA.amp'], 'CDA', 'A2');
+            end
             xlswrite(savefname, {'TTP.SCR-Onset','TTP.SCR-Amplitude'}, 'TTP', 'A1')
-            xlswrite(savefname, [scrList.TTP.onset', scrList.TTP.amp'], 'TTP', 'A2');
+            if ~isempty(scr_ttpidx)   %JG17.09.2012 eingefügt, damit xlswrite nicht aufgrund von empty data mit Fehler abbricht, was zu Meldung "ERROR!" im Batchmode führte
+                xlswrite(savefname, [scrList.TTP.onset', scrList.TTP.amp'], 'TTP', 'A2');
+            end
             
         elseif strcmp(leda2.analysis.method,'nndeco')
             xlswrite(savefname, {'DDA.SCR-Onset','DDA.SCR-Amplitude'}, 'DDA', 'A1');
-            xlswrite(savefname, [scrList.DDA.onset', scrList.DDA.amp'], 'DDA', 'A2');
+            if ~isempty(scr_idx)   %JG17.09.2012 eingefügt, damit xlswrite nicht aufgrund von empty data mit Fehler abbricht, was zu Meldung "ERROR!" im Batchmode führte
+                xlswrite(savefname, [scrList.DDA.onset', scrList.DDA.amp'], 'DDA', 'A2');
+            end
             xlswrite(savefname, {'TTP.SCR-Onset','TTP.SCR-Amplitude'}, 'TTP', 'A1')
-            xlswrite(savefname, [scrList.TTP.onset', scrList.TTP.amp'], 'TTP', 'A2');
+            if ~isempty(scr_ttpidx)   %JG17.09.2012 eingefügt, damit xlswrite nicht aufgrund von empty data mit Fehler abbricht, was zu Meldung "ERROR!" im Batchmode führte
+                xlswrite(savefname, [scrList.TTP.onset', scrList.TTP.amp'], 'TTP', 'A2');
+            end
             
         end
         

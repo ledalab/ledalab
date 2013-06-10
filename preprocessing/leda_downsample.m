@@ -1,4 +1,4 @@
-function downsample(fac, type)
+function leda_downsample(fac, type)  %MB 11.06.2013 (changed from downsample.m)
 global leda2
 
 Fs = round(leda2.data.samplingrate);

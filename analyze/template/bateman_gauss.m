@@ -9,7 +9,7 @@ if sigma > 0
     g = normpdf(t, winwidth2+1, sigma*sr);
     g = g / max(g) * amp;
     bg = conv([ones(1,winwidth2)*component(1), component, ones(1,winwidth2)*component(end)], g);
-
+    
     component = bg((winwidth2*2+1) : (end-winwidth2*2));
 
 end

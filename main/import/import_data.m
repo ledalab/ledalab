@@ -39,9 +39,20 @@ try
     switch datatype
         case 'mat',
             load(file);
+            if (exist('fileinfo'))   %JG 27.9.2012
+                if leda2.intern.batchmode
+                    add2log(1,['File ',file,' is a native Matlab file of Ledalab: Please use batch mode parameter settings ''open'',''leda'' instead of ''open'',''mat''!'], 1,1,1,1,0,1);
+                else
+                    add2log(1,['File ',file,' is a native Matlab file of Ledalab: Please use the function "Open" from the "File" menu (instead of "Import Data...")!'], 1,1,1,1,0,1);
+                end
+
+                return;
+            end
+            
             conductance = data.conductance;
             time = data.time;
             event = data.event;
+            timeoffset = data.timeoff;  %JG 27.9.2012
 
         case 'text'
             [time, conductance, event] = gettextdata(file);
@@ -97,8 +108,14 @@ end
 time = time(:)'; %force data in row
 conductance = conductance(:)';
 
-timeoffset = time(1);
-time = time - timeoffset;
+if  strcmp(datatype,'mat') 
+    if (time(1) ~=0)    %JG 29.9.2012: Only than, otherwise keep timeoffset from imported matlab file
+        timeoffset = time(1);
+        time = time - timeoffset;
+    end
+else
+    timeoffset = time(1);        
+end
 
 
 close_ledafile;
@@ -159,7 +176,7 @@ end
 if (leda2.data.samplingrate > 32 || leda2.data.N > 36000) && ~leda2.intern.batchmode
     cmd = questdlg('Data is quite large. Do you wish to downsample your data in order to speed up the analysis?','Warning','Yes','No','Yes');
     if strcmp(cmd, 'Yes')
-        downsample;
+        leda_downsample;  %MB 11.06.2013
     end
 end
 

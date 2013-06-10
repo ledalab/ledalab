@@ -13,8 +13,6 @@ function leda_split(action)
 %   (and standard error) might be distorted.
 %
 % analysis.driver and analysis.phasicData is available, 2012-04-16.
-
-% Please adress questions, comments, bug reports related to this function to christoph.huber-huber@univie.ac.at
 % Christoph Huber-Huber, 2012.
 
 
