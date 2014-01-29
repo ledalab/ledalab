@@ -82,7 +82,7 @@ else %sdeco
     kids = get(leda2.gui.rangeview.ax, 'Children');
     fitcomps = kids(1:2);
     set(fitcomps,'Tag','FitComp');
-
+    set(leda2.gui.rangeview.ax, 'Children',[kids((length(fitcomps)+1):end); fitcomps]);
 end
 
 

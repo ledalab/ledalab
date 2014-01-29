@@ -138,11 +138,11 @@ if ~isempty(event)
     for ev = 1:leda2.data.events.N
 
         leda2.data.events.event(ev).time = leda2.data.events.event(ev).time - timeoffset;
-        if ~any(strcmp(event_fields, 'name'))
-            leda2.data.events.event(ev).name = '';
-        end
         if ~any(strcmp(event_fields, 'nid'))
-            leda2.data.events.event(ev).nid = [];
+            leda2.data.events.event(ev).nid = 1;    %MB 29.01.2014
+        end
+        if ~any(strcmp(event_fields, 'name'))
+            leda2.data.events.event(ev).name = num2str(leda2.data.events.event(ev).nid); %MB 29.01.2014
         end
         if ~any(strcmp(event_fields, 'userdata'))
             leda2.data.events.event(ev).userdata = [];
@@ -160,7 +160,7 @@ leda2.intern.current_dir = leda2.file.pathname;
 cd(pathname);
 leda2.file.open = 1;
 file_changed(1);
-add2log(1,[' Imported ',datatype,'-file ',file,' successfully.'],1,1,1);
+add2log(1,['Imported ',datatype,'-file ',file,' successfully.'],1,1,1);
 
 refresh_data(0);    %Data statistics
 

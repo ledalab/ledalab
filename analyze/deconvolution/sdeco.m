@@ -238,19 +238,28 @@ driver = leda2.analysis.driver;
 [minL, maxL] = get_peaks(driver, 1);
 minL = [minL(1:length(maxL)), length(t)];
 
+%Impulse data
 leda2.analysis.impulseOnset = t(minL(1:end-1));
 leda2.analysis.impulsePeakTime = t(maxL);   % = effective peak-latency
 leda2.analysis.impulseAmp = driver(maxL);
 
+%SCR data
+leda2.analysis.onset = leda2.analysis.impulsePeakTime;
 for iPeak = 1:length(maxL)
-    sc_reconv = conv(leda2.analysis.driver(minL(iPeak):minL(iPeak+1)), leda2.analysis.kernel);
+    driver_segment = leda2.analysis.driver(minL(iPeak):minL(iPeak+1));
+    %driver_segment(driver_segment < 0) = 0;  %negative drivers can lead to wrong detection of maxima
+    sc_reconv = conv(driver_segment, leda2.analysis.kernel);
     leda2.analysis.amp(iPeak) = max(sc_reconv);
+    mx_idx = find(sc_reconv == max(sc_reconv));
+    leda2.analysis.peakTime(iPeak) = t(minL(iPeak)) + mx_idx(1)/leda2.data.samplingrate;  %SCR peak could be outside of SC time range
 end
-negamp_idx = find(leda2.analysis.amp <= 0);
+negamp_idx = find(leda2.analysis.amp < .001);  % criterion removes peaks at end of sc_reconv due to large negative driver-segments
 leda2.analysis.impulseOnset(negamp_idx) = [];
 leda2.analysis.impulsePeakTime(negamp_idx) = [];
 leda2.analysis.impulseAmp(negamp_idx) = [];
+leda2.analysis.onset(negamp_idx) = [];
 leda2.analysis.amp(negamp_idx) = [];
+leda2.analysis.peakTime(negamp_idx) = [];
 
 add2log(1,'Continuous Decomposition Analysis.',1,1,1)
 leda2.file.version = leda2.intern.version; %work around indicating analysis version of current fit

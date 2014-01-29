@@ -62,7 +62,7 @@ if leda2.data.events.N > 0
     eventInRange = find(eventTimeList > rg_start & eventTimeList < rg_end);
     for ev = eventInRange
         ev_t = leda2.data.events.event(ev).time;
-        set(rgview.eventtxt(ev),'Position',[ev_t-rgview.range/200, rg_bottom+.1, 0],'Visible','on');
+        set(rgview.eventtxt(ev),'Position',[ev_t-rgview.range/200, rg_top-.1, 1],'HorizontalAlignment','right','Visible','on');     %MB 29.01.2014
     end
     if ~isempty(eventInRange)
         if leda2.gui.eventinfo.showEvent %was just set in event-info
