@@ -61,8 +61,11 @@ leda2.gui.rangeview.conductance = plot(time.data, cond.data, 'Color',[0 0 0], 'L
 %leda2.data.conductance.smoothData = smooth_adapt(leda2.data.conductance.data, 'gauss', leda2.data.samplingrate*2, .00003);
 leda2.gui.rangeview.cond_smooth = plot(time.data, leda2.data.conductance.smoothData ,'m','Tag','InitialSolutionInfo','Visible',onoffstr(leda2.pref.showSmoothData),'ButtonDownFcn','leda_click(2)');
 %Min/Max
-leda2.gui.rangeview.minima = plot(leda2.trough2peakAnalysis.onset, leda2.data.conductance.data(leda2.trough2peakAnalysis.onset_idx),'gv','Visible',onoffstr(leda2.pref.showMinMax));
-leda2.gui.rangeview.maxima = plot(leda2.trough2peakAnalysis.peaktime, leda2.data.conductance.data(leda2.trough2peakAnalysis.peaktime_idx),'r^','Visible',onoffstr(leda2.pref.showMinMax));
+
+signAmp = .00;  %Significant amplitude threshold for display of minima and maxima
+sigIdx = find(leda2.trough2peakAnalysis.amp > signAmp);
+leda2.gui.rangeview.minima = plot(leda2.trough2peakAnalysis.onset(sigIdx), leda2.data.conductance.data(leda2.trough2peakAnalysis.onset_idx(sigIdx)),'gv','Visible',onoffstr(leda2.pref.showMinMax));
+leda2.gui.rangeview.maxima = plot(leda2.trough2peakAnalysis.peaktime(sigIdx), leda2.data.conductance.data(leda2.trough2peakAnalysis.peaktime_idx(sigIdx)),'r^','Visible',onoffstr(leda2.pref.showMinMax));
 
 
 %Events - rangeview

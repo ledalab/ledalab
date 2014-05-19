@@ -1,0 +1,7 @@
+What's new in Ledalab V.3.4.6?
+
+- Biotrace import function now supports UK format in addition to DE version.
+- Butterworth-filter function extended (lower cutoff and order can be set to create a low-pass filter)
+- Filter function now included to batchmode analysis
+- PhasicMax score (i.e., maximum phasic driver value within response window) added to event-related activation scores
+- Minor debugging of graphic functions

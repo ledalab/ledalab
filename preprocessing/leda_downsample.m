@@ -58,10 +58,11 @@ leda2.data.conductance.smoothData = smooth_adapt(leda2.data.conductance.data, 'g
 trough2peak_analysis;
 
 delete_fit(0);
+add2log(1,['Data downsampled to ',  sprintf('%4.2f Hz   (Factor %d)', leda2.data.samplingrate, fac),'.'],1,1,1);
 if leda2.intern.batchmode
     return;
 end
 
 plot_data;
 file_changed(1);
-add2log(1,['Data downsampled to ',  sprintf('%4.2f Hz   (Factor %d)', leda2.data.samplingrate, fac),'.'],1,1,1);
+

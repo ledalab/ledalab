@@ -18,7 +18,7 @@ switch datatype
     case 'text', ext = {'*.txt'};
     case 'text2', ext = {'*.txt'};
     case 'text3', ext = {'*.txt'};
-
+        
     otherwise
         if leda2.intern.prompt
             msgbox('Unknown filetype.','Info')
@@ -45,7 +45,7 @@ try
                 else
                     add2log(1,['File ',file,' is a native Matlab file of Ledalab: Please use the function "Open" from the "File" menu (instead of "Import Data...")!'], 1,1,1,1,0,1);
                 end
-
+                
                 return;
             end
             
@@ -53,13 +53,13 @@ try
             time = data.time;
             event = data.event;
             timeoffset = data.timeoff;  %JG 27.9.2012
-
+            
         case 'text'
             [time, conductance, event] = gettextdata(file);
             
         case 'text2'
             [time, conductance, event] = gettext2data(file);
-
+            
         case 'text3'
             [time, conductance, event] = gettext3data(file);
             
@@ -71,33 +71,33 @@ try
             
         case 'biopacmat'
             [time, conductance, event] = getBiopacMatData(file);
-
+            
         case 'cassylab',
             [time, conductance, event] = getcassydata(file);
-
-        case 'varioport'       
+            
+        case 'varioport'
             [time, conductance, event] = getVarioportData(file);
-
+            
         case 'visionanalyzer'
             [time, conductance, event] = getVisionanalyzerData(file);
             
         case 'vitaport'
             [time, conductance, event] = getVitaportData(file);
-
+            
         case 'portilab'
             [time, conductance, event] = getPortilabData(file);
             
         case 'psychlab'
             [time, conductance, event] = getPsychlabData(file);
-                        
+            
         case 'userdef'
             [time, conductance, event] = getuserdefdata(file);
-
+            
     end
     
 catch
-   add2log(0,['Unable to import ',file,'.'],1,1,0,1,0,1)
-   return
+    add2log(0,['Unable to import ',file,'.'],1,1,0,1,0,1)
+    return
 end
 
 if isempty(conductance)
@@ -108,14 +108,14 @@ end
 time = time(:)'; %force data in row
 conductance = conductance(:)';
 
-if  strcmp(datatype,'mat') 
-    if (time(1) ~=0)    %JG 29.9.2012: Only than, otherwise keep timeoffset from imported matlab file
-        timeoffset = time(1);
-        time = time - timeoffset;
-    end
-else
-    timeoffset = time(1);        
+%if  strcmp(datatype,'mat')  %%MB removed 19.05.2014
+timeoffset = time(1);
+if (timeoffset ~= 0)    %JG 29.9.2012: Only than, otherwise keep timeoffset from imported matlab file
+    time = time - timeoffset;
 end
+%else
+%    timeoffset = time(1);
+%end
 
 
 close_ledafile;
@@ -133,10 +133,10 @@ if ~isempty(event)
     leda2.data.events.event = event;  %event must contain at least event.time
     leda2.data.events.N = length(event);
     event_fields = fieldnames(event);
-
+    
     %set dummy values for missing event-info
     for ev = 1:leda2.data.events.N
-
+        
         leda2.data.events.event(ev).time = leda2.data.events.event(ev).time - timeoffset;
         if ~any(strcmp(event_fields, 'nid'))
             leda2.data.events.event(ev).nid = 1;    %MB 29.01.2014
@@ -148,7 +148,7 @@ if ~isempty(event)
             leda2.data.events.event(ev).userdata = [];
         end
     end
-
+    
 end
 
 leda2.file.filename = filename;
@@ -187,4 +187,4 @@ if leda2.intern.batchmode
     return;
 end
 
-plot_data; 
+plot_data;

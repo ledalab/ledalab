@@ -3,7 +3,7 @@ function leda_batchanalysis(varargin)
 global leda2
 
 %parse batch-mode arguments and check their validity
-[valid_options, pathname, open_datatype, downsample_factor, smooth_settings, analysis_method, do_optimize, ...
+[valid_options, pathname, open_datatype, filter_settings, downsample_factor, smooth_settings, analysis_method, do_optimize, ...
     export_era_settings, export_scrlist_settings, do_save_overview] = parse_arguments(varargin{:});
 
 if ~valid_options || ~(downsample_factor > 1 || analysis_method || do_optimize || any(export_era_settings) || any(export_scrlist_settings) || do_save_overview) %invalid option or no option
@@ -20,6 +20,7 @@ pathname = fileparts(pathname);
 leda2.current.batchmode.file = [];
 leda2.current.batchmode.command.pathname = pathname;
 leda2.current.batchmode.command.datatype = open_datatype;
+leda2.current.batchmode.command.filter_settings = filter_settings;
 leda2.current.batchmode.command.downsample = downsample_factor;
 leda2.current.batchmode.command.smooth = smooth_settings;
 leda2.current.batchmode.command.method = analysis_method;
@@ -47,6 +48,11 @@ for iFile = 1:nFile
         if ~leda2.current.fileopen_ok
             disp('Unable to open file!');
             continue;
+        end
+        
+        %Filter, MB: 14.05.2014
+        if filter_settings(1) > 0
+            leda_filter(filter_settings);
         end
         
         %Downsample
@@ -104,7 +110,7 @@ for iFile = 1:nFile
             analysis_overview;
         end
         
-        if downsample_factor > 0 || analysis_method  || iscell(smooth_settings)
+        if filter_settings(1) > 0 || downsample_factor > 0 || analysis_method  || iscell(smooth_settings)
             save_ledafile(0);
         end
         
@@ -120,7 +126,7 @@ save([pathname,filesep,'batchmode_protocol'],'protocol');
 
 
 
-function [valid_options, wdir, open_datatype, downsample_factor, smooth_settings, analysis_method, do_optimize, ...
+function [valid_options, wdir, open_datatype, filter_settings, downsample_factor, smooth_settings, analysis_method, do_optimize, ...
     export_era_settings, export_scrlist_settings, do_save_overview] = parse_arguments(varargin)
 
 wdir = varargin{1};
@@ -132,6 +138,7 @@ wdir = [wdir, '*.mat'];
 valid_options = 1;
 %default options
 open_datatype = 'leda'; %open
+filter_settings = [0 0];
 downsample_factor = 0;
 smooth_settings = 0;
 analysis_method = 0;
@@ -164,6 +171,15 @@ if nargin > 1
                 %    disp(['Unknown datatype: ',option_arg])
                 %    return;
                 %end
+                
+            case 'filter'
+                if isnumeric(option_arg)
+                    filter_settings = option_arg;
+                else
+                    valid_options = 0;
+                    disp('Filter settings require 2 numeric arguments (filter order, and lower cutoff, e.g. [1 5])')
+                    return;
+                end
                 
             case 'downsample'
                 if isnumeric(option_arg)

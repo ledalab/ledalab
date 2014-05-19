@@ -13,7 +13,7 @@
 
 
 % ==> Name your working directory where analyzed *_era-files are located:
-wdir = 'D:\M\Forschung\Project\Matlab\leda\Workshop data\';     
+wdir = 'D:\Uni\M\Forschung\Project\Matlab\leda\Workshop data\';     
 files = dir([wdir, '*_era.mat']);   %List all files that resulted from event-related analysis (ERA) in Ledalab
 
 

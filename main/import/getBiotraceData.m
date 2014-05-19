@@ -13,9 +13,23 @@ fid = fopen(filename);
 while  feof(fid) == 0
     iLine = iLine + 1;
     tline = fgetl(fid);
+    if iLine == 1   %based on content in first line of file determine Biotrace language format %%MB19.3.2014
+        if strcmp(tline,'Unbearbeiteter Daten-Export (tab separat)')
+            lang_format = 'GE';
+        elseif strcmp(tline,'RAW Data export file (tab separated)')
+            lang_format = 'UK';
+        end
+    end
+    
     if iLine == 9
-        freq = strread(tline,'Ausgabegeschwindigkeit:\t%d\tSamples/sek.');
-    elseif iLine == 12
+        if strcmp(lang_format, 'GE') %%MB19.3.2014
+            freq = strread(tline,'Ausgabegeschwindigkeit:\t%d\tSamples/sek.');
+        elseif  strcmp(lang_format, 'UK')
+            freq = strread(tline,'Output rate:\t%d\tSamples/sec.');
+        end
+    end
+    
+    if iLine == 12
         labels = strread(tline,'%s','delimiter','\t');
     end
 end
@@ -39,7 +53,7 @@ conductance = M(:,scIdx(1)); %take first SC channel
 time = (M(:,1) - M(1,1)) / freq;
 
 %get events
-eventCol = find(strcmp(labels,'Ereignisse')); %column of events
+eventCol = find(strcmp(labels,'Ereignisse') | strcmp(labels,'Events')); %column of events  %%MB19.3.2014
 eventIdx = find(M(:,eventCol));
 for iEvent = 1:length(eventIdx)
     iEventIdx = eventIdx(iEvent);
