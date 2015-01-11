@@ -2,7 +2,7 @@ function import_eventinfo(infotype)
 global leda2
 
 
-[filename, pathname] = uigetfile({'*.txt';'*.dat'},'Choose a Eventinfo-file');
+[filename, pathname] = uigetfile({'*.txt';'*.dat'},'Choose an event-info file');
 
 if all(filename == 0) || all(pathname == 0) %Cancel
     return
@@ -10,6 +10,8 @@ end
 
 
 switch infotype
+    case 'default',
+        event = getevents([pathname, filename]);    
     case 'userdef',
         event = getuserdefeventinfo([pathname, filename]);
 end
@@ -38,7 +40,7 @@ if ~isempty(event)
 
     %plot updated event-names
     for ev = 1:N
-        set(leda2.gui.rangeview.eventtxt(ev),'String',sprintf('%.1f:  %s (%s)',leda2.data.events.event(ev).time, leda2.data.events.event(ev).name), num2str(leda2.data.events.event(ev).nid));
+        set(leda2.gui.rangeview.eventtxt(ev),'String',sprintf('%.1f:  %s (%s)',leda2.data.events.event(ev).time, leda2.data.events.event(ev).name, num2str(leda2.data.events.event(ev).nid)));
     end
 
 end

@@ -52,7 +52,7 @@ try
             conductance = data.conductance;
             time = data.time;
             event = data.event;
-            timeoffset = data.timeoff;  %JG 27.9.2012
+%             timeoffset = data.timeoff;  %JG 27.9.2012
             
         case 'text'
             [time, conductance, event] = gettextdata(file);

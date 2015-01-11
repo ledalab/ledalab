@@ -26,8 +26,9 @@ leda2.gui.menu.menu_1b13 = uimenu(leda2.gui.menu.menu_1b,'Label','Text Type 3 (M
 leda2.gui.menu.menu_1b14 = uimenu(leda2.gui.menu.menu_1b,'Label','User-defined Data','Callback','import_data(''userdef'');','Enable','off');
 
 leda2.gui.menu.menu_1c = uimenu(leda2.gui.menu.menu_1,'Label','Import Events...'); %,'Accelerator','i'
-leda2.gui.menu.menu_1c1 = uimenu(leda2.gui.menu.menu_1c,'Label','Event-Data [Time (Marker)]','Callback','import_eventdata(''userdef'')');
-leda2.gui.menu.menu_1c2 = uimenu(leda2.gui.menu.menu_1c,'Label','User-defined Event-Labels','Callback','import_eventinfo(''userdef'')');
+leda2.gui.menu.menu_1c1 = uimenu(leda2.gui.menu.menu_1c,'Label','Load New Event Markers (and DELETE exisiting ones)','Callback','import_eventdata(''default'')');
+leda2.gui.menu.menu_1c1 = uimenu(leda2.gui.menu.menu_1c,'Label','Load New Event Markers (and KEEP exisiting ones)','Callback','import_addeventdata(''default'')');
+leda2.gui.menu.menu_1c2 = uimenu(leda2.gui.menu.menu_1c,'Label','Recode Existing Event Markers','Callback','import_eventinfo(''default'')');
 leda2.gui.menu.menu_1d = uimenu(leda2.gui.menu.menu_1,'Label','Export Data...');
 leda2.gui.menu.menu_1d1 = uimenu(leda2.gui.menu.menu_1d,'Label','ASCII File','Callback','exportTextData');
 leda2.gui.menu.menu_1e = uimenu(leda2.gui.menu.menu_1,'Label','Save','Callback','save_ledafile','Accelerator','s','Separator','on');

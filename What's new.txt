@@ -1,7 +1,59 @@
-What's new in Ledalab V.3.4.6?
+What's new in Ledalab V.3.4.7?
 
-- Biotrace import function now supports UK format in addition to DE version.
-- Butterworth-filter function extended (lower cutoff and order can be set to create a low-pass filter)
-- Filter function now included to batchmode analysis
-- PhasicMax score (i.e., maximum phasic driver value within response window) added to event-related activation scores
-- Minor debugging of graphic functions
+
+--------------------------------------------------------------------------
+NEW EVENT IMPORT FUNCTIONS
+
+Changed files:
+- import_eventdata.m (infotype switch modified)
+- import_eventinfo.m (infotype switch modified)
+- ledagui.m (now refers to getevents.m by default)
+
+Added files:
+- getevents.m (new event marker read function for import_eventdata.m and import_eventinfo.m) 
+- import_addeventdata.m (new function to add newly imported event markers while keeping the old ones)
+
+
+
+Changed functionality for importing event markers:
+
+
+Option 1; File -> Import Events -> Load New Event Markers (and DELETE exisiting ones):
+To load new markers from a text file and and DELETE the already existing ones.
+
+You need a text-file with tab-separated columns and titles in the first row. You can use additional user-specified columns if you like and give them arbitrary titles.
+You need at least the columns 'time' and 'nid', the rest is optional.
+- 'time' --> time of event relative to first sample point in seconds (numeric)
+- 'nid'  --> numeric ID of the marker indicating the experimental condition (integer) 
+- 'name' --> name of the marker (string) 
+
+
+Option 2; File -> Import Events -> Load New Event Markers (and KEEP exisiting ones):
+To load new markers from a text file and KEEP the already existing ones.
+
+You need a text-file with tab-separated columns and titles in the first row. You can use additional user-specified columns if you like and give them arbitrary titles.
+You need at least the columns 'time' and 'nid', the rest is optional.
+- 'time' --> time of event relative to first sample point in seconds (numeric)
+- 'nid'  --> numeric ID of the marker indicating the experimental condition (integer) 
+- 'name' --> name of the marker (string) 
+
+
+Oprtion 3: File -> Import Events -> Recode Existing Events Markers
+To recode existing markers from a text file with the same number of rows as there are existing markers.
+
+You need a text-file with tab-separated columns and titles in the first row.  You can use additional user-specified columns if you like and give them arbitrary titles.
+You need at least one of these columns. 
+- 'time' --> time of event relative to first sample point in seconds (numeric)
+- 'nid'  --> ID of the marker indicating the experimental condition (integer) 
+- 'name' --> name of the marker (string) 
+
+
+
+--------------------------------------------------------------------------
+BUG IN DATA IMPORT FUNCTION
+
+Changed files:
+- import_data.m (infotype switch modified)
+
+line54
+%             timeoffset = data.timeoff;  %JG 27.9.2012
