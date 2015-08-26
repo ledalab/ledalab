@@ -30,7 +30,7 @@ for ev = 1:size(C{1},1)-1 % starts in line 2 as first line contians header
             case 'name' 
                 event(ev).name = C{nf}{1+ev};           
             otherwise % user specific data will be stored in cell array
-                event(ev).userdata.(C{nf}{1}) = C{nf}{1+ev};
+                event(ev).userdata.(genvarname(C{nf}{1}(isstrprop(C{nf}{1},'alphanum')))) = C{nf}{1+ev}; % replaces characters invalid for fielnames TOB 27.08.2015
         end
     end
 end

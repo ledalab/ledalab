@@ -50,7 +50,7 @@ try
             end
             
             conductance = data.conductance;
-            time = data.time;
+            time = double(data.time); % TOB 27.08.2015 Force data to be double format
             event = data.event;
 %             timeoffset = data.timeoff;  %JG 27.9.2012
             
@@ -136,7 +136,6 @@ if ~isempty(event)
     
     %set dummy values for missing event-info
     for ev = 1:leda2.data.events.N
-        
         leda2.data.events.event(ev).time = leda2.data.events.event(ev).time - timeoffset;
         if ~any(strcmp(event_fields, 'nid'))
             leda2.data.events.event(ev).nid = 1;    %MB 29.01.2014

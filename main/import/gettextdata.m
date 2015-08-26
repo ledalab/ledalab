@@ -17,7 +17,8 @@ M = dlmread(fullpathname);
 
 time = M(:,1);
 conductance = M(:,2);
-
+    
+event = [];
 if size(M,2) > 2
     eventCol = 3;
     eventIdx = find(M(:,eventCol));
@@ -27,6 +28,4 @@ if size(M,2) > 2
         event(iEvent).nid = M(iEventIdx, eventCol);
         event(iEvent).name = num2str(M(iEventIdx, eventCol));
     end
-else
-    event = [];
 end
