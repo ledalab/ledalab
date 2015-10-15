@@ -13,7 +13,7 @@ fclose(fid);
 numFields = length(strfind(firstLine,sprintf('\t'))) + 1;
 formatString = repmat('%s',1,numFields);
 fid = fopen(fullpath);
-C = textscan(fid, formatString,'\t');
+C = textscan(fid, formatString,'Delimiter','\t');
 fclose(fid);
 
 for ev = 1:size(C{1},1)-1 % starts in line 2 as first line contians header
