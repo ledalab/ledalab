@@ -7,32 +7,42 @@ ccd = diff(data); %Differential
 %Search for signum changes in first differntial:
 %slower but safer method to determine extrema than looking for zeros (taking into account
 %plateaus where ccd does not immediatly change the signum at extrema)
-cccri = [];
-start_idx = find(ccd);
+start_idx = find(ccd,1);
 if isempty(start_idx) %data == zeros(1,n)
     return;
 end
 
-start_idx = start_idx(1);
+cccri = zeros(1, length(ccd), 'uint32');
+cccriidx = 2;
 csi = sign(ccd(start_idx)); %currentsignum = current slope
+signvec = sign(ccd);
 for i = start_idx+1:length(ccd)
-    if sign(ccd(i)) ~= csi
-
-        if (isempty(cccri) && csi == 1)   %if first extrema = maximum, insert minimum before
-            predataidx = start_idx:i-1;
-            [mn, idx] = min(data(predataidx));
-            cccri =  predataidx(idx);
-        end
-
-        cccri = [cccri, i];
+    if signvec(i) ~= csi
+        cccri(cccriidx) = i;
+        cccriidx = cccriidx + 1;
         csi = -csi;
     end
 end
 
-%if last extremum is maximum add minimum after it
-if ~mod(size(cccri,2),2);
-    cccri = [cccri, length(data)];
+if cccriidx == 2 % no peak as data is increasing only
+   return;
 end
+
+%if first extrema = maximum, insert minimum before
+if (sign(ccd(start_idx)) == 1)
+   predataidx = start_idx:cccri(2)-1;
+   [mn, idx] = min(data(predataidx));
+   cccri(1) =  predataidx(idx);
+end
+
+%if last extremum is maximum add minimum after it
+if mod(cccriidx - (cccri(1)==0), 2);
+    cccri(cccriidx) = length(data);
+    cccriidx = cccriidx + 1;
+end
+
+% crop cccri from the first minimum to the last written index
+cccri = cccri(1+(cccri(1)==0):cccriidx-1);
 
 if ndiff >= 2
 
