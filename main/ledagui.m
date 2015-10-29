@@ -74,8 +74,8 @@ leda2.gui.menu.menu_5b = uimenu(leda2.gui.menu.menu_5,'Label','Plot event-relate
 
 %-Results
 leda2.gui.menu.menu_6  = uimenu(leda2.gui.fig_main,'Label','Results');
-leda2.gui.menu.menu_6a = uimenu(leda2.gui.menu.menu_6,'Label','Export Event-Related Activation','Callback','export_era','Accelerator','e');
-leda2.gui.menu.menu_6b = uimenu(leda2.gui.menu.menu_6,'Label','Export SCR-List','Callback','export_scrlist');
+uimenu(leda2.gui.menu.menu_6,'Label','Export Event-Related Activation','Callback',@export_era_dialog,'Accelerator','e');
+uimenu(leda2.gui.menu.menu_6,'Label','Export SCR-List','Callback',@export_scrlist_dialog);
 
 %-Info
 leda2.gui.menu.menu_7 =  uimenu(leda2.gui.fig_main,'Label','Info');
@@ -101,7 +101,6 @@ x1 = .05; x2 = .7; x3 = .75; x4 = .98;
 y2 = .7; y3 = .27; y5 = .22; y6 = .19; y7 = .17; y8 = .02;
 
 %Rangeview (= Epoch Display)
-warning('off','MATLAB:hg:willberemoved');
 leda2.gui.rangeview.ax = axes('Units','normalized','Position',[x1 y3 x2-x1 y2-y3],'XLim',[leda2.gui.rangeview.start, leda2.gui.rangeview.start + leda2.gui.rangeview.range],'YLim',[0,20],'Color',[1 1 1],'DrawMode','fast','ButtonDownFcn','leda_click(2)');
 set(get(leda2.gui.rangeview.ax,'YLabel'),'String','Skin Conductance [\muS]')
 set(get(leda2.gui.rangeview.ax,'XLabel'),'String','Time [sec]')

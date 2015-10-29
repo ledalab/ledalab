@@ -69,6 +69,7 @@ leda2.set.export.SCRstart = 1.00; %sec
 leda2.set.export.SCRend   = 4.00; %sec
 leda2.set.export.SCRmin   = .01; %muS
 leda2.set.export.savetype = 1;
+leda2.set.export.zscale = 0;
 
 
 

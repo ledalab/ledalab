@@ -34,7 +34,9 @@ p.addParamValue('export_era', [0,0,0,0], checkfn( ...
 p.addParamValue('export_scrlist', [0,0], checkfn( ...
       isminsizenumeric(1), 'Export requires numeric argument (amp_threshold [filetype])'));
 
-p.addParamValue('overview', 0, checkfn(@isnumeric,'Overview option requires numeric argument (1 = yes, 0 = no)'));
+p.addParamValue('overview', 0, checkfn(@isboolornumeric,'Overview option requires boolean or numeric argument (1 = yes, 0 = no)'));
+
+p.addParamValue('zscale', 0, checkfn(@isboolornumeric, 'zscale requires boolean or numeric argument (1 = true, 0 = false)'));
 
 p.parse(varargin{:});
 
@@ -63,6 +65,7 @@ leda2.current.batchmode.command = args;
 leda2.current.batchmode.start = datestr(now, 21);
 leda2.current.batchmode.version = leda2.intern.version;
 leda2.current.batchmode.settings = leda2.set;
+leda2.set.export.zscale = args.zscale;
 tic
 
 for iFile = 1:nFile
@@ -123,7 +126,7 @@ for iFile = 1:nFile
             else
                 leda2.set.export.savetype = 1;
             end
-            export_era('savePeaks')
+            export_era;
         end
         
         %Export Scrlist
@@ -134,7 +137,7 @@ for iFile = 1:nFile
             else
                 leda2.set.export.savetype = 1;
             end
-            export_scrlist('saveList')
+            export_scrlist;
         end
         
         %Save
@@ -167,6 +170,10 @@ end
 
 function fn = isminsizenumeric(minsize)
    fn = @(arg) isnumeric(arg) && length(arg)>=minsize;
+end
+
+function res = isboolornumeric(arg)
+   res = isnumeric(arg) || islogical(arg);
 end
 
 function fun = checkfn(fn, errormsg)

@@ -1,70 +1,17 @@
-function export_era(action)
+function export_era
 % Saving results into Matlab/textfile/or Excel (*_era.mat/txt/xls)
 %
 %  - Choose SCR-Window times relative to event
 %  - Choose minimum amplitude threshold for SCR
 
+global leda2;
 
-if nargin < 1,
-    action = 'start';
-end
-
-switch action,
-    case 'start', start;
-    case 'take_settings',take_settings;
-    case 'savePeaks', savePeaks;
-end
-
-function start
-global leda2
-
-dy = .13;
-
-
-if ~leda2.file.open
-    if leda2.intern.prompt
-        msgbox('No open File!','Export Event-Related Activation','error')
-    end
-    return
-end
 if leda2.data.events.N < 1
     if leda2.intern.prompt
         msgbox('File has no Events!','Export Event-Related Activation','error')
     end
     return
 end
-
-
-leda2.gui.export.fig_pl = figure('Units','normalized','Position',[.2 .5 .6 .2],'Name','Export Event-Related Activation','MenuBar','none','NumberTitle','off');
-
-leda2.gui.export.text_scrWindowLimits = uicontrol('Style','text','Units','normalized','Position',[.1 .75 .35 dy],'BackgroundColor',[.8 .8 .8],'String','SCR window relative to event (start - end) [sec]:','HorizontalAlignment','left');
-leda2.gui.export.edit_scrWindowStart = uicontrol('Style','edit','Units','normalized','Position',[.5 .75 .1 dy],'BackgroundColor',[1 1 1],'String',num2str(leda2.set.export.SCRstart,'%1.2f'));
-leda2.gui.export.edit_scrWindowEnd   = uicontrol('Style','edit','Units','normalized','Position',[.65 .75 .1 dy],'BackgroundColor',[1 1 1],'String',num2str(leda2.set.export.SCRend,'%1.2f'));
-
-leda2.gui.export.text_scrAmplitudeMin = uicontrol('Style','text','Units','normalized','Position',[.1 .5 .35 .08],'BackgroundColor',[.8 .8 .8],'String','SCR amplitude minimum [muS]:','HorizontalAlignment','left');
-leda2.gui.export.edit_scrAmplitudeMin = uicontrol('Style','edit','Units','normalized','Position',[.5 .5 .1 dy],'BackgroundColor',[1 1 1],'String',num2str(leda2.set.export.SCRmin,'%1.2f'));
-
-leda2.gui.export.butt_savePeaks = uicontrol('Units','normalized','Position',[.1 .2 .3 dy],'String','Export','Callback','export_era(''take_settings'')');
-leda2.gui.export.popm_type = uicontrol('Style','popupmenu','Units','normalized','Position',[.5 .2 .3 dy],'String',{'Matlab-File';'Text-File'; 'Excel-File'},'Value',leda2.set.export.savetype);
-
-
-
-function take_settings
-global leda2
-
-leda2.set.export.SCRstart = str2double(get(leda2.gui.export.edit_scrWindowStart,'String'));
-leda2.set.export.SCRend = str2double(get(leda2.gui.export.edit_scrWindowEnd,'String'));
-leda2.set.export.SCRmin = str2double(get(leda2.gui.export.edit_scrAmplitudeMin,'String'));
-leda2.set.export.savetype = get(leda2.gui.export.popm_type,'Value');
-
-savePeaks;
-
-close(leda2.gui.export.fig_pl)
-
-
-
-function savePeaks
-global leda2
 
 scrWindow_t1 = leda2.set.export.SCRstart;
 scrWindow_t2 = leda2.set.export.SCRend;
@@ -107,7 +54,7 @@ for iEvent = 1:leda2.data.events.N
     era.Event.name{iEvent} = event.name;
     era.Event.ud{iEvent} = event.userdata;
     
-    [t_respwin, cs_respwin, idx_respwin] = subrange(event.time + scrWindow_t1, event.time + scrWindow_t2);  %data of response window
+    [~, cs_respwin, idx_respwin] = subrange(event.time + scrWindow_t1, event.time + scrWindow_t2);  %data of response window
     
     % RESET ALL MEASURES
     % Measures yielded by Continuous Decomposition Analysis (CDA)
@@ -154,7 +101,7 @@ for iEvent = 1:leda2.data.events.N
     
     %Global measures
     era.Global.Mean(iEvent) = mean(leda2.data.conductance.data(idx_respwin));       %simple Mean of data within response window
-    diff = 0;
+    diff = zeros(1,length(cs_respwin)-1);
     for i = 1:length(cs_respwin)-1
         diff(i) = max(cs_respwin(i+1:end)) - cs_respwin(i);
     end
@@ -201,14 +148,31 @@ for iEvent = 1:leda2.data.events.N
     
 end %iEvent
 
+%% z-scaling
+%%%%%%%%%%%%
+
+if leda2.set.export.zscale
+    % better than zscore from the stats toolbox as it's free and handles NaNs better
+    zscore = @(x) (x-mean(x(~isnan(x))))/std(x(~isnan(x)));
+
+    if(strcmp(leda2.analysis.method,'sdeco'))
+        era.CDA = structfun(zscore, era.CDA, 'UniformOutput', false);
+    elseif strcmp(leda2.analysis.method,'nndeco')
+        era.DDA = structfun(zscore, era.DDA, 'UniformOutput', false);
+    end
+    era.TTP.AmpSum = zscore(era.TTP.AmpSum);
+end
 
 %% Export
 %%%%%%%%%
 savefname = [leda2.file.filename(1:end-4), '_era'];
+if leda2.set.export.zscale
+    savefname = [savefname, '_z'];
+end
 
 %-Matlab Export
 if leda2.set.export.savetype == 1
-    results = era;
+    results = era; %#ok<NASGU>
     savefname = [savefname,'.mat'];
     save(savefname,'results');
 end

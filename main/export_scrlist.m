@@ -1,56 +1,8 @@
-function export_scrlist(action)
+function export_scrlist
 % Saving scr_list to Excel (*_scrlist.mat/txt/xls)
 %
 %  - Choose minimum amplitude threshold for SCR
 
-
-if nargin < 1,
-    action = 'start';
-end
-
-switch action,
-    case 'start', start;
-    case 'take_settings',take_settings;
-    case 'saveList', saveList;
-end
-
-function start
-global leda2
-
-dy = .13;
-
-
-if ~leda2.file.open
-    if leda2.intern.prompt
-        msgbox('No open File!','Export SCR-List','error')
-    end
-    return
-end
-
-
-leda2.gui.export.fig_pl = figure('Units','normalized','Position',[.2 .5 .6 .2],'Name','Export SCR-List','MenuBar','none','NumberTitle','off');
-
-leda2.gui.export.text_scrAmplitudeMin = uicontrol('Style','text','Units','normalized','Position',[.1 .5 .35 .08],'BackgroundColor',[.8 .8 .8],'String','SCR amplitude minimum [muS]:','HorizontalAlignment','left');
-leda2.gui.export.edit_scrAmplitudeMin = uicontrol('Style','edit','Units','normalized','Position',[.5 .5 .1 dy],'BackgroundColor',[1 1 1],'String',num2str(leda2.set.export.SCRmin,'%1.2f'));
-
-leda2.gui.export.butt_savePeaks = uicontrol('Units','normalized','Position',[.1 .2 .3 dy],'String','Export','Callback','export_scrlist(''take_settings'')');
-leda2.gui.export.popm_type = uicontrol('Style','popupmenu','Units','normalized','Position',[.5 .2 .3 dy],'String',{'Matlab-File';'Text-File'; 'Excel-File'},'Value',leda2.set.export.savetype);
-
-
-
-function take_settings
-global leda2
-
-leda2.set.export.SCRmin = str2double(get(leda2.gui.export.edit_scrAmplitudeMin,'String'));
-leda2.set.export.savetype = get(leda2.gui.export.popm_type,'Value');
-
-saveList;
-
-close(leda2.gui.export.fig_pl)
-
-
-
-function saveList
 global leda2
 
 scrAmplitudeMin = leda2.set.export.SCRmin;
@@ -83,7 +35,7 @@ amp_ttp = leda2.trough2peakAnalysis.amp;
 
 if ~isempty(leda2.analysis)
     scr_idx = find(onset >= 0 & amp >= scrAmplitudeMin);
-    if isempty(scr_idx)   %JG17.09.2012 Warnung eingefügt, Zusammenhang siehe andere Änderungen JG17.09.2012 bei Excel-Export
+    if isempty(scr_idx)
         if strcmp(leda2.analysis.method,'sdeco')
             add2log(1,['SCR-List export for ',leda2.file.filename,': No SCRs detected (method CDA)!'], 1,1,1,1,0,1);
         else
@@ -100,17 +52,33 @@ if ~isempty(leda2.analysis)
 end
 
 scr_ttpidx = find(onset_ttp >= 0 & amp_ttp >= scrAmplitudeMin);
-if isempty(scr_ttpidx)   %JG17.09.2012 Warnung eingefügt, Zusammenhang siehe andere Änderungen JG17.09.2012 bei Excel-Export
+if isempty(scr_ttpidx)
     add2log(1,['SCR-List export for ',leda2.file.filename,': No SCRs detected (method TTP)!'], 1,1,1,1,0,1);
 end
 scrList.TTP.onset = onset_ttp(scr_ttpidx);
 scrList.TTP.amp = amp_ttp(scr_ttpidx);
 
 
+%% z-scaling
+%%%%%%%%%%%%
+
+if leda2.set.export.zscale
+    % better than zscore from the stats toolbox as it's free and handles NaN better
+    zscore = @(x) (x-mean(x(~isnan(x))))/std(x(~isnan(x)));
+    if(strcmp(leda2.analysis.method,'sdeco'))
+        scrList.CDA.amp = zscore(scrList.CDA.amp);
+    elseif strcmp(leda2.analysis.method,'nndeco')
+        scrList.DDA.amp = zscore(scrList.DDA.amp);
+    end
+    scrList.TTP.amp = zscore(scrList.TTP.amp);
+end
 
 %% Export
 %%%%%%%%%
 savefname = [leda2.file.filename(1:end-4), '_scrlist'];
+if leda2.set.export.zscale
+    savefname = [savefname, '_z'];
+end
 
 %-Matlab Export
 if leda2.set.export.savetype == 1
@@ -151,27 +119,27 @@ if leda2.set.export.savetype == 3
     
     if isempty(leda2.analysis)
         xlswrite(savefname, {'TTP.SCR-Onset','TTP.SCR-Amplitude'}, 'TTP', 'A1')
-        if ~isempty(scr_ttpidx)   %JG17.09.2012 eingefügt, damit xlswrite nicht aufgrund von empty data mit Fehler abbricht, was zu Meldung "ERROR!" im Batchmode führte
+        if ~isempty(scr_ttpidx)
             xlswrite(savefname, [scrList.TTP.onset', scrList.TTP.amp'], 'TTP', 'A2');
         end
     else
         if strcmp(leda2.analysis.method,'sdeco')
             xlswrite(savefname, {'CDA.SCR-Onset','CDA.SCR-Amplitude'}, 'CDA', 'A1');
-            if ~isempty(scr_idx)   %JG17.09.2012 eingefügt, damit xlswrite nicht aufgrund von empty data mit Fehler abbricht, was zu Meldung "ERROR!" im Batchmode führte
+            if ~isempty(scr_idx)
                 xlswrite(savefname, [scrList.CDA.onset', scrList.CDA.amp'], 'CDA', 'A2');
             end
             xlswrite(savefname, {'TTP.SCR-Onset','TTP.SCR-Amplitude'}, 'TTP', 'A1')
-            if ~isempty(scr_ttpidx)   %JG17.09.2012 eingefügt, damit xlswrite nicht aufgrund von empty data mit Fehler abbricht, was zu Meldung "ERROR!" im Batchmode führte
+            if ~isempty(scr_ttpidx)
                 xlswrite(savefname, [scrList.TTP.onset', scrList.TTP.amp'], 'TTP', 'A2');
             end
             
         elseif strcmp(leda2.analysis.method,'nndeco')
             xlswrite(savefname, {'DDA.SCR-Onset','DDA.SCR-Amplitude'}, 'DDA', 'A1');
-            if ~isempty(scr_idx)   %JG17.09.2012 eingefügt, damit xlswrite nicht aufgrund von empty data mit Fehler abbricht, was zu Meldung "ERROR!" im Batchmode führte
+            if ~isempty(scr_idx)
                 xlswrite(savefname, [scrList.DDA.onset', scrList.DDA.amp'], 'DDA', 'A2');
             end
             xlswrite(savefname, {'TTP.SCR-Onset','TTP.SCR-Amplitude'}, 'TTP', 'A1')
-            if ~isempty(scr_ttpidx)   %JG17.09.2012 eingefügt, damit xlswrite nicht aufgrund von empty data mit Fehler abbricht, was zu Meldung "ERROR!" im Batchmode führte
+            if ~isempty(scr_ttpidx)
                 xlswrite(savefname, [scrList.TTP.onset', scrList.TTP.amp'], 'TTP', 'A2');
             end
             
@@ -181,3 +149,4 @@ if leda2.set.export.savetype == 3
 end
 
 add2log(1,['SCR-List exported to ',savefname], 1,1,1,0,0,1);
+
