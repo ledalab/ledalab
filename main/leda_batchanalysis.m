@@ -34,7 +34,7 @@ p.addParamValue('export_era', [0,0,0,0], checkfn( ...
 p.addParamValue('export_scrlist', [0,0], checkfn( ...
       isminsizenumeric(1), 'Export requires numeric argument (amp_threshold [filetype])'));
 
-p.addParamValue('overview', 0, checkfn(@isboolornumeric,'Overview option requires boolean or numeric argument (1 = yes, 0 = no)'));
+p.addParamValue('overview', 0);
 
 p.addParamValue('zscale', 0, checkfn(@isboolornumeric, 'zscale requires boolean or numeric argument (1 = true, 0 = false)'));
 
@@ -142,7 +142,13 @@ for iFile = 1:nFile
         
         %Save
         if args.overview
-            analysis_overview;
+            % Legacy behaviour: if 'overview' is set to 1, assume
+            % a tif file should be exported
+            if args.overview == 1
+                args.overview = 'tif';
+            end
+
+            analysis_overview(args.overview);
         end
         
         if args.filter(1) > 0 || args.downsample > 0 || analysis_method  || iscell(args.smooth)
@@ -185,7 +191,7 @@ function fun = checkfn(fn, errormsg)
    fun = @(arg) maybeError(fn(arg), errormsg);
 end
 
-function analysis_overview
+function analysis_overview(format)
 global leda2
 
 t = leda2.data.time.data;
@@ -259,7 +265,7 @@ l = legend('Driver', 'Remainder', sprintf('Error-compound = %5.2f',analysis.erro
 set(l, 'FontSize',8,'Location','NorthEast');
 xlabel('Time [s]'); ylabel('[\muS]')
 
-saveas(gcf, leda2.file.filename(1:end-4), 'tif')
+saveas(gcf, leda2.file.filename(1:end-4), format)
 
 close(gcf);
 drawnow;
