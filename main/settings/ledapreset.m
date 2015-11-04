@@ -25,15 +25,6 @@ leda2.analysis = [];
 % define structure for GUI of leda_split.m
 leda2.gui.split = [];
 
-% define structure used by leda_split.m
-% leda2.data.split.name = '';
-% leda2.data.split.data = [];
-% leda2.data.split.mean = [];
-% leda2.data.split.time = [];
-% leda2.data.split.stderr = [];
-% leda2.data.split.start = [];
-% leda2.data.split.end = [];
-
 
 %Default Setting:
 
@@ -63,14 +54,13 @@ leda2.set.tauMin = .001; %.1
 leda2.set.tauMax = 100;
 leda2.set.tauMinDiff = .01;
 leda2.set.dist0_min = .001;
-% %leda2.set.downsampleType
+
 % %Export (ERA)
 leda2.set.export.SCRstart = 1.00; %sec
 leda2.set.export.SCRend   = 4.00; %sec
 leda2.set.export.SCRmin   = .01; %muS
 leda2.set.export.savetype = 1;
 leda2.set.export.zscale = 0;
-
 
 
 % settings for leda_split.m
@@ -82,7 +72,6 @@ leda2.set.split.stderr = 0;
 %leda2.set.split.variable = 'phasicData';
 %leda2.set.split.selectedconditions = [];
 %leda2.set.split.plot = 1;
-
 
 
 %Ledapref
@@ -110,15 +99,27 @@ end
 ledamem.prevfile = leda2.intern.prevfile;
 ledamem.set.default = leda2.set;
 ledamem.pref.default = leda2.pref;
-save(fullfile(leda2.intern.install_dir,'main','settings','ledamem'), 'ledamem') %,'-v6'
+save(fullfile(leda2.intern.install_dir,'main','settings','ledamem.mat'), 'ledamem');
 
 
 %Apply custom settings if available
-if any(strcmp(fieldnames(ledamem.set),'custom')) && ~isempty(ledamem.set.custom)
-    leda2.set = ledamem.set.custom;
-    %disp('Custom settings loaded.')
+if isfield(ledamem.set,'custom') && isstruct(ledamem.set.custom)
+    leda2.set = mergestructs(ledamem.set.custom, ledamem.set.default);
 end
-if any(strcmp(fieldnames(ledamem.pref),'custom')) && ~isempty(ledamem.pref.custom)
-    leda2.pref = ledamem.pref.custom;
-    %disp('Custom preferences loaded.')
+if isfield(ledamem.pref,'custom') && ~isempty(ledamem.pref.custom)
+    leda2.pref = mergestructs(ledamem.pref.custom, ledamem.pref.default);
+end
+end
+
+function old = mergestructs(old,new)
+% merges the supplid structs without overwriting contents in the first
+    fn = fieldnames(new);
+    for i=1:length(fn)
+        f = fn{i};
+        if ~isfield(old,f)
+            old.(f) = new.(f);
+        elseif isstruct(old.(f)) && isstruct(new.(f))
+            old.(f) = mergestructs(old.(f),new.(f));
+        end
+    end
 end
