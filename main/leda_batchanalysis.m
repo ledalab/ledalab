@@ -208,7 +208,7 @@ else
 end
 
 
-figure('Units','normalized','Position',[0 0.05 1 .9],'MenuBar','none','NumberTitle','off');
+figure('Units','normalized','Position',[0 0.05 1 .9],'MenuBar','none','NumberTitle','off','Visible','off');
 
 %Decomposition
 subplot(2,1,1);
