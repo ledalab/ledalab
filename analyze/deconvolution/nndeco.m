@@ -202,10 +202,7 @@ end
 plot(t(minL), driver(minL), 'g*');
 plot(t(maxL), driver(maxL), 'r*');
 set(gca,'XLim',[t(1),t(end)], 'YLim',[-max(remd)*2 - .2, max(driver) + .2])
-% err1d = deverror(driver, [0, .2]);
-% err2d = deverror(remd, [0, 005]);
-% err1s = succnz(driver, .05, 1.4);
-% err2s = succnz(remd, .05, 1.7);
+
 legend(sprintf('Driver error (dev/discr) = %4.3f,  %4.1f)', leda2.analysis0.error.deviation(1), leda2.analysis0.error.discreteness(1)), ...
     sprintf('Remainder error (dev/discr) = %4.3f,  %4.1f)', leda2.analysis0.error.deviation(2), leda2.analysis0.error.discreteness(2)), ...
     sprintf('Total error (dev/discr) = %4.4f, %4.4f', sum(leda2.analysis0.error.deviation), sum(leda2.analysis0.error.discreteness)),'Location','NorthEast');
