@@ -23,14 +23,14 @@ while  feof(fid) == 0
     
     if iLine == 9
         if strcmp(lang_format, 'GE') %%MB19.3.2014
-            freq = strread(tline,'Ausgabegeschwindigkeit:\t%d\tSamples/sek.');
+            freq = sscanf(tline,'Ausgabegeschwindigkeit:\t%d\tSamples/sek.');
         elseif  strcmp(lang_format, 'UK')
-            freq = strread(tline,'Output rate:\t%d\tSamples/sec.');
+            freq = sscanf(tline,'Output rate:\t%d\tSamples/sec.');
         end
     end
     
     if iLine == 12
-        labels = strread(tline,'%s','delimiter','\t');
+        labels = strsplit(tline,'\t');
     end
 end
 fclose(fid);
@@ -40,9 +40,8 @@ nSamples = nLines - (headerLines + footerLines);
 nSignals = length(labels) - 1;
 
 %read data
-M = dlmread(filename,'\t',[headerLines, 0, headerLines+nSamples-1, nSignals]);
 skip_samples = 1;  %avoid data errors at beginning
-M = M(1+skip_samples :end, :);
+M = dlmread(filename,'\t',[headerLines+skip_samples, 0, headerLines+nSamples-1, nSignals]);
 
 
 for i = 1:length(labels)
