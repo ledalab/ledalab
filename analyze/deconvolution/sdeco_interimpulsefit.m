@@ -37,7 +37,7 @@ for i = 1:length(groundtime)
         t_idx = iif_t > groundtime(i) - tonicGridSize & iif_t < t(end) - 1;
         grid_idx = t > groundtime(i) - tonicGridSize & t < t(end) - 1;
     else
-        t_idx = iif_t > groundtime(i) - tonicGridSize & iif_t <= groundtime(i) + tonicGridSize/2;
+        t_idx = iif_t > groundtime(i) - tonicGridSize/2 & iif_t <= groundtime(i) + tonicGridSize/2;
         grid_idx = t > groundtime(i) - tonicGridSize/2 & t <= groundtime(i) + tonicGridSize/2;
     end
     %Estimate groundlevel at groundtime
