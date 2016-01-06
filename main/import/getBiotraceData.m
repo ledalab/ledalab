@@ -18,6 +18,8 @@ while  feof(fid) == 0
             lang_format = 'GE';
         elseif strcmp(tline,'RAW Data export file (tab separated)')
             lang_format = 'UK';
+        else
+            error('The first line doesn''t seem to be from a Biotrace text export.');
         end
     end
     
