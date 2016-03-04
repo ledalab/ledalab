@@ -55,7 +55,7 @@ for iEvent = 1:leda2.data.events.N
     era.Event.ud{iEvent} = event.userdata;
     
     [~, cs_respwin, idx_respwin] = subrange(event.time + scrWindow_t1, event.time + scrWindow_t2);  %data of response window
-    
+
     % RESET ALL MEASURES
     % Measures yielded by Continuous Decomposition Analysis (CDA)
     if ~isempty(leda2.analysis)
@@ -85,6 +85,13 @@ for iEvent = 1:leda2.data.events.N
     % Measures based on raw SC data
     era.Global.Mean(iEvent) = NaN;
     era.Global.MaxDeflection(iEvent) = NaN;
+    
+    
+    if isempty(idx_respwin)
+        warning(['Data doesn''t contain ERA-window for event nr. %d.\n'...
+            'Is the marker too close to the end of the recording?'],iEvent);
+        break;
+    end
     
     
     %Set Measures
