@@ -65,7 +65,6 @@ for iEvent = 1:leda2.data.events.N
             era.CDA.AmpSum(iEvent) = NaN;   % Amplitude-Sum of sign SCRs (reconvolved from phasic driver-peaks)
             era.CDA.SCR(iEvent) = NaN;          % Average phasic driver activity (time integral over response window by size of responsewindow)
             era.CDA.ISCR(iEvent) = NaN;         % Phasic driver area (time integral over response window)
-            %era.CDA.SCR_ITTP(iEvent) = NaN;    % Max SCR Amplitude after reconvolution from phasic segment in response window
             era.CDA.PhasicMax(iEvent) = NaN;  % Driver maximum within response window
             era.CDA.Tonic(iEvent) = NaN;        % Average level of (decomposed) Tonic component
             
@@ -119,15 +118,10 @@ for iEvent = 1:leda2.data.events.N
                 era.CDA.Latency(iEvent) = onset_sdeco(scr_idx(1)) - event.time;
             end
             era.CDA.AmpSum(iEvent) = sum(amp_sdeco(scr_idx));
-            era.CDA.SCR(iEvent) = max(0, sum(leda2.analysis.driver(idx_respwin))/(sr*(scrWindow_t2-scrWindow_t1)));  % ISCR = average phasic driver activity  [muS]
+
             era.CDA.ISCR(iEvent) = max(0, sum(leda2.analysis.driver(idx_respwin))/sr);  % ISCR = phasic_area  [muS*sec]
+            era.CDA.SCR(iEvent) = era.CDA.ISCR(iEvent) / (sr*(scrWindow_t2-scrWindow_t1));% SCR = average phasic driver activity  [muS]
             era.CDA.PhasicMax(iEvent) = max(0, max(leda2.analysis.driver(idx_respwin)));
-            %             sc_reconv = conv(leda2.analysis.driver(idx_respwin), leda2.analysis.kernel);
-            %             if max(sc_reconv) >= scrAmplitudeMin
-            %                 era.CDA.SCR_ITTP(iEvent) = max(sc_reconv);
-            %             else
-            %                 era.CDA.SCR_ITTP(iEvent) = 0;
-            %             end
             era.CDA.Tonic(iEvent) = mean(leda2.analysis.tonicData(idx_respwin));
             
         elseif strcmp(leda2.analysis.method,'nndeco') %DDA
