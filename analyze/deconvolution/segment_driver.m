@@ -1,4 +1,4 @@
-function [segmOnset, segmImpulse, segmOversh, impMin, impMax] = segment_driver(data, remd, ndiff, sigc, segmWidth)
+function [segmOnset, segmImpulse, segmOversh, impMin, impMax] = segment_driver(data, remd, sigc, segmWidth)
 
 segmOnset = [];
 segmImpulse = {};
@@ -6,7 +6,7 @@ segmOversh = {};
 impMin = [];
 impMax = [];
 
-[cccrimin, cccrimax] = get_peaks(data, ndiff);
+[cccrimin, cccrimax] = get_peaks(data);
 if isempty(cccrimax)
     return
 end
@@ -21,7 +21,7 @@ end
 %maxL = cccrimax(s > sigc);
 
 
-[rmdimin, rmdimax] = get_peaks(remd, ndiff);%get peaks of remainder
+[rmdimin, rmdimax] = get_peaks(remd);%get peaks of remainder
 [rmdimins, rmdimaxs] = signpeak(remd, rmdimin, rmdimax, .005); %get remainder segments
 
 %Segments: 12 sec, max 3 sec preceding maximum

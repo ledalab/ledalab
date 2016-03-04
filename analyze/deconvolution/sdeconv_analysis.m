@@ -61,7 +61,7 @@ driverSC = driverSC(n_prefix+1:end);
 driverSC_smooth = driverSC_smooth(n_prefix+1:end);
 remainderSC = remainderSC(n_prefix+1:length(d)+n_prefix);
 %Inter-impulse fit
-[onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(driverSC_smooth, zeros(size(driverSC_smooth)), 1, sigc, round(sr * leda2.set.segmWidth));  %Segmentation of non-extended data!
+[onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(driverSC_smooth, zeros(size(driverSC_smooth)), sigc, round(sr * leda2.set.segmWidth));  %Segmentation of non-extended data!
 if estim_tonic
     [tonicDriver, tonicData] = sdeco_interimpulsefit(driverSC_smooth, kernel, impMin, impMax);
 else

@@ -29,7 +29,7 @@ if ~isempty(leda2.analysis)
         if leda2.intern.version <= 3.34  %see sdeco lines ~235+
             t = leda2.data.time.data;
             driver = leda2.analysis.driver;
-            [minL, maxL] = get_peaks(driver, 1);
+            [minL, maxL] = get_peaks(driver);
             minL = [minL(1:length(maxL)), length(t)];
             leda2.analysis.impulseOnset = t(minL(1:end-1));
             leda2.analysis.impulsePeakTime = t(maxL);   % = effective peak-latency

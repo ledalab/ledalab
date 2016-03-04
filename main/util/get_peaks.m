@@ -1,4 +1,4 @@
-function [cccrimin, cccrimax] = get_peaks(data, ndiff)
+function [cccrimin, cccrimax] = get_peaks(data)
 
 cccrimin = [];
 cccrimax = [];
@@ -43,28 +43,6 @@ end
 
 % crop cccri from the first minimum to the last written index
 cccri = cccri(1+(cccri(1)==0):cccriidx-1);
-
-if ndiff >= 2
-
-    %Find zeros in second differential
-    ccdd = diff(ccd);
-    f20 = [];
-    csi = sign(ccdd(1)); %currentsignum = current slope
-    for i = 1:length(ccdd)
-        if sign(ccdd(i)) ~= csi %inflection point
-            if ccd(i) > 0 && csi < 0  %ascending slope with inflection point changing from neg to pos flexion f''
-                if ndiff > 1
-                    cccri = [cccri, i, i]; %f''=0 is maximum and minimum
-                end
-            elseif ccd(i) > 0 && csi > 0
-                f20 = [f20, i];
-            end
-            csi = -csi;
-        end
-    end
-    cccri = [cccri, f20];
-
-end
 
 cccri = sort(cccri);
 

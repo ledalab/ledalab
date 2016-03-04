@@ -52,7 +52,7 @@ sigc = max(.01, 2*leda2.set.sigPeak/max(bg));  %threshold for burst peak
 qt = deconv([d_ext,ones(1,length(kernel)-1)], kernel);
 %[qts, win] = smooth_adapt(qt, 'gauss', winwidth_max, .0002);  %.0002
 qts = smooth(qt, swin, 'gauss');  %%%
-[onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(qts, zeros(size(qts)), 1, sigc*20, round(sr * leda2.set.segmWidth));  %.05,
+[onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(qts, zeros(size(qts)), sigc*20, round(sr * leda2.set.segmWidth));  %.05,
 targetdata_min = interimpulsefit(qts, t_ext, impMin, impMax);  %writes target.xxx0
 
 %if the dist0 is always overwriten dist0 can not be fitted, but is set by taus
@@ -82,7 +82,7 @@ remd = smooth(r, swin, 'gauss'); %%%
 q0 = deconv([d_ext,ones(1,length(kernel)-1)], kernel);
 q0s = smooth(q0, swin, 'gauss');  %%%
 %r0s = smooth(r0, smoothwin_driver, 'gauss');
-[onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(driver, remd, 1, sigc, round(sr * leda2.set.segmWidth));  %.05,  %leda2.set.sigPeak*max(1,(tau(2)-tau(1)))
+[onset_idx, impulse, overshoot, impMin, impMax] = segment_driver(driver, remd, sigc, round(sr * leda2.set.segmWidth));  %.05,  %leda2.set.sigPeak*max(1,(tau(2)-tau(1)))
 
 
 %Calculate impulse response

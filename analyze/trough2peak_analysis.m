@@ -3,7 +3,7 @@ global leda2
 
 ds = leda2.data.conductance.smoothData;% smoothData;
 t = leda2.data.time.data;
-[minL, maxL] = get_peaks(ds, 1);
+[minL, maxL] = get_peaks(ds);
 minL = minL(1:length(maxL));
 
 

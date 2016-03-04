@@ -235,7 +235,7 @@ leda2 = rmfield(leda2, 'analysis0');
 % SCRs reconvolved from Driver-Peaks
 t = leda2.data.time.data;
 driver = leda2.analysis.driver;
-[minL, maxL] = get_peaks(driver, 1);
+[minL, maxL] = get_peaks(driver);
 minL = [minL(1:length(maxL)), length(t)];
 
 %Impulse data
