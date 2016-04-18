@@ -1,10 +1,10 @@
-What's new in Ledalab V.3.4.8?
+What's new in Ledalab V.3.4.9?
+------------------------------
 
+Optional z-scaling of exported variables
 
---------------------------------------------------------------------------
+The batchmode parameter 'overview' now accepts an image type as parameter, e.g. 'overview','png'
 
-gettextdata.m updated to more robustly allow data import from text files in ANSI format.
+Fixed marker import for Matlab >=R2015a
 
-getevents.m updated to more robustly cope with invalid characters in event file column headers
-
-import_data.m updated to prevent unnecessary rounding of time values
+Various performance optimizations and bugfixes
