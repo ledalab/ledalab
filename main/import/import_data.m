@@ -3,27 +3,35 @@ function import_data(datatype, pathname, filename)
 global leda2
 leda2.current.fileopen_ok = 0;
 
-switch datatype
-    case 'biotrace', ext = {'*.txt'};
-    case 'biopac', ext = {'*.acq'};
-    case 'biopacmat', ext = {'*.mat'};
-    case 'cassylab', ext = {'*.lab'};
-    case 'varioport', ext = {'*.vpd'};
-    case 'visionanalyzer', ext = {'*.mat'};
-    case 'vitaport', ext = {'*.asc'};
-    case 'portilab', ext = {'*.txt'};
-    case 'psychlab', ext = {'*.txt'};
-    case 'userdef', ext = {'*.txt'};
-    case 'mat', ext = {'*.mat'};
-    case 'text', ext = {'*.txt'};
-    case 'text2', ext = {'*.txt'};
-    case 'text3', ext = {'*.txt'};
-        
-    otherwise
-        if leda2.intern.prompt
-            msgbox('Unknown filetype.','Info')
-        end
-        return
+% Access to extensions: datatypes(1).(datatype)
+% Access to functions: datatypes(2).(datatype)
+datatypes = struct( ...
+    'biotrace', {'txt',@getBiotraceData},...
+    'biotracemat',{'mat',@getBiotraceMatData},...
+    'biopac',{'acq',@getBiopacData},...
+    'biopacmat',{'mat',@getBiopacMatData},...
+    'cassylab',{'lab',@getcassydata},...
+    'varioport',{'vpd',@getVarioportData},...
+    'visionanalyzer',{'mat',@getVisionanalyzerData},...
+    'vitaport',{'asc',@getVitaportData},...
+    'portilab',{'txt',@getPortilabData},...
+    'psychlab',{'txt',@getPsychlabData},...
+    'userdef',{'txt',@getuserdefdata},...
+    'text',{'txt',@gettextdata},...
+    'text2',{'txt',@gettext2data},...
+    'text3',{'txt',@gettext3data});
+    
+if ~isfield(datatypes,datatype) && ~strcmp(datatype,'mat')
+    if leda2.intern.prompt
+        msgbox('Unknown filetype.','Info')
+    end
+    return
+end
+
+if strcmp(datatype, 'mat')
+    ext = '*.mat';
+else
+    ext = ['*.', datatypes(1).(datatype)];
 end
 
 if nargin < 3
@@ -34,70 +42,31 @@ if nargin < 3
 end
 file = fullfile(pathname, filename);
 
+
+
 %Try to import the selected data-file
 try
-    switch datatype
-        case 'mat',
-            load(file);
-            if (exist('fileinfo'))   %JG 27.9.2012
-                if leda2.intern.batchmode
-                    add2log(1,['File ',file,' is a native Matlab file of Ledalab: Please use batch mode parameter settings ''open'',''leda'' instead of ''open'',''mat''!'], 1,1,1,1,0,1);
-                else
-                    add2log(1,['File ',file,' is a native Matlab file of Ledalab: Please use the function "Open" from the "File" menu (instead of "Import Data...")!'], 1,1,1,1,0,1);
-                end
-                
-                return;
+    if strcmp(datatype, 'mat')
+        load(file);
+        if (exist('fileinfo','var'))   %JG 27.9.2012
+            if leda2.intern.batchmode
+                add2log(1,['File ',file,' is a native Matlab file of Ledalab: Please use batch mode parameter settings ''open'',''leda'' instead of ''open'',''mat''!'], 1,1,1,1,0,1);
+            else
+                add2log(1,['File ',file,' is a native Matlab file of Ledalab: Please use the function "Open" from the "File" menu (instead of "Import Data...")!'], 1,1,1,1,0,1);
             end
-            
-            conductance = data.conductance;
-            time = double(data.time); % TOB 27.08.2015 Force data to be double format
-            event = data.event;
-%             timeoffset = data.timeoff;  %JG 27.9.2012
-            
-        case 'text'
-            [time, conductance, event] = gettextdata(file);
-            
-        case 'text2'
-            [time, conductance, event] = gettext2data(file);
-            
-        case 'text3'
-            [time, conductance, event] = gettext3data(file);
-            
-        case 'biotrace'
-            [time, conductance, event] = getBiotraceData(file);
-            
-        case 'biopac'
-            [time, conductance, event] = getBiopacData(file);
-            
-        case 'biopacmat'
-            [time, conductance, event] = getBiopacMatData(file);
-            
-        case 'cassylab',
-            [time, conductance, event] = getcassydata(file);
-            
-        case 'varioport'
-            [time, conductance, event] = getVarioportData(file);
-            
-        case 'visionanalyzer'
-            [time, conductance, event] = getVisionanalyzerData(file);
-            
-        case 'vitaport'
-            [time, conductance, event] = getVitaportData(file);
-            
-        case 'portilab'
-            [time, conductance, event] = getPortilabData(file);
-            
-        case 'psychlab'
-            [time, conductance, event] = getPsychlabData(file);
-            
-        case 'userdef'
-            [time, conductance, event] = getuserdefdata(file);
-            
+
+            return;
+        end
+        conductance = data.conductance;
+        time = double(data.time); % TOB 27.08.2015 Force data to be double format
+        event = data.event;
+    else
+        getDataFunction = datatypes(2).(datatype);
+        [time, conductance, event] = getDataFunction(file);
     end
-    
-catch
+catch ex
     add2log(0,['Unable to import ',file,'.'],1,1,0,1,0,1)
-    return
+    rethrow(ex);
 end
 
 if isempty(conductance)
@@ -108,25 +77,18 @@ end
 time = time(:)'; %force data in row
 conductance = conductance(:)';
 
-%if  strcmp(datatype,'mat')  %%MB removed 19.05.2014
 timeoffset = time(1);
 if (timeoffset ~= 0)    %JG 29.9.2012: Only than, otherwise keep timeoffset from imported matlab file
     time = time - timeoffset;
 end
-%else
-%    timeoffset = time(1);
-%end
-
 
 close_ledafile;
 if leda2.file.open, return; end %closing failed
-
 
 %Load data
 leda2.data.conductance.data = conductance;
 leda2.data.time.data = time;
 leda2.data.time.timeoff = timeoffset;
-conductanceerror = sqrt(mean(diff(conductance).^2)/2);
 
 %Get events
 if ~isempty(event)
@@ -147,7 +109,6 @@ if ~isempty(event)
             leda2.data.events.event(ev).userdata = [];
         end
     end
-    
 end
 
 leda2.file.filename = filename;

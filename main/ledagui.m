@@ -13,6 +13,7 @@ leda2.gui.menu.menu_1b = uimenu(leda2.gui.menu.menu_1,'Label','Import Data...');
 leda2.gui.menu.menu_1b1 = uimenu(leda2.gui.menu.menu_1b,'Label','BioPac (*.acq)','Callback','import_data(''biopac'');');
 leda2.gui.menu.menu_1b2 = uimenu(leda2.gui.menu.menu_1b,'Label','BioPac (Matlab-Export) (*.mat)','Callback','import_data(''biopacmat'');');
 leda2.gui.menu.menu_1b3 = uimenu(leda2.gui.menu.menu_1b,'Label','BioTrace (Text Export)','Callback','import_data(''biotrace'');');
+uimenu(leda2.gui.menu.menu_1b, 'Label', 'Biotrace (.mat Export)', 'Callback', 'import_data(''biotracemat'');');
 leda2.gui.menu.menu_1b4 = uimenu(leda2.gui.menu.menu_1b,'Label','Cassy Lab (.lab)','Callback','import_data(''cassylab'');');
 leda2.gui.menu.menu_1b5 = uimenu(leda2.gui.menu.menu_1b,'Label','PortiLab (Text Export)','Callback','import_data(''portilab'');');
 leda2.gui.menu.menu_1b6 = uimenu(leda2.gui.menu.menu_1b,'Label','PsychLab (Text Export)','Callback','import_data(''psychlab'');');
