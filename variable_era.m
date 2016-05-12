@@ -51,5 +51,5 @@ for iEvent = 1:nEvents
 end
 
 % Save to Excel
-xlswrite(datafile(1:end-4),{'Event','Duration', 'CDA.SCR', 'CDA.ISCR', 'CDA.AmpSum', 'CDA.PhasicMax', 'CDA.Latency', 'CDA.Tonic'},'ERA','A1')
-xlswrite(datafile(1:end-4),[1:nEvents; duration; SCR; ISCR; AmpSum; PhasicMax; Latency; Tonic]','ERA','A2')
+xlswrite(datafile(1:end-4),{'Event','Duration', 'CDA.nSCR', 'CDA.SCR', 'CDA.ISCR', 'CDA.AmpSum', 'CDA.PhasicMax', 'CDA.Latency', 'CDA.Tonic'},'ERA','A1')
+xlswrite(datafile(1:end-4),[1:nEvents; duration; nSCR; SCR; ISCR; AmpSum; PhasicMax; Latency; Tonic]','ERA','A2')
