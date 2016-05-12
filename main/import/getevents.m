@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% new event marker read function for import_eventdata.m and import_eventinfo.m 
-% by Til Ole Bergmann, bergmann@psychologie.uni-kiel.de
-% last edit 2014-06-13 by TOB
+% new event marker read function for import_eventdata.m and import_eventinfo.m
+% by Til Ole Bergmann, bergmann@psychologie.uni-kiel.de; Mathias Benedek
+% last edit 2016-05-11 by MB
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function event = getevents(fullpath)
@@ -24,9 +24,9 @@ for ev = 1:size(C{1},1)-1 % starts in line 2 as first line contians header
                 event(ev).time = str2num(C{nf}{1+ev});
             case 'nid' 
                 event(ev).nid = str2num(C{nf}{1+ev});
-                if ~isfield(event(ev),'name')
-                    event(ev).name = num2str(event(ev).nid);           
-                end
+                %if ~isfield(event(ev),'name')
+                event(ev).name = num2str(event(ev).nid);
+                %end
             case 'name' 
                 event(ev).name = C{nf}{1+ev};           
             otherwise % user specific data will be stored in cell array

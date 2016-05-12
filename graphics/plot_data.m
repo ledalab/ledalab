@@ -17,6 +17,7 @@ leda2.gui.eventinfo.current_event = 0;
 axes(leda2.gui.overview.ax);
 cla;
 hold on
+leda2.gui.overview.driver = [];
 leda2.gui.overview.conductance = plot(time.data, cond.data,'ButtonDownFcn','leda_click(1)','Color',[0 0 0],'LineWidth',1);
 
 %range-indicator-field
