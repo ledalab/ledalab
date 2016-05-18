@@ -6,7 +6,7 @@ if leda2.file.open, return; end %closing failed
 
 delete(gcf)
 
-save_ledamem
+save_ledamem('custom');
 
 add2log(0,['<<<< ',datestr(now,31), ' Session closed'],1);
 add2log(0,' ',1);

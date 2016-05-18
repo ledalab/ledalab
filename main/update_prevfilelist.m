@@ -23,7 +23,7 @@ else
     pf(1).filename = filename;
     pf(1).pathname = pathname;
     leda2.intern.prevfile = pf;
-    save_ledamem;
+    save_ledamem('custom');
     n2 = length(pf);
 
     for i = 1:n2
