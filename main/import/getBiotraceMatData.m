@@ -1,6 +1,6 @@
 function [time, conductance, event] = getBiotraceMatData(filename)
+% Import Biotrace .mat files
 data = load(filename);
-
 
 assert(isfield(data,'Sessioninfo'), 'Data file doesn''t contain ''Sessioninfo''. Is this a Biotrace .mat-export?');
 assert(isfield(data,'Sessiondata'), 'Data file doesn''t contain ''Sessiondata''. Is this a Biotrace .mat-export?');
@@ -27,7 +27,8 @@ conductance = cell2mat(signals(4:end,scIdx(1)));
 time = (0:nSamples-1)' / freq;
 
 eventCol = find(~cellfun(@isempty,regexp(labels,'(Ereignisse|Events)')));
-eventIdx = find(~cellfun(@isempty,signals(:,eventCol)));
+% correct for 'header' rows again
+eventIdx = find(~cellfun(@isempty,signals(4:end,eventCol)))+3;
 % Generate unique identifiers for events
 [~,~,eventNids] = unique(signals(eventIdx,eventCol));
 event = struct('time',num2cell(time(eventIdx)), ...
