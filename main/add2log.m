@@ -25,8 +25,10 @@ end
 
 if ledalog
     fid_ll = fopen(fullfile(leda2.intern.install_dir,'ledalog.txt'),'a');
-    fprintf(fid_ll,'%s\r\n', newinfo);
-    fclose(fid_ll);
+    if fid_ll ~= -1
+        fprintf(fid_ll,'%s\r\n', newinfo);
+        fclose(fid_ll);
+    end
 end
 
 if sessionlog && ~leda2.intern.batchmode
