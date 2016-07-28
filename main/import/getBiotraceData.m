@@ -26,25 +26,36 @@ while ~feof(fid)
     end
     res = regexp(tline,'(?:Abtastrate|Output rate|Ausgabegeschwindigkeit):\t(\d+)\tSamples/se[ck]','tokens');
     if ~isempty(res)
-        freq = str2num(res{1});
+        freq = str2num(res{1}{1});
     end
 end    
 % Skip line with sample rates
 fgetl(fid);
 labels = strsplit(fgetl(fid),'\t');
+fgetl(fid); fgetl(fid); % skip 2 empty lines
 
+% count samples
+nSamples = 0;
+while ~feof(fid)
+    tline = fgetl(fid);
+    if isempty(tline) || all(tline == ' ')
+        break;
+    end
+    nSamples = nSamples + 1;
+end
 fclose(fid);
-nLines = iLine;  %total number of lines
 
-nSamples = nLines - (headerLines + footerLines);
 nSignals = length(labels) - 1;
 
 %read data
 skip_samples = 1;  %avoid data errors at beginning
-M = dlmread(filename,'\t',[headerLines+skip_samples, 0, headerLines+nSamples-1, nSignals]);
+M = dlmread(filename,'\t',[headerLines+skip_samples, 0, nSamples-skip_samples+headerLines, nSignals]);
 
 % Which column label(s) contain either SC/GSR or EDA?
 scIdx = find(~cellfun(@isempty,regexp(labels,'(SC/GSR|EDA)')));
+if isempty(scIdx)
+    error([filename ' doesn''t contain any SC / EDA channels']);
+end
 conductance = M(:,scIdx(1)); %take first SC channel
 time = (M(:,1) - M(1,1)) / freq;
 
