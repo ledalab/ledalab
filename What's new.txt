@@ -8,3 +8,10 @@ The batchmode parameter 'overview' now accepts an image type as parameter, e.g. 
 Fixed marker import for Matlab >=R2015a
 
 Various performance optimizations and bugfixes
+
+The batchmode doesn't change the working directory any more and allows more flexibility
+in the choice of files to be analyzed, e.g.:
+
+Ledalab('C:/study/datadir') % directory with data files
+Ledalab('C:/study/datadir/*.txt') % all patterns accepted by dir()
+Ledalab({'participant1.txt','participant24.txt'}) % cell array with file names

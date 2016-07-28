@@ -116,8 +116,12 @@ leda2.file.pathname = pathname;
 leda2.file.date = clock;
 leda2.file.log = {};
 leda2.file.version = leda2.intern.version;
-leda2.intern.current_dir = leda2.file.pathname;
-cd(pathname);
+if ~leda2.intern.batchmode
+    leda2.intern.current_dir = leda2.file.pathname;
+    cd(pathname);
+end
+
+
 leda2.file.open = 1;
 file_changed(1);
 add2log(1,['Imported ',datatype,'-file ',file,' successfully.'],1,1,1);

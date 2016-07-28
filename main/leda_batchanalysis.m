@@ -8,7 +8,10 @@ valid_analysis_methods = {'none','CDA','DDA'};
 p = inputParser();
 p.KeepUnmatched = true;
 
-p.addRequired('dir', @ischar);
+p.addRequired('dir', checkfn(@(arg) ...
+    ischar(arg) || (iscell(arg) && all(cellfun(@ischar,arg))), ...
+    ['First parameter should be either a char (path or pattern accepted '...
+    ' by dir() _or_ a cell array of strings']));
 % addParameter would've been better but isn't supported in Octave and Matlab before R2013
 %#ok<*NVREPL>
 p.addParamValue('open','leda',@ischar);
@@ -54,12 +57,28 @@ if isempty(analysis_method)
 end
 args.analyze = analysis_method;
 
-dirL = dir(args.dir);
-dirL = dirL(~[dirL.isdir]);
-nFile = length(dirL);
+if ischar(args.dir)
+    % simple case: a dirname ('C:/files/datadir')
+    % if it's a dir, we need to have a directory separator at the end
+    if isdir(args.dir)
+        if args.dir(end) ~= '/'
+            args.dir = [args.dir '/'];
+        end
+    end
+    % less simple case: a pattern ('C:/files/datadir/*.txt')
+    % or a single file ('C:/files/datadir/file.txt')
+    % enumerate matching files
+    files = dir(args.dir);
+    % get all matching _files_ in a cell array
+    files = {files(~[files.isdir]).name};
+    pathname = fileparts(args.dir);
+elseif iscell(args.dir)
+    % args.dir is already a cell array with files to analyse
+    files = args.dir;
+    pathname = './';
+end
 
-add2log(1,['Starting Ledalab batch for ',args.dir,' (',num2str(nFile),' file/s)'],1,0,0,1)
-pathname = fileparts(args.dir);
+add2log(1,['Starting Ledalab batch for ',num2str(length(files)),' file(s)'],1,0,0,1)
 leda2.current.batchmode.file = [];
 leda2.current.batchmode.command = args;
 leda2.current.batchmode.start = datestr(now, 21);
@@ -68,8 +87,8 @@ leda2.current.batchmode.settings = leda2.set;
 leda2.set.export.zscale = args.zscale;
 tic
 
-for iFile = 1:nFile
-    filename = dirL(iFile).name;
+for iFile = 1:length(files)
+    filename = files{iFile};
     leda2.current.batchmode.file(iFile).name = filename;
     disp(' '); add2log(1,['Batch-Analyzing ',filename],1,0,0,1)
     
@@ -78,7 +97,11 @@ for iFile = 1:nFile
         if strcmp(args.open,'leda')
             open_ledafile(0, pathname, filename);
         else
-            import_data(args.open, pathname, filename);
+            try
+                import_data(args.open, pathname, filename);
+            catch error
+                disp(error);
+            end
         end
         if ~leda2.current.fileopen_ok
             disp('Unable to open file!');
@@ -163,7 +186,7 @@ end
 
 leda2.current.batchmode.processing_time = toc;
 protocol = leda2.current.batchmode;
-save([pathname,filesep,'batchmode_protocol'],'protocol');
+save('batchmode_protocol.mat','protocol');
 end
 
 function flag = maybeError(flag, errormsg)
