@@ -223,7 +223,7 @@ leda2.analysis0.target.t = leda2.data.time.data;
 leda2.analysis0.target.d = leda2.data.conductance.data;
 leda2.analysis0.target.sr = leda2.data.samplingrate;
 
-sdeconv_analysis(leda2.analysis0.tau, 1); %fix until tonicDriver is read from leda2.analysis0.target.poly of the best optimization
+sdeconv_analysis(leda2.analysis0.tau, 0); % Only a very hacky fix - prnthp 1/12/2018
 
 delete_fit(0);
 leda2.analysis0 = rmfield(leda2.analysis0, {'target','driverSC'});
