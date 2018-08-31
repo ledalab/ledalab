@@ -127,7 +127,7 @@ for iEvent = 1:leda2.data.events.N
             era.CDA.AmpSum(iEvent) = sum(amp_sdeco(scr_idx));
 
             era.CDA.ISCR(iEvent) = max(0, sum(leda2.analysis.driver(idx_respwin))/sr);  % ISCR = phasic_area  [muS*sec]
-            era.CDA.SCR(iEvent) = era.CDA.ISCR(iEvent) / (sr*(scrWindow_t2-scrWindow_t1));% SCR = average phasic driver activity  [muS]
+            era.CDA.SCR(iEvent) = era.CDA.ISCR(iEvent) / (scrWindow_t2-scrWindow_t1); % SCR = average phasic driver activity  [muS]
             era.CDA.PhasicMax(iEvent) = max(0, max(leda2.analysis.driver(idx_respwin)));
             era.CDA.Tonic(iEvent) = mean(leda2.analysis.tonicData(idx_respwin));
             
