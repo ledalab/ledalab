@@ -1,5 +1,7 @@
 function [xopt, opthistory] = deconv_optimize(x0, nr_iv, method)
 
+global leda2 % for tonic driver history
+
 if nr_iv == 0
     xopt = x0;
     opthistory = [];
@@ -22,6 +24,7 @@ for i = 1: min(nr_iv, length(xList))
     else
         [x, history] = cgd(xList{i}, @sdeconv_analysis, [.3 2], .01, 20, .05);
     end
+    tonicDriver_poly_history(i) = leda2.analysis0.target.poly; % tonicDriver's polynomials needs to match
     opthistory(i) = history;
     x_opt(i) = {x};
     err_opt(i) = history.error(end);
@@ -30,5 +33,6 @@ end
 
 [mn, idx] = min(err_opt);
 
+leda2.analysis0.target.poly = tonicDriver_poly_history(idx); % tonicDriver's polynomials needs to match
 xopt = x_opt{idx};
 add2log(0, ['Final optimized parameter: ',sprintf(' %5.2f\t',xopt),sprintf(' Error: %6.3f',mn)], 0,1,1,1,0)

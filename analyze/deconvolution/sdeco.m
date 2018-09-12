@@ -72,39 +72,39 @@ if ~leda2.intern.batchmode
     %     if exist('leda2.gui.deconv.fig') && ishandle(leda2.gui.deconv.fig)
     %         close(leda2.gui.deconv.fig)
     %     end
-    
+
     leda2.gui.deconv.fig = figure('Units','normalized','Position',[.1 .05 .8 .9],'Name','Continuous Decomposition Analysis','Color',leda2.gui.col.fig,'ToolBar','figure','NumberTitle','off','MenuBar','none');  %
-    
+
     leda2.gui.deconv.text_tau1 = uicontrol('Style','text','Units','normalized','Position',[.1 .01 .05 .02],'String','tau1','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.text_tau2 = uicontrol('Style','text','Units','normalized','Position',[.18 .01 .05 .02],'String','tau2','BackgroundColor',get(gcf,'Color'));
     %leda2.gui.deconv.text_dist0 = uicontrol('Style','text','Units','normalized','Position',[.26 .01 .05 .02],'String','dist0','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.edit_tau1 = uicontrol('Style','edit','Units','normalized','Position',[.1 .04 .05 .03],'String',leda2.analysis0.tau(1));  %tmp_tau1
     leda2.gui.deconv.edit_tau2 = uicontrol('Style','edit','Units','normalized','Position',[.18 .04 .05 .03],'String',leda2.analysis0.tau(2));  %tmp_tau2
     %leda2.gui.deconv.edit_dist0 = uicontrol('Style','edit','Units','normalized','Position',[.26 .04 .05 .03],'String',leda2.analysis0.dist0);  %tmp_dist0
-    
+
     leda2.gui.deconv.text_smoothWinSize = uicontrol('Style','text','Units','normalized','Position',[.31 .065 .08 .025],'String','Smooth-Win [sec]  (SD of Gauss)','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.text_gridsize = uicontrol('Style','text','Units','normalized','Position',[.34 .035 .05 .02],'String','Grid-Size','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.text_sigPeak = uicontrol('Style','text','Units','normalized','Position',[.34 .005 .05 .02],'String','Sig-Peak','BackgroundColor',get(gcf,'Color'));
     leda2.gui.deconv.edit_smoothWinSize = uicontrol('Style','edit','Units','normalized','Position',[.4 .07 .05 .02],'String',leda2.analysis0.smoothwin);
     leda2.gui.deconv.edit_gridSize = uicontrol('Style','edit','Units','normalized','Position',[.4 .04 .05 .02],'String',leda2.set.tonicGridSize_sdeco);
     leda2.gui.deconv.edit_sigPeak = uicontrol('Style','edit','Units','normalized','Position',[.4 .01 .05 .02],'String',leda2.set.sigPeak);
-    
+
     %leda2.gui.deconv.chbx_d0Autoupdate = uicontrol('Style','checkbox','Units','normalized','Position',[.48 .07 .09 .02],'String','d0 autopdate','Value',leda2.set.d0Autoupdate,'BackgroundColor',get(gcf,'Color'));  %tmp_tau1
     leda2.gui.deconv.chbx_tonicIsConst = uicontrol('Style','checkbox','Units','normalized','Position',[.48 .04 .09 .02],'String','tonic = const','Value',leda2.set.tonicIsConst,'BackgroundColor',get(gcf,'Color'),'Enable','Off');  %tmp_tau1
     leda2.gui.deconv.chbx_tonicSlowIncrease = uicontrol('Style','checkbox','Units','normalized','Position',[.48 .01 .09 .02],'String','tonic slow increase','Value',leda2.set.tonicSlowIncrease,'BackgroundColor',get(gcf,'Color'),'Enable','Off');  %tmp_tau1
-    
+
     leda2.gui.deconv.butt_analyze = uicontrol('Style','pushbutton','Units','normalized','Position',[.6 .05 .1 .03],'String','Analyze','Callback',@deconv_analysis_gui);
     leda2.gui.deconv.butt_optimize = uicontrol('Style','pushbutton','Units','normalized','Position',[.6 .02 .1 .02],'String','Optimize','Callback',@deconv_opt);
     leda2.gui.deconv.butt_apply = uicontrol('Style','pushbutton','Units','normalized','Position',[.75 .03 .15 .05],'String','Apply','Callback',@deconv_apply);
-    
+
     deconv_analysis_gui;
-    
+
 else
-    
+
     [err, x] = sdeconv_analysis(leda2.analysis0.tau);  %set dist0
     [leda2.analysis0.tau, leda2.analysis0.opt_history] = deconv_optimize(x, nr_iv,'sdeco');
     deconv_apply;
-    
+
 end
 
 
@@ -223,7 +223,7 @@ leda2.analysis0.target.t = leda2.data.time.data;
 leda2.analysis0.target.d = leda2.data.conductance.data;
 leda2.analysis0.target.sr = leda2.data.samplingrate;
 
-sdeconv_analysis(leda2.analysis0.tau, 0);
+sdeconv_analysis(leda2.analysis0.tau, 0); % Only a very hacky fix - prnthp 1/12/2018
 
 delete_fit(0);
 leda2.analysis0 = rmfield(leda2.analysis0, {'target','driverSC'});
