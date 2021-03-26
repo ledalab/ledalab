@@ -11,18 +11,17 @@ elseif nargin == 1
 elseif nargin == 3 %File is handed over
 end
 
-if all(filename == 0) || all(pathname == 0) %Cancel
+file = fullfile(pathname, filename);
+if exist(file, 'file') ~= 2
     return
 end
-file = fullfile(pathname, filename);
-
 
 %Try to open file
 try
     ledafile = load(file, '-mat');
-    cd(pathname);
+    cd(fileparts(file))
 catch
-    add2log(0,['Unable to open ',file],1,1,0,1,0,1);
+    add2log(0,['Unable to open ', file],1,1,0,1,0,1);
     return;
 end
 
@@ -31,15 +30,15 @@ end
 ledafile_vars = fieldnames(ledafile); %isstruct?
 
 if any(strcmp(ledafile_vars,'epocharray')) %V1.x
-    add2log(0,['Unable to open ',file,': This is a ledafit-file. Please open corresponding ledadata-file instead..'],1,1,0,1,0,1);
+    add2log(0,['Unable to open ', file,': This is a ledafit-file. Please open corresponding ledadata-file instead..'],1,1,0,1,0,1);
     return;
 end
 
 if (~any(strcmp(ledafile_vars,'fileinfo'))) && (~any(strcmp(ledafile_vars,'ledalab'))) %JG 01.11.2012
     if leda2.intern.batchmode
-            add2log(0,['Unable to open ',file,': This is not a native Ledalab-file. Please use batch mode parameter settings ''open'',''mat'' instead of ''open'',''leda''!'],1,1,0,1,0,1);        
+            add2log(0,['Unable to open ', file,': This is not a native Ledalab-file. Please use batch mode parameter settings ''open'',''mat'' instead of ''open'',''leda''!'],1,1,0,1,0,1);        
     else
-            add2log(0,['Unable to open ',file,': This is not a native Ledalab-file. Please use "Import Data"->"Matlab File" instead of "Open"!'],1,1,0,1,0,1);
+            add2log(0,['Unable to open ', file,': This is not a native Ledalab-file. Please use "Import Data"->"Matlab File" instead of "Open"!'],1,1,0,1,0,1);
     end
     return;
 end
@@ -51,15 +50,15 @@ if any(strcmp(ledafile_vars,'data'))
         time_tmp = ledafile.data.time;
         timeoff_tmp = ledafile.data.timeoff;        
         if isempty(cond_tmp) || isempty(time_tmp)
-                add2log(0,['Unable to open ',pathname, filename,':  Requested data not available!'],1,1,0,1,0,1);
+                add2log(0,['Unable to open ', file,':  Requested data not available!'],1,1,0,1,0,1);
                 return
         end            
     catch
-        add2log(0,['Unable to open ',pathname, filename],1,1,0,1,0,1);
+        add2log(0,['Unable to open ', file],1,1,0,1,0,1);
         return
     end
 else
-    add2log(0,['Unable to open ',file,': Could not load data.'],1,1,0,1,0,1);
+    add2log(0,['Unable to open ', file,': Could not load data.'],1,1,0,1,0,1);
     return;
 end
 %Valid ledadata available and ready to load!
