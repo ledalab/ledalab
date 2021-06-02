@@ -3,7 +3,7 @@ global leda2
 
 t = leda2.analysis0.target.t;
 d = leda2.analysis0.target.d;
-sr = leda2.analysis0.target.sr;
+sr = round(leda2.analysis0.target.sr);
 tonicGridSize = leda2.set.tonicGridSize_sdeco;
 nKernel = length(kernel);
 

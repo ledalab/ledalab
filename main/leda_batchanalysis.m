@@ -60,7 +60,7 @@ args.analyze = analysis_method;
 if ischar(args.dir)
     % simple case: a dirname ('C:/files/datadir')
     % if it's a dir, we need to have a directory separator at the end
-    if isdir(args.dir)
+    if isfolder(args.dir)
         if args.dir(end) ~= '/'
             args.dir = [args.dir '/'];
         end
@@ -75,7 +75,10 @@ if ischar(args.dir)
 elseif iscell(args.dir)
     % args.dir is already a cell array with files to analyse
     files = args.dir;
-    pathname = './';
+    % Let's assume the passed files are already resolvable!
+    % Either they are local to the pwd, or they have absolute paths; either
+    % way, '' is a correct suffix whereas './' only works in the former case
+    pathname = '';
 end
 
 add2log(1,['Starting Ledalab batch for ',num2str(length(files)),' file(s)'],1,0,0,1)
