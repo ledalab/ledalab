@@ -52,7 +52,9 @@ for iEvent = 1:leda2.data.events.N
     era.Event.time(iEvent) = event.time;
     era.Event.nid(iEvent) = event.nid;
     era.Event.name{iEvent} = event.name;
-    era.Event.ud{iEvent} = event.userdata;
+    if isfield(event, 'userdata')
+        era.Event.ud{iEvent} = event.userdata;
+    end
     
     [~, cs_respwin, idx_respwin] = subrange(event.time + scrWindow_t1, event.time + scrWindow_t2);  %data of response window
 
