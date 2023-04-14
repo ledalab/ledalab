@@ -13,19 +13,26 @@ function [time, conductance, event] = gettextdata(fullpathname)
 %[time, conductance] = textread(fullpathname,'%f\t%f','headerlines',0);
 %event = {};
 
-M = dlmread(fullpathname);
+% M = dlmread(fullpathname);
+% time = table2array(M(:,1));
+% conductance = M(:,2);
 
-time = M(:,1);
-conductance = M(:,2);
+M = readtable(fullpathname);
+time = table2array(M(:,1));
+conductance = table2array(M(:,2));
     
 event = [];
 if size(M,2) > 2
     eventCol = 3;
-    eventIdx = find(M(:,eventCol));
+    evt = table2array(M(:, eventCol));
+    eventIdx = find(~cellfun(@isempty, evt));
+%     eventIdx = find(M(:,eventCol));
+    nid = 1;
     for iEvent = 1:length(eventIdx)
         iEventIdx = eventIdx(iEvent);
         event(iEvent).time = time(iEventIdx);
-        event(iEvent).nid = M(iEventIdx, eventCol);
-        event(iEvent).name = num2str(M(iEventIdx, eventCol));
+        event(iEvent).nid = nid;%M(iEventIdx, eventCol);
+        event(iEvent).name = evt{iEventIdx};
+        nid = nid + 1;
     end
 end
